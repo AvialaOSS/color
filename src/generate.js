@@ -1,5 +1,5 @@
-const colorPalette = require('./palette');
-const colorPaletteDark = require('./palette-dark');
+import colorPalette from './palette.js';
+import colorPaletteDark from './palette-dark.js';
 
 /**
  * @param {string} color
@@ -25,4 +25,4 @@ function generate(color, options = {}) {
   return dark ? colorPaletteDark(color, index, format) : colorPalette(color, index, format);
 }
 
-module.exports = generate;
+export default generate;

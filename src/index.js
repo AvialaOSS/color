@@ -1,8 +1,6 @@
-const generate = require('./generate');
-const { getRgbStr } = require('./utils');
-
-exports.generate = generate;
-exports.getRgbStr = getRgbStr;
+import generate from './generate.js';
+import { getRgbStr } from './utils.js';
+import { extractColorFromImage, extractColorFromFile } from './image-color.js';
 
 const colorList = {
   red: '#F53F3F',
@@ -59,4 +57,4 @@ function getPresetColors() {
   return presetColors;
 }
 
-exports.getPresetColors = getPresetColors;
+export { colorList, getPresetColors, generate, getRgbStr, extractColorFromImage, extractColorFromFile };

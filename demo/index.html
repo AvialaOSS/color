@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>颜色色卡系统</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Aviala Design 色卡系统</h1>
+    <div class="color-input-group">
+      <div class="color-input">
+        <input type="text" id="colorInput" placeholder="请输入颜色值 (例如: #FF0000)" />
+        <button id="generateBtn"><i class="ri-palette-line"></i> 生成色卡</button>
+      </div>
+      <div class="color-input">
+        <div class="file-input-wrapper">
+          <input type="file" id="imageInput" accept="image/*" />
+          <label for="imageInput">选择图片</label>
+        </div>
+        <button id="extractBtn"><i class="ri-image-line"></i> 从图片提取颜色</button>
+      </div>
+    </div>
+    <div id="notification" class="notification"></div>
+    <div id="customColorCard" class="color-card" style="display: none;">
+      <h3>自定义颜色</h3>
+      <div class="variants" id="customColorVariants"></div>
+    </div>
+    <div id="colorPalette"></div>
+  </div>
+
+  <script type="module">
+    // 修改导入路径，使用相对路径
+    import { getPresetColors } from './src/index.js';
+    import generate from './src/generate.js';
+    import { extractColorFromFile } from './src/image-color.js';
+    
+    // 通知功能
+    function showNotification(message, type = 'info') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.style.display = 'block';
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          notification.style.display = 'none';
+          notification.style.opacity = '1';
+        }, 300);
+      }, 2000);
+    }
+
+    // 自定义颜色生成功能
+    const colorInput = document.getElementById('colorInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const customColorCard = document.getElementById('customColorCard');
+    const customColorVariants = document.getElementById('customColorVariants');
+
+    // 生成色卡函数
+    function generateColorPalette(color) {
+      if (!color) return;
+
+      try {
+        const variants = [];
+        // 生成亮色系列
+        const lightColors = generate(color, { list: true });
+        variants.push({
+          type: '亮色',
+          colors: lightColors
+        });
+        // 生成暗色系列
+        const darkColors = generate(color, { list: true, dark: true });
+        variants.push({
+          type: '暗色',
+          colors: darkColors
+        });
+
+        // 渲染结果
+        customColorVariants.innerHTML = variants.map(({ type, colors }) => 
+          `<div class="variant">
+            <h4>${type}</h4>
+            ${colors.map(color => 
+              `<div class="color-block" style="background:${color}" data-color="${color}">
+                <span>${color}</span>
+                <div class="color-tooltip">点击复制</div>
+              </div>`
+            ).join('')}
+          </div>`
+        ).join('');
+
+        customColorCard.style.display = 'block';
+        window.scrollTo({ top: customColorCard.offsetTop - 20, behavior: 'smooth' });
+        showNotification('色卡生成成功！', 'success');
+        
+        // 添加颜色复制功能
+        addCopyFunctionality(customColorCard);
+      } catch (error) {
+        showNotification('生成色卡失败: ' + error.message, 'error');
+      }
+    }
+
+    // 从输入框生成色卡
+    generateBtn.addEventListener('click', () => {
+      const color = colorInput.value.trim();
+      if (!color) {
+        showNotification('请输入有效的颜色值', 'error');
+        return;
+      }
+      generateColorPalette(color);
+    });
+    
+    // 支持回车键生成色卡
+    colorInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const color = colorInput.value.trim();
+        if (color) {
+          generateColorPalette(color);
+        } else {
+          showNotification('请输入有效的颜色值', 'error');
+        }
+      }
+    });
+    
+    // 从图片提取颜色并生成色卡
+    const imageInput = document.getElementById('imageInput');
+    const extractBtn = document.getElementById('extractBtn');
+    
+    // 显示选择的文件名
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (file) {
+        const label = document.querySelector('label[for="imageInput"]');
+        label.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+        label.classList.add('file-selected');
+      }
+    });
+    
+    extractBtn.addEventListener('click', async () => {
+      const file = imageInput.files[0];
+      if (!file) {
+        showNotification('请选择图片文件', 'error');
+        return;
+      }
+      
+      try {
+        extractBtn.disabled = true;
+        extractBtn.innerHTML = '<i class="ri-loader-line ri-spin"></i> 提取中...';
+        showNotification('正在从图片提取颜色...', 'info');
+        
+        // 提取颜色
+        const color = await extractColorFromFile(file);
+        
+        // 更新输入框的值
+        colorInput.value = color;
+        
+        // 生成色卡
+        generateColorPalette(color);
+      } catch (error) {
+        showNotification('提取颜色失败: ' + error.message, 'error');
+      } finally {
+        extractBtn.disabled = false;
+        extractBtn.innerHTML = '<i class="ri-image-line"></i> 从图片提取颜色';
+      }
+    });
+
+    // 添加颜色复制功能
+    function addCopyFunctionality(container) {
+      const colorBlocks = container.querySelectorAll('.color-block');
+      colorBlocks.forEach(block => {
+        block.addEventListener('click', async () => {
+          const color = block.dataset.color || block.querySelector('span').textContent;
+          try {
+            await navigator.clipboard.writeText(color);
+            showNotification(`已复制颜色: ${color}`, 'success');
+          } catch (err) {
+            showNotification('复制失败，请手动复制', 'error');
+          }
+        });
+      });
+    }
+    
+    const palette = document.getElementById('colorPalette');
+    const colors = getPresetColors();
+
+    Object.entries(colors).forEach(([name, variants]) => {
+      const colorCard = document.createElement('div');
+      colorCard.className = 'color-card';
+      
+      colorCard.innerHTML = `
+        <h3>${name}</h3>
+        <div class="variants">
+          ${Object.entries(variants).filter(([type]) => type !== 'primary').map(([type, colorset]) => 
+            `<div class="variant">
+              <h4>${type}</h4>
+              ${colorset.map(color => 
+                `<div class="color-block" style="background:${color}" data-color="${color}">
+                  <span>${color}</span>
+                  <div class="color-tooltip">点击复制</div>
+                </div>`
+              ).join('')}
+            </div>`
+          ).join('')}
+        </div>
+      `;
+      
+      palette.appendChild(colorCard);
+    });
+    
+    // 为所有预设色卡添加复制功能
+    addCopyFunctionality(palette);
+    
+    // 页面加载完成后显示欢迎信息
+    window.addEventListener('load', () => {
+      showNotification('欢迎使用 Aviala Design 色卡系统', 'success');
+    });
+  </script>
+</body>
+</html>

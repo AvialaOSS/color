@@ -1,6 +1,6 @@
-const Color = require('color');
-const colorPalette = require('./palette');
-const { getColorString } = require('./utils');
+import Color from 'color';
+import colorPalette from './palette.js';
+import { getColorString } from './utils.js';
 
 // 暗色色板
 
@@ -49,4 +49,4 @@ function colorPaletteDark(originColor, i, format) {
   return getColorString(retColor, format);
 }
 
-module.exports = colorPaletteDark;
+export default colorPaletteDark;
