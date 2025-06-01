@@ -1,13 +1,15 @@
 # ArcoDesign Color
 
-ArcoDesign Color Utils - 一个强大的颜色处理工具库。
+Aviala Design Color - 一个强大的颜色处理工具库。
 
 ## 功能概述
 
-本库提供两大核心功能：
+本库提供四大核心功能：
 
 1. **色盘生成**：根据给定颜色通过算法生成包含十个颜色的梯度色板，支持亮色模式和暗色模式。
 2. **图片取色**：从图片中提取主色调，可用于生成与图片匹配的调色板或主题色。
+3. **界面色彩系统**：基于主色生成完整的界面色彩系统，包括语义色彩（成功、警告、错误、信息）。
+4. **主题混合**：基于 HCT 色彩空间的高级主题混合功能，支持多种混合模式。
 
 ## 安装
 
@@ -17,7 +19,16 @@ npm install @aviala-design/color```
 ## 基本使用
 
 ```js
-import { generate, getPresetColors, getRgbStr, extractColorFromImage } from '@arco-design/color';
+import { 
+  generate, 
+  getPresetColors, 
+  getRgbStr, 
+  extractColorFromImage,
+  generateInterfaceColorSystem,
+  blendInHct,
+  rgbToHct,
+  hctToRgb
+} from '@aviala-design/color';
 
 // 生成色盘
 const colorPalette = generate('#3491FA', { list: true });
@@ -32,6 +43,17 @@ console.log(arcoblue.primary); // arco蓝的主色
 // 获取RGB字符串
 const rgbStr = getRgbStr('#F53F3F');
 console.log(rgbStr); // 245,63,63
+
+// 生成界面色彩系统
+const colorSystem = generateInterfaceColorSystem('#3491FA');
+console.log(colorSystem.success); // 成功色
+console.log(colorSystem.warning); // 警告色
+console.log(colorSystem.error); // 错误色
+console.log(colorSystem.info); // 信息色
+
+// 主题混合
+const blended = blendInHct([64, 196, 255], [255, 87, 34], 'overlay', 0.5);
+console.log(blended); // 混合后的RGB颜色
 ```
 
 ## API 详解
@@ -171,6 +193,109 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
 });
 ```
 
+### 界面色彩系统功能
+
+#### generateInterfaceColorSystem(primaryColor: string, options?: Object)
+
+基于主色生成完整的界面色彩系统，包括语义色彩。
+
+**参数：**
+- `primaryColor`: string - 主色，支持十六进制格式（如 '#3491FA'）
+- `options`: Object - 可选配置项
+  - `successBase`: string - 自定义成功色基础色，默认为绿色
+  - `warningBase`: string - 自定义警告色基础色，默认为橙色
+  - `errorBase`: string - 自定义错误色基础色，默认为红色
+  - `infoBase`: string - 自定义信息色基础色，默认为蓝色
+
+**返回值：**
+- `Object` - 包含完整色彩系统的对象
+  - `primary`: string[] - 主色色盘（10个颜色）
+  - `success`: string[] - 成功色色盘（10个颜色）
+  - `warning`: string[] - 警告色色盘（10个颜色）
+  - `error`: string[] - 错误色色盘（10个颜色）
+  - `info`: string[] - 信息色色盘（10个颜色）
+
+**示例：**
+
+```js
+// 生成默认界面色彩系统
+const colorSystem = generateInterfaceColorSystem('#3491FA');
+console.log(colorSystem.primary); // 主色色盘
+console.log(colorSystem.success); // 成功色色盘
+console.log(colorSystem.warning); // 警告色色盘
+console.log(colorSystem.error); // 错误色色盘
+console.log(colorSystem.info); // 信息色色盘
+
+// 自定义语义色基础色
+const customColorSystem = generateInterfaceColorSystem('#3491FA', {
+  successBase: '#00C853',
+  warningBase: '#FF9800',
+  errorBase: '#F44336',
+  infoBase: '#2196F3'
+});
+```
+
+### 主题混合功能
+
+#### rgbToHct(rgb: number[])
+
+将 RGB 颜色转换为 HCT 色彩空间。
+
+**参数：**
+- `rgb`: number[] - RGB 颜色数组 [r, g, b]，范围 0-255
+
+**返回值：**
+- `number[]` - HCT 颜色数组 [h, c, t]，色相(0-360)、色度(0-100+)、色调(0-100)
+
+#### hctToRgb(hct: number[])
+
+将 HCT 颜色转换为 RGB 色彩空间。
+
+**参数：**
+- `hct`: number[] - HCT 颜色数组 [h, c, t]
+
+**返回值：**
+- `number[]` - RGB 颜色数组 [r, g, b]，范围 0-255
+
+#### blendInHct(color1: number[], color2: number[], mode: string, ratio: number)
+
+在 HCT 色彩空间中混合两个颜色。
+
+**参数：**
+- `color1`: number[] - 第一个颜色的 RGB 数组
+- `color2`: number[] - 第二个颜色的 RGB 数组
+- `mode`: string - 混合模式，可选值：'multiply'、'screen'、'overlay'、'softLight'
+- `ratio`: number - 混合比例，范围 0-1
+
+**返回值：**
+- `number[]` - 混合后的 RGB 颜色数组
+
+**示例：**
+
+```js
+// RGB 到 HCT 转换
+const hct = rgbToHct([64, 196, 255]);
+console.log(hct); // [200, 45, 80]
+
+// HCT 到 RGB 转换
+const rgb = hctToRgb([200, 45, 80]);
+console.log(rgb); // [64, 196, 255]
+
+// 颜色混合
+const blended = blendInHct(
+  [64, 196, 255],  // 蓝色
+  [255, 87, 34],   // 橙色
+  'overlay',       // 叠加模式
+  0.5              // 50% 混合
+);
+console.log(blended); // 混合后的颜色
+
+// 不同混合模式示例
+const multiply = blendInHct([255, 0, 0], [0, 255, 0], 'multiply', 0.5);
+const screen = blendInHct([255, 0, 0], [0, 255, 0], 'screen', 0.5);
+const softLight = blendInHct([255, 0, 0], [0, 255, 0], 'softLight', 0.5);
+```
+
 ## 实现原理
 
 ### 色盘生成算法
@@ -190,3 +315,42 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
 2. **像素量化**：将RGB颜色空间从256^3种可能的颜色减少到16^3种
 3. **颜色频率统计**：统计每种颜色的出现频率
 4. **主色调提取**：过滤掉灰色和接近白色/黑色的颜色，选择出现频率最高的颜色
+
+### 界面色彩系统算法
+
+界面色彩系统基于色彩理论和无障碍访问性原则：
+
+1. **语义色彩映射**：将功能语义（成功、警告、错误、信息）映射到合适的色相区域
+2. **色彩调和**：确保生成的语义色彩与主色形成和谐的色彩关系
+3. **对比度优化**：自动调整颜色的明度以满足 WCAG 无障碍访问标准
+4. **一致性保证**：所有语义色彩使用相同的饱和度和明度调整算法
+
+### 主题混合算法
+
+主题混合功能基于 Material Design 3 的 HCT 色彩空间：
+
+1. **HCT 色彩空间**：使用色相(Hue)、色度(Chroma)、色调(Tone)三个维度描述颜色
+2. **感知均匀性**：HCT 空间在视觉感知上更加均匀，混合结果更自然
+3. **多种混合模式**：
+   - **multiply**: 相乘混合，产生更深的颜色
+   - **screen**: 屏幕混合，产生更亮的颜色
+   - **overlay**: 叠加混合，结合相乘和屏幕的效果
+   - **softLight**: 柔光混合，产生柔和的混合效果
+4. **比例控制**：支持精确的混合比例控制，实现渐进式颜色过渡
+
+## 版本历史
+
+### v0.2.0 (最新)
+- ✨ 新增界面色彩系统功能
+- ✨ 新增基于 HCT 色彩空间的主题混合功能
+- 📚 完善 API 文档和使用示例
+- 🔧 优化代码结构和性能
+
+### v0.1.1
+- 🐛 修复色盘生成的边界情况
+- 📚 更新文档和示例
+
+### v0.1.0
+- 🎉 初始版本发布
+- ✨ 色盘生成功能
+- ✨ 图片取色功能
