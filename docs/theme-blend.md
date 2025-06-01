@@ -268,6 +268,37 @@ const fullColorSystem = generateInterfaceColorSystem('#165DFF', {
   controlBlendRatio: 0.08,
   semanticBlendRatio: 0.12
 });
+
+// 自定义语义色基准色
+const customSemanticSystem = generateInterfaceColorSystem('#165DFF', {
+  semanticColors: {
+    success: '#00b96b',    // 自定义成功色
+    warning: '#faad14',    // 保持默认警告色
+    error: '#ff7875',      // 自定义错误色
+    info: '#40a9ff'        // 自定义信息色
+  }
+});
+
+// 品牌定制示例
+const brandColorSystem = generateInterfaceColorSystem('#6366f1', {
+  semanticColors: {
+    success: '#10b981',    // 品牌绿色
+    warning: '#f59e0b',    // 品牌橙色
+    error: '#ef4444',      // 品牌红色
+    info: '#3b82f6'        // 品牌蓝色
+  },
+  semanticBlendRatio: 0.15  // 增强主题色影响
+});
+
+// 部分自定义（只修改需要的颜色）
+const partialCustomSystem = generateInterfaceColorSystem('#165DFF', {
+  semanticColors: {
+    success: '#52c41a',    // 默认
+    warning: '#ff8c00',    // 仅自定义警告色
+    error: '#ff4d4f',      // 默认
+    info: '#1890ff'        // 默认
+  }
+});
 ```
 
 ### 12. generateThemePalette - 完整主题色板
@@ -403,7 +434,39 @@ const cssVariables = {
 };
 ```
 
-### 2. 品牌色系统
+### 2. 界面工具中的语义色配置
+
+在提供的界面工具中，用户可以通过可视化界面自定义语义色基准色：
+
+**使用步骤：**
+1. 选择"界面色彩系统"模式
+2. 在弹出的配置面板中输入自定义语义色：
+   - 成功色 (success) - 默认: `#52c41a`
+   - 警告色 (warning) - 默认: `#faad14`
+   - 错误色 (error) - 默认: `#ff4d4f`
+   - 信息色 (info) - 默认: `#1890ff`
+3. 点击"生成主题混合"或按回车键
+4. 系统将生成包含自定义语义色的完整界面色彩系统
+
+**配置特性：**
+- 支持部分自定义：只需填写要修改的颜色，其他保持默认
+- 智能显示：只有选择界面色彩系统时才显示配置面板
+- 便捷操作：所有输入框都支持回车键快速生成
+- 实时预览：生成的颜色立即显示在界面中
+
+```javascript
+// 界面工具生成的代码示例
+const customColorSystem = generateInterfaceColorSystem('#165DFF', {
+  semanticColors: {
+    success: '#00b96b',    // 用户自定义的成功色
+    warning: '#faad14',    // 保持默认
+    error: '#ff7875',      // 用户自定义的错误色
+    info: '#1890ff'        // 保持默认
+  }
+});
+```
+
+### 3. 品牌色系统
 
 ```javascript
 // 基于品牌主色生成完整色彩系统

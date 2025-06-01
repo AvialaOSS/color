@@ -54,6 +54,18 @@
         </select>
         <input type="range" id="blendRatio" min="0" max="1" step="0.05" value="0.15" />
         <span id="blendRatioValue">15%</span>
+        
+        <!-- 界面色彩系统专用配置 -->
+        <div id="interfaceSystemConfig" style="display: none; margin-top: 10px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: #f9f9f9;">
+          <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #666;">语义色基准色配置</h4>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            <input type="text" id="successColor" placeholder="成功色 (默认: #52c41a)" />
+            <input type="text" id="warningColor" placeholder="警告色 (默认: #faad14)" />
+            <input type="text" id="errorColor" placeholder="错误色 (默认: #ff4d4f)" />
+            <input type="text" id="infoColor" placeholder="信息色 (默认: #1890ff)" />
+          </div>
+        </div>
+        
         <button id="generateThemeBtn"><i class="ri-brush-line"></i> 生成主题混合</button>
       </div>
     </div>
@@ -326,6 +338,20 @@
     const targetColorInput = document.getElementById('targetColorInput');
     const blendMode = document.getElementById('blendMode');
     const blendRatio = document.getElementById('blendRatio');
+    const interfaceSystemConfig = document.getElementById('interfaceSystemConfig');
+    const successColor = document.getElementById('successColor');
+    const warningColor = document.getElementById('warningColor');
+    const errorColor = document.getElementById('errorColor');
+    const infoColor = document.getElementById('infoColor');
+    
+    // 监听混合模式变化，显示/隐藏界面色彩系统配置
+    blendMode.addEventListener('change', () => {
+      if (blendMode.value === 'interface-system') {
+        interfaceSystemConfig.style.display = 'block';
+      } else {
+        interfaceSystemConfig.style.display = 'none';
+      }
+    });
     const blendRatioValue = document.getElementById('blendRatioValue');
     const generateThemeBtn = document.getElementById('generateThemeBtn');
 
@@ -357,13 +383,16 @@
         // 处理对象结果（完整色板）
         let html = '';
         
-        if (result.theme) {
+        // 检查是否是单个主题色（字符串）而不是界面色彩系统的主题色对象
+        if (result.theme && typeof result.theme === 'string') {
           html += `
             <div class="variant">
               <h4>主题色</h4>
-              <div class="color-block" style="background:${result.theme}" data-color="${result.theme}">
-                <span>${result.theme}</span>
-                <div class="color-tooltip">点击复制</div>
+              <div class="color-grid">
+                <div class="color-block" style="background:${result.theme}" data-color="${result.theme}">
+                  <span>${result.theme}</span>
+                  <div class="color-tooltip">点击复制</div>
+                </div>
               </div>
             </div>
           `;
@@ -373,12 +402,14 @@
           html += `
             <div class="variant">
               <h4>主题变体</h4>
-              ${result.variants.map(color => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
+              <div class="color-grid">
+                ${result.variants.map(color => 
+                  `<div class="color-block" style="background:${color}" data-color="${color}">
+                    <span>${color}</span>
+                    <div class="color-tooltip">点击复制</div>
+                  </div>`
+                ).join('')}
+              </div>
             </div>
           `;
         }
@@ -387,69 +418,67 @@
           html += `
             <div class="variant">
               <h4>语义色彩</h4>
-              ${Object.entries(result.semantic).map(([name, color]) => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${name}: ${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
+              <div class="color-grid">
+                ${Object.entries(result.semantic).map(([name, color]) => 
+                  `<div class="color-block" style="background:${color}" data-color="${color}">
+                    <span>${name}: ${color}</span>
+                    <div class="color-tooltip">点击复制</div>
+                  </div>`
+                ).join('')}
+              </div>
             </div>
           `;
         }
         
-        if (result.ui) {
-          html += `
-            <div class="variant">
-              <h4>界面色彩</h4>
-              ${Object.entries(result.ui).map(([name, color]) => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${name}: ${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
-            </div>
-          `;
-        }
+        // result.ui 已经不再使用，界面色彩系统使用 controls, semantic, theme 三个部分
         
         // 处理界面色彩系统的结果
         if (result.controls) {
           html += `
             <div class="variant">
               <h4>基础控件颜色 (灰色系1-12)</h4>
-              ${Object.entries(result.controls).map(([name, color]) => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${name}: ${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
+              <div class="color-grid">
+                ${Object.entries(result.controls).map(([name, color]) => 
+                  `<div class="color-block" style="background:${color}" data-color="${color}">
+                    <span>${name}: ${color}</span>
+                    <div class="color-tooltip">点击复制</div>
+                  </div>`
+                ).join('')}
+              </div>
             </div>
           `;
         }
         
+        // 检查是否是界面色彩系统的语义色（包含多个颜色变体）
         if (result.semantic && typeof result.semantic === 'object' && Object.keys(result.semantic).length > 4) {
           html += `
             <div class="variant">
-              <h4>表意色 (1-10)</h4>
-              ${Object.entries(result.semantic).map(([name, color]) => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${name}: ${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
+              <h4>表意色 (success/warning/error/info 各1-10)</h4>
+              <div class="color-grid">
+                ${Object.entries(result.semantic).map(([name, color]) => 
+                  `<div class="color-block" style="background:${color}" data-color="${color}">
+                    <span>${name}: ${color}</span>
+                    <div class="color-tooltip">点击复制</div>
+                  </div>`
+                ).join('')}
+              </div>
             </div>
           `;
         }
         
-        if (result.theme && typeof result.theme === 'object') {
+        // 检查是否是界面色彩系统的主题色（包含多个颜色变体）
+        if (result.theme && typeof result.theme === 'object' && Object.keys(result.theme).length > 1) {
           html += `
             <div class="variant">
-              <h4>主题色 (1-10)</h4>
-              ${Object.entries(result.theme).map(([name, color]) => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${name}: ${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
+              <h4>主题色 (theme-1 到 theme-10)</h4>
+              <div class="color-grid">
+                ${Object.entries(result.theme).map(([name, color]) => 
+                  `<div class="color-block" style="background:${color}" data-color="${color}">
+                    <span>${name}: ${color}</span>
+                    <div class="color-tooltip">点击复制</div>
+                  </div>`
+                ).join('')}
+              </div>
             </div>
           `;
         }
@@ -460,9 +489,11 @@
         customColorVariants.innerHTML = `
           <div class="variant">
             <h4>${title}</h4>
-            <div class="color-block" style="background:${result}" data-color="${result}">
-              <span>${result}</span>
-              <div class="color-tooltip">点击复制</div>
+            <div class="color-grid">
+              <div class="color-block" style="background:${result}" data-color="${result}">
+                <span>${result}</span>
+                <div class="color-tooltip">点击复制</div>
+              </div>
             </div>
           </div>
         `;
@@ -525,9 +556,27 @@
           case 'interface-system':
             const baseGray = '#666666'; // 默认基准灰色
             const isDark = false; // 默认亮色模式
+            
+            // 获取用户自定义的语义色基准色
+            const customSemanticColors = {};
+            if (successColor.value.trim()) customSemanticColors.success = successColor.value.trim();
+            if (warningColor.value.trim()) customSemanticColors.warning = warningColor.value.trim();
+            if (errorColor.value.trim()) customSemanticColors.error = errorColor.value.trim();
+            if (infoColor.value.trim()) customSemanticColors.info = infoColor.value.trim();
+            
+            // 如果用户没有输入任何自定义颜色，使用默认值
+            const semanticColors = Object.keys(customSemanticColors).length > 0 ? {
+              success: '#52c41a',
+              warning: '#faad14', 
+              error: '#ff4d4f',
+              info: '#1890ff',
+              ...customSemanticColors
+            } : undefined;
+            
             result = generateInterfaceColorSystem(themeColor, {
               baseGray,
-              isDark
+              isDark,
+              semanticColors
             });
             title = '界面色彩系统';
             break;
@@ -545,7 +594,7 @@
     });
 
     // 支持回车键生成主题混合
-    [themeColorInput, targetColorInput].forEach(input => {
+    [themeColorInput, targetColorInput, successColor, warningColor, errorColor, infoColor].forEach(input => {
       input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
           generateThemeBtn.click();

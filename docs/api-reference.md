@@ -563,6 +563,86 @@ const uiColors = {
 const blended = blendUIColors('#165DFF', uiColors, 0.05);
 ```
 
+### generateInterfaceColorSystem
+
+生成完整的界面色彩系统，包含控件色、语义色和主题色。
+
+```typescript
+function generateInterfaceColorSystem(
+  themeColor: string, 
+  options?: InterfaceColorSystemOptions
+): InterfaceColorSystem
+```
+
+**参数：**
+- `themeColor`: string - 主题色
+- `options`: InterfaceColorSystemOptions - 可选配置
+
+**InterfaceColorSystemOptions 接口：**
+```typescript
+interface InterfaceColorSystemOptions {
+  baseGray?: string;              // 基础灰色，默认 '#666666'
+  isDark?: boolean;               // 是否为暗色模式，默认 false
+  semanticColors?: Record<string, string>; // 自定义语义色
+  controlBlendRatio?: number;     // 控件色混合比例，默认 0.08
+  semanticBlendRatio?: number;    // 语义色混合比例，默认 0.12
+}
+```
+
+**返回值：**
+- `InterfaceColorSystem` - 界面色彩系统对象
+
+**InterfaceColorSystem 接口：**
+```typescript
+interface InterfaceColorSystem {
+  controls: Record<string, string>;  // 控件色 (gray-1 到 gray-12)
+  semantic: Record<string, string>;  // 语义色 (success-1 到 success-10, warning-1 到 warning-10, 等)
+  theme: Record<string, string>;     // 主题色 (theme-1 到 theme-10)
+}
+```
+
+**示例：**
+```javascript
+import { generateInterfaceColorSystem } from '@aviala-design/color';
+
+// 基础用法
+const colorSystem = generateInterfaceColorSystem('#165DFF');
+
+// 自定义语义色
+const customSystem = generateInterfaceColorSystem('#165DFF', {
+  semanticColors: {
+    success: '#00b96b',
+    warning: '#faad14',
+    error: '#ff7875',
+    info: '#1890ff'
+  },
+  isDark: false
+});
+
+console.log(customSystem);
+/*
+{
+  controls: {
+    'gray-1': '#ffffff',
+    'gray-2': '#fafafa',
+    // ... gray-3 到 gray-12
+  },
+  semantic: {
+    'success-1': '#f6ffed',
+    'success-2': '#d9f7be',
+    // ... success-3 到 success-10
+    'warning-1': '#fffbe6',
+    // ... 其他语义色
+  },
+  theme: {
+    'theme-1': '#f0f5ff',
+    'theme-2': '#d6e4ff',
+    // ... theme-3 到 theme-10
+  }
+}
+*/
+```
+
 ### generateThemePalette
 
 生成完整的主题色板。
@@ -668,6 +748,22 @@ interface ThemePalette {
   variants?: string[];                     // 主题变体
   semantic: Record<string, string>;       // 语义色
   ui: Record<string, string>;             // 界面色
+}
+
+// 界面色彩系统选项
+interface InterfaceColorSystemOptions {
+  baseGray?: string;                       // 基础灰色，默认 '#666666'
+  isDark?: boolean;                        // 是否为暗色模式，默认 false
+  semanticColors?: Record<string, string>; // 自定义语义色
+  controlBlendRatio?: number;              // 控件色混合比例，默认 0.08
+  semanticBlendRatio?: number;             // 语义色混合比例，默认 0.12
+}
+
+// 界面色彩系统结果
+interface InterfaceColorSystem {
+  controls: Record<string, string>;       // 控件色 (gray-1 到 gray-12)
+  semantic: Record<string, string>;       // 语义色 (success-1 到 success-10, warning-1 到 warning-10, 等)
+  theme: Record<string, string>;          // 主题色 (theme-1 到 theme-10)
 }
 ```
 
