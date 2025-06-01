@@ -21,7 +21,7 @@ export function getColorString(color, format) {
   const innerFormat = getFormat(format);
 
   if (innerFormat === 'hex') {
-    return color[innerFormat]();
+    return color[innerFormat]().toLowerCase();
   }
   return color[innerFormat]().round().string();
 }
