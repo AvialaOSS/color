@@ -1,6 +1,21 @@
 import generate from './generate.js';
 import { getRgbStr } from './utils.js';
 import { extractColorFromImage, extractColorFromFile } from './image-color.js';
+import { generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL } from './linear.js';
+import { 
+  rgbToHct,
+  hctToRgb,
+  blendInHct,
+  harmonizeColor,
+  generateThemeVariants,
+  blendSemanticColors,
+  blendUIColors,
+  generateThemePalette,
+  generateControlColors,
+  generateSemanticColors,
+  generateThemeColors,
+  generateInterfaceColorSystem
+} from './theme-blend.js';
 
 const colorList = {
   red: '#F53F3F',
@@ -57,4 +72,27 @@ function getPresetColors() {
   return presetColors;
 }
 
-export { colorList, getPresetColors, generate, getRgbStr, extractColorFromImage, extractColorFromFile };
+export { 
+  colorList, 
+  getPresetColors, 
+  generate, 
+  getRgbStr, 
+  extractColorFromImage, 
+  extractColorFromFile,
+  generateLinear,
+  generateGrayLinear,
+  generateMonochromeLinear,
+  generateLinearHSL,
+  rgbToHct,
+  hctToRgb,
+  blendInHct,
+  harmonizeColor,
+  generateThemeVariants,
+  blendSemanticColors,
+  blendUIColors,
+  generateThemePalette,
+  generateControlColors,
+  generateSemanticColors,
+  generateThemeColors,
+  generateInterfaceColorSystem
+};

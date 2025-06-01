@@ -113,52 +113,87 @@ h1 {
 
 .variant {
   flex: 1;
+  min-width: 0;
 }
 
 .variant h4 {
   margin-top: 0;
   margin-bottom: 15px;
-  font-weight: 500;
-  color: #4e5969;
-  font-size: 15px;
+  font-weight: 600;
+  color: #1d2129;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #f2f3f5;
+  padding-bottom: 8px;
+}
+
+/* 界面色彩特殊样式 */
+.variant:has(h4:contains("界面色彩")) .color-block {
+  height: 50px;
+  margin-bottom: 6px;
+}
+
+.variant:has(h4:contains("界面色彩")) .color-block span {
+  font-size: 10px;
+  padding: 4px 8px;
 }
 
 .color-block {
   position: relative;
   height: 60px;
-  margin-bottom: 10px;
-  border-radius: 6px;
+  margin-bottom: 8px;
+  border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .color-block:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  border-color: rgba(0,0,0,0.12);
 }
 
 .color-block span {
-  background: rgba(255,255,255,0.9);
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  opacity: 0.9;
-  transition: all 0.2s ease;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(4px);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  opacity: 0;
+  transition: all 0.3s ease;
+  color: #333;
+  border: 1px solid rgba(255,255,255,0.3);
+  max-width: 90%;
+  text-align: center;
+  word-break: break-all;
 }
 
 .color-block:hover span {
   opacity: 1;
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 /* 自定义色卡样式 */
 #customColorCard {
   border-top: 3px solid #165DFF;
+}
+
+/* 线性渐变色卡样式 */
+#linearColorCard {
+  border-top: 3px solid #722ED1;
+}
+
+#linearColorCard h3 {
+  border-left-color: #722ED1;
 }
 
 /* 文件上传样式 */
@@ -289,4 +324,71 @@ button:disabled {
   background: #86909c;
   cursor: not-allowed;
   animation: pulse 1.5s infinite;
+}
+
+/* 主题混合功能样式 */
+.theme-blend {
+  background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  padding: 15px;
+  position: relative;
+}
+
+.theme-blend::before {
+  content: '🎨';
+  position: absolute;
+  top: -8px;
+  left: 15px;
+  background: white;
+  padding: 0 8px;
+  font-size: 16px;
+}
+
+.theme-blend input[type="range"] {
+  flex: 1;
+  margin: 0 10px;
+  accent-color: #165DFF;
+}
+
+.theme-blend #blendRatioValue {
+  min-width: 40px;
+  text-align: center;
+  font-weight: 600;
+  color: #165DFF;
+  background: rgba(22, 93, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.theme-blend select {
+  padding: 8px 12px;
+  border: 1px solid #e5e6eb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  min-width: 120px;
+}
+
+.theme-blend button {
+  background: linear-gradient(135deg, #165DFF 0%, #0E42D2 100%);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(22, 93, 255, 0.3);
+}
+
+.theme-blend button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 93, 255, 0.4);
+}
+
+.theme-blend button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(22, 93, 255, 0.3);
 }
