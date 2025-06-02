@@ -125,6 +125,41 @@ fileInput.addEventListener('change', async (event) => {
 });
 ```
 
+### 5. 主题混合与品牌定制
+
+使用HCT色彩空间进行高级主题混合：
+
+```javascript
+import { generateThemePalette, generateInterfaceColorSystem } from '@aviala-design/color';
+
+// 生成完整的主题色盘
+const themePalette = generateThemePalette('#3491FA', {
+  semanticColors: {
+    success: '#00C853',
+    warning: '#FF9800',
+    error: '#F44336'
+  },
+  semanticBlendRatio: 0.1 // 10%的品牌色影响
+});
+
+console.log('控制色系:', themePalette.control);
+console.log('语义色系:', themePalette.semantic);
+console.log('主题色变体:', themePalette.theme);
+
+// 生成界面色彩系统
+const interfaceColors = generateInterfaceColorSystem('#3491FA', {
+  semanticColors: {
+    success: '#00C853',
+    warning: '#FF9800',
+    error: '#F44336'
+  },
+  semanticBlendRatio: 0.08,
+  controlBlendRatio: 0.05
+});
+
+console.log('完整界面色彩系统:', interfaceColors);
+```
+
 ## 常见使用场景
 
 ### 场景1：设计系统色盘

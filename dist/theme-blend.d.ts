@@ -1,32 +1,4 @@
 /**
- * 生成基础控件颜色（灰色系1-12）
- * @param {string} themeColor - 主题颜色
- * @param {Object} options - 配置选项
- * @returns {Object} 基础控件颜色对象
- */
-export function generateControlColors(themeColor: string, options?: Object): Object;
-/**
- * 生成表意色（1-10）
- * @param {string} themeColor - 主题颜色
- * @param {Object} options - 配置选项
- * @returns {Object} 表意色对象
- */
-export function generateSemanticColors(themeColor: string, options?: Object): Object;
-/**
- * 生成主题色（1-10）
- * @param {string} themeColor - 主题颜色
- * @param {Object} options - 配置选项
- * @returns {Object} 主题色对象
- */
-export function generateThemeColors(themeColor: string, options?: Object): Object;
-/**
- * 生成完整的界面色彩系统
- * @param {string} themeColor - 主题颜色
- * @param {Object} options - 配置选项
- * @returns {Object} 包含三个部分的完整色彩系统
- */
-export function generateInterfaceColorSystem(themeColor: string, options?: Object): Object;
-/**
  * 主题色混合模块
  * 基于 Material Design 3 的 HCT 颜色空间实现颜色混合和调和
  *
@@ -72,14 +44,6 @@ export function harmonizeColor(themeColor: string, targetColor: string, harmoniz
  */
 export function generateThemeVariants(themeColor: string, options?: Object | any[]): any[];
 /**
- * 表意色混合 - 为成功、警告、错误等状态色添加主题色调
- * @param {string} themeColor - 主题色
- * @param {Object} semanticColors - 表意色对象，如 {success: '#4caf50', warning: '#ff9800', error: '#f44336'}
- * @param {number} blendRatio - 混合强度
- * @returns {Object} 混合后的表意色对象
- */
-export function blendSemanticColors(themeColor: string, semanticColors: Object, blendRatio?: number): Object;
-/**
  * UI 元素颜色混合 - 为按钮、卡片等 UI 元素生成主题化颜色
  * @param {string} themeColor - 主题色
  * @param {Object} uiColors - UI 颜色对象
@@ -87,6 +51,34 @@ export function blendSemanticColors(themeColor: string, semanticColors: Object, 
  * @returns {Object} 混合后的 UI 颜色对象
  */
 export function blendUIColors(themeColor: string, uiColors: Object, blendRatio?: number): Object;
+/**
+ * 生成基础控件颜色（灰色系1-12）
+ * @param {string} themeColor - 主题颜色
+ * @param {Object} options - 配置选项
+ * @returns {Object} 基础控件颜色对象
+ */
+export function generateControlColors(themeColor: string, options?: Object): Object;
+/**
+ * 生成表意色（1-10）
+ * @param {string} themeColor - 主题颜色
+ * @param {Object} options - 配置选项
+ * @returns {Object} 表意色对象
+ */
+export function generateSemanticColors(themeColor: string, options?: Object): Object;
+/**
+ * 生成主题色（1-10）
+ * @param {string} themeColor - 主题颜色
+ * @param {Object} options - 配置选项
+ * @returns {Object} 主题色对象
+ */
+export function generateThemeColors(themeColor: string, options?: Object): Object;
+/**
+ * 生成完整的界面色彩系统
+ * @param {string} themeColor - 主题颜色
+ * @param {Object} options - 配置选项
+ * @returns {Object} 包含三个部分的完整色彩系统
+ */
+export function generateInterfaceColorSystem(themeColor: string, options?: Object): Object;
 /**
  * 生成完整的主题色板
  * @param {string} themeColor - 主题色

@@ -4,7 +4,6 @@ const {
   blendInHct,
   harmonizeColor,
   generateThemeVariants,
-  blendSemanticColors,
   blendUIColors,
   generateThemePalette,
   generateControlColors,
@@ -57,22 +56,7 @@ describe('Theme Blend Functions', () => {
     });
   });
   
-  test('blendSemanticColors should blend semantic colors', () => {
-    const semanticColors = {
-      success: '#4caf50',
-      warning: '#ff9800',
-      error: '#f44336'
-    };
-    
-    const blended = blendSemanticColors(testThemeColor, semanticColors, 0.15);
-    expect(blended).toHaveProperty('success');
-    expect(blended).toHaveProperty('warning');
-    expect(blended).toHaveProperty('error');
-    
-    Object.values(blended).forEach(color => {
-      expect(color).toMatch(/^#[0-9a-f]{6}$/i);
-    });
-  });
+
   
   test('blendUIColors should blend UI colors', () => {
     const uiColors = {

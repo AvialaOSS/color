@@ -2,7 +2,7 @@ import { default as generate } from './generate.js';
 import { getRgbStr } from './utils.js';
 import { extractColorFromImage, extractColorFromFile } from './image-color.js';
 import { generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL } from './linear.js';
-import { rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendSemanticColors, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem } from './theme-blend.js';
+import { rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem } from './theme-blend.js';
 export namespace colorList {
     let red: string;
     let orangered: string;
@@ -25,4 +25,4 @@ export function getPresetColors(): {
         primary: string;
     };
 };
-export { generate, getRgbStr, extractColorFromImage, extractColorFromFile, generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL, rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendSemanticColors, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem };
+export { generate, getRgbStr, extractColorFromImage, extractColorFromFile, generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL, rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem };

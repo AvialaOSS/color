@@ -2,14 +2,59 @@
 
 主题混合功能参考了 Material Design 3 的 HCT 色彩空间，提供了强大的颜色调和与混合能力，特别适用于品牌色系统和主题定制。
 
+> **💡 提示**：主题混合功能基于感知均匀的 HCT 色彩空间，能够生成更自然、协调的颜色组合，特别适合构建一致性强的设计系统。
+
 ## 功能概述
 
 ### 核心特性
 
 - **HCT 色彩空间**：基于人眼感知的色彩空间，提供更自然的颜色过渡
-- **四种混合模式**：调和、混合、变体生成、完整色板
-- **智能色彩调和**：自动生成协调的颜色搭配
+- **智能色彩调和**：自动生成协调的颜色搭配，保持品牌一致性
+- **完整色彩系统**：一键生成包含控件色、语义色、主题色的完整界面色彩系统
+- **暗色模式支持**：自动适配亮色和暗色两种模式
 - **无障碍友好**：确保生成的颜色符合对比度要求
+- **高度可定制**：支持自定义语义色、混合比例等参数
+
+### 适用场景
+
+- **设计系统构建**：为组件库和设计系统生成一致的色彩规范
+- **品牌色彩定制**：基于品牌主色生成完整的色彩体系
+- **主题切换**：支持多主题和暗色模式的应用
+- **界面色彩优化**：提升界面色彩的协调性和视觉层次
+
+## 快速开始
+
+### 基础用法
+
+```javascript
+import { generateInterfaceColorSystem } from '@aviala-design/color';
+
+// 生成完整的界面色彩系统
+const colorSystem = generateInterfaceColorSystem('#165DFF');
+
+console.log(colorSystem);
+/*
+输出:
+{
+  controls: { 'gray-1': '#f8f9fa', 'gray-2': '#f1f3f4', ... },
+  semantic: { 'success-1': '#f6ffed', 'error-1': '#fff2f0', ... },
+  theme: { 'theme-1': '#f0f5ff', 'theme-6': '#165DFF', ... }
+}
+*/
+```
+
+### 自定义配置
+
+```javascript
+// 自定义语义色和混合比例
+const customSystem = generateInterfaceColorSystem('#165DFF', {
+  semanticColors: {
+    success: '#00b96b',
+    error: '#ff7875'
+  },
+  semanticBlendRatio: 0.15
+});
+```
 
 ## API 说明
 
@@ -84,26 +129,7 @@ const customVariants = generateThemeVariants('#165DFF', {
 });
 ```
 
-### 6. blendSemanticColors - 语义色混合
-
-将主题色混合到语义色中，保持品牌一致性。
-
-```javascript
-import { blendSemanticColors } from '@aviala-design/color';
-
-const semanticColors = {
-  success: '#00B42A',
-  warning: '#FF7D00',
-  error: '#F53F3F',
-  info: '#165DFF'
-};
-
-const blended = blendSemanticColors('#165DFF', semanticColors, 0.15);
-console.log(blended);
-// 输出调和后的语义色
-```
-
-### 7. blendUIColors - 界面色混合
+### 6. blendUIColors - 界面色混合
 
 将主题色混合到界面色中，创建统一的视觉风格。
 
@@ -150,7 +176,7 @@ const customControls = generateControlColors('#165DFF', {
 });
 ```
 
-### 9. generateSemanticColors - 表意色生成
+### 7. generateSemanticColors - 表意色生成
 
 生成表意色（1-10），为成功、警告、错误等状态提供完整的色阶。
 
@@ -192,7 +218,7 @@ const customSemantic = generateSemanticColors('#165DFF', {
 });
 ```
 
-### 10. generateThemeColors - 主题色生成
+### 8. generateThemeColors - 主题色生成
 
 生成主题色（1-10），提供主题色的完整明度变化。
 
@@ -226,8 +252,30 @@ const darkThemeColors = generateThemeColors('#165DFF', {
 
 ### 11. generateInterfaceColorSystem - 完整界面色彩系统
 
-生成包含控件色、表意色、主题色的完整界面色彩系统。
+生成包含控件色、表意色、主题色的完整界面色彩系统。这是最常用的函数，能够一次性生成设计系统所需的所有颜色。
 
+**函数签名：**
+```typescript
+function generateInterfaceColorSystem(
+  themeColor: string,
+  options?: InterfaceColorSystemOptions
+): InterfaceColorSystem
+```
+
+**参数说明：**
+- `themeColor`: string - 主题色（十六进制格式）
+- `options`: InterfaceColorSystemOptions - 可选配置项
+
+**返回值结构：**
+```typescript
+interface InterfaceColorSystem {
+  controls: Record<string, string>;  // 控件色：gray-1 到 gray-12
+  semantic: Record<string, string>;  // 语义色：success-1 到 success-10, warning-1 到 warning-10, 等
+  theme: Record<string, string>;     // 主题色：theme-1 到 theme-10
+}
+```
+
+**基础用法：**
 ```javascript
 import { generateInterfaceColorSystem } from '@aviala-design/color';
 
@@ -238,35 +286,39 @@ console.log(colorSystem);
 输出:
 {
   controls: {
-    'gray-1': '#f8f9fa',
+    'gray-1': '#f8f9fa',    // 最浅的控件色
     'gray-2': '#f1f3f4',
-    // ... gray-3 到 gray-12
+    'gray-6': '#666666',    // 中等控件色
+    'gray-12': '#1a1a1a'    // 最深的控件色
   },
   semantic: {
-    'success-1': '#f6ffed',
-    'success-2': '#d9f7be',
-    // ... 所有表意色变体
+    'success-1': '#f6ffed', // 最浅的成功色
+    'success-6': '#52c41a', // 标准成功色
+    'success-10': '#135200', // 最深的成功色
+    'error-1': '#fff2f0',   // 最浅的错误色
+    'error-6': '#ff4d4f',   // 标准错误色
+    // ... 其他语义色变体
   },
   theme: {
-    'theme-1': '#f0f5ff',
-    'theme-2': '#d6e4ff',
-    // ... theme-3 到 theme-10
+    'theme-1': '#f0f5ff',   // 最浅的主题色
+    'theme-6': '#165DFF',   // 标准主题色
+    'theme-10': '#030852'   // 最深的主题色
   }
 }
 */
 
 // 完整配置
 const fullColorSystem = generateInterfaceColorSystem('#165DFF', {
-  baseGray: '#666666',
-  isDark: false,
+  baseGray: '#666666',        // 自定义基础灰色
+  isDark: false,              // 亮色模式
   semanticColors: {
-    success: '#52c41a',
-    warning: '#faad14',
-    error: '#ff4d4f',
-    info: '#1890ff'
+    success: '#52c41a',       // 自定义成功色
+    warning: '#faad14',       // 自定义警告色
+    error: '#ff4d4f',         // 自定义错误色
+    info: '#1890ff'           // 自定义信息色
   },
-  controlBlendRatio: 0.08,
-  semanticBlendRatio: 0.12
+  controlBlendRatio: 0.08,    // 控件色混合比例
+  semanticBlendRatio: 0.12    // 语义色混合比例
 });
 
 // 自定义语义色基准色
@@ -402,7 +454,11 @@ interface ThemePaletteOptions {
 
 ### 1. 完整界面色彩系统
 
+**React 组件库集成示例：**
+
 ```javascript
+import { generateInterfaceColorSystem } from '@aviala-design/color';
+
 // 生成完整的界面色彩系统
 const colorSystem = generateInterfaceColorSystem('#1890FF', {
   isDark: false,
@@ -413,6 +469,32 @@ const colorSystem = generateInterfaceColorSystem('#1890FF', {
     info: '#1890ff'
   }
 });
+
+// 转换为设计令牌
+const designTokens = {
+  colors: {
+    // 主题色
+    primary: {
+      50: colorSystem.theme['theme-1'],
+      100: colorSystem.theme['theme-2'],
+      500: colorSystem.theme['theme-6'],  // 主色
+      900: colorSystem.theme['theme-10']
+    },
+    // 中性色
+    gray: {
+      50: colorSystem.controls['gray-1'],
+      100: colorSystem.controls['gray-2'],
+      500: colorSystem.controls['gray-6'],
+      900: colorSystem.controls['gray-12']
+    },
+    // 语义色
+    success: {
+      50: colorSystem.semantic['success-1'],
+      500: colorSystem.semantic['success-6'],
+      900: colorSystem.semantic['success-10']
+    }
+  }
+};
 
 // 应用到CSS变量
 const cssVariables = {
@@ -698,6 +780,8 @@ function blendHCT(color1, color2, ratio) {
 - **功能导向**：根据组件功能选择合适的色彩类别
 - **一致性**：在整个应用中保持色彩使用的一致性
 - **可访问性**：确保足够的对比度以满足无障碍要求
+- **品牌一致性**：通过主题色混合保持品牌特色
+- **情感传达**：合理使用语义色传达正确的情感信息
 
 ```javascript
 // 推荐的色彩层次使用
@@ -807,6 +891,8 @@ function getCachedTheme(primaryColor, options) {
 1. **色彩空间转换**：RGB与HCT转换可能存在精度损失，建议在关键场景下进行测试
 2. **显示器差异**：不同显示器的色彩表现可能有差异，建议在多种设备上验证
 3. **性能考虑**：大量颜色转换时建议使用缓存，避免重复计算
+4. **浏览器兼容性**：确保目标浏览器支持所使用的颜色格式
+5. **色彩精度**：在需要精确色彩匹配的场景下，建议进行色彩校准
 
 ```javascript
 // 性能优化示例
@@ -864,3 +950,12 @@ function checkContrast(backgroundColor, textColor) {
 - **线性生成**：数学线性插值，适合渐变效果
 - **主题混合**：基于感知的色彩调和，适合品牌色系统
 - **图片取色**：从图片中提取主色调，适合内容驱动的配色
+
+## 常见问题
+
+### Q: 如何选择合适的混合比例？
+
+**A:** 混合比例的选择取决于你想要的品牌化程度：
+- **5-8%**：轻微的品牌化，保持原色特性
+- **10-15%**：中等程度的品牌化，平衡效果
+- **15-20%**：强烈的品牌化，明显的主题色影响
