@@ -7,7 +7,7 @@ This library provides four core functionalities:
 1. **Color Palette Generation**: Generate gradient swatches containing ten colors using algorithms, supporting both light and dark modes.
 2. **Image Color Extraction**: Extract dominant colors from images for generating matching palettes or theme colors.
 3. **Interface Color System**: Generate complete interface color systems based on primary colors, including semantic colors (success, warning, error, info).
-4. **Theme Blending**: Advanced theme blending functionality based on HCT color space with multiple blending modes.
+4. **Theme Blending**: Advanced theme blending functionality based on HCT color space with multiple blending modes, supporting complete interface color system generation with brand customization.
 
 ## Usage
 
@@ -22,6 +22,7 @@ import {
   getRgbStr,
   extractColorFromImage,
   generateInterfaceColorSystem,
+  generateThemePalette,
   blendInHct,
   rgbToHct,
   hctToRgb
@@ -55,6 +56,19 @@ console.log(colorSystem.success); // Success colors
 console.log(colorSystem.warning); // Warning colors
 console.log(colorSystem.error); // Error colors
 console.log(colorSystem.info); // Info colors
+
+// Generate complete theme palette with brand customization
+const themePalette = generateThemePalette('#3491FA', {
+  semanticColors: {
+    success: '#00C853',
+    warning: '#FF9800',
+    error: '#F44336'
+  },
+  semanticBlendRatio: 0.1 // 10% brand influence on semantic colors
+});
+console.log(themePalette.control); // Control colors (primary, gray)
+console.log(themePalette.semantic); // Semantic colors with brand influence
+console.log(themePalette.theme); // Theme color variations
 
 // Theme blending
 const blended = blendInHct([64, 196, 255], [255, 87, 34], 'overlay', 0.5);
@@ -148,6 +162,45 @@ const customColorSystem = generateInterfaceColorSystem('#3491FA', {
   errorBase: '#F44336',
   infoBase: '#2196F3'
 });
+```
+
+### generateThemePalette(themeColor: string, options?: Object)
+
+Generate a complete theme palette with advanced brand customization and semantic color blending.
+
+**Parameters:**
+- `themeColor`: string - Primary theme color in hex format
+- `options`: Object - Optional configuration
+  - `semanticColors`: Object - Custom semantic color bases
+    - `success`: string - Success color base
+    - `warning`: string - Warning color base
+    - `error`: string - Error color base
+    - `info`: string - Info color base
+  - `semanticBlendRatio`: number - Brand influence on semantic colors (0-1, default: 0.08)
+  - `controlBlendRatio`: number - Brand influence on control colors (0-1, default: 0.05)
+
+**Returns:**
+- `Object` - Complete theme palette
+  - `control`: Object - Control colors (primary, gray)
+  - `semantic`: Object - Semantic colors with brand influence
+  - `theme`: string[] - Theme color variations (10 colors)
+
+```js
+// Basic theme palette
+const basicPalette = generateThemePalette('#3491FA');
+
+// Advanced customization with brand influence
+const brandPalette = generateThemePalette('#3491FA', {
+  semanticColors: {
+    success: '#00C853',
+    warning: '#FF9800',
+    error: '#F44336',
+    info: '#2196F3'
+  },
+  semanticBlendRatio: 0.12, // 12% brand influence
+  controlBlendRatio: 0.08   // 8% brand influence
+});
+console.log(brandPalette.semantic.success); // Brand-influenced success colors
 ```
 
 ### rgbToHct(rgb: number[])

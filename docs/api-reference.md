@@ -22,7 +22,6 @@
   - [blendInHct](#blendinhct)
   - [harmonizeColor](#harmonizecolor)
   - [generateThemeVariants](#generatethemevariants)
-  - [blendSemanticColors](#blendsemanticcolors)
   - [blendUIColors](#blenduicolors)
   - [generateThemePalette](#generatethemepalette)
 - [类型定义](#类型定义)
@@ -497,38 +496,7 @@ const variants = generateThemeVariants('#165DFF');
 console.log(variants); // ['#f0f5ff', '#d6e4ff', ...]
 ```
 
-### blendSemanticColors
 
-将主题色混合到语义色中。
-
-```typescript
-function blendSemanticColors(
-  themeColor: string, 
-  semanticColors: Record<string, string>, 
-  ratio: number
-): Record<string, string>
-```
-
-**参数：**
-- `themeColor`: string - 主题色
-- `semanticColors`: Record<string, string> - 语义色对象
-- `ratio`: number - 混合比例（0-1）
-
-**返回值：**
-- `Record<string, string>` - 混合后的语义色对象
-
-**示例：**
-```javascript
-import { blendSemanticColors } from '@aviala-design/color';
-
-const semanticColors = {
-  success: '#00B42A',
-  warning: '#FF7D00',
-  error: '#F53F3F'
-};
-
-const blended = blendSemanticColors('#165DFF', semanticColors, 0.15);
-```
 
 ### blendUIColors
 

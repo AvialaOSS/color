@@ -8,6 +8,7 @@
 - [可访问性考虑](#可访问性考虑)
 - [性能优化](#性能优化)
 - [主题设计](#主题设计)
+- [主题混合与品牌定制](#主题混合与品牌定制)
 - [数据可视化](#数据可视化)
 - [移动端适配](#移动端适配)
 - [开发工作流](#开发工作流)
@@ -515,7 +516,7 @@ const brandTheme = extendTheme(baseTheme, {
 使用主题混合功能创建一致性更强的颜色系统：
 
 ```javascript
-import { generateThemePalette, harmonizeColor, blendSemanticColors } from '@aviala-design/color';
+import { generateThemePalette, harmonizeColor } from '@aviala-design/color';
 
 // 品牌色主题混合
 class BrandThemeSystem {
@@ -637,6 +638,288 @@ function setupResponsiveTheme(brandColor) {
   mediaQuery.addListener(updateTheme);
   
   return system;
+}
+```
+
+## 主题混合与品牌定制
+
+### 1. 混合比例选择策略
+
+```javascript
+import { generateThemePalette } from '@aviala-design/color';
+
+// 不同场景的混合比例建议
+const blendingStrategies = {
+  // 轻微品牌化 - 保持原色特性
+  subtle: {
+    semanticBlendRatio: 0.05,
+    controlBlendRatio: 0.03
+  },
+  
+  // 中等品牌化 - 平衡效果
+  moderate: {
+    semanticBlendRatio: 0.08,
+    controlBlendRatio: 0.05
+  },
+  
+  // 强烈品牌化 - 明显的主题色影响
+  strong: {
+    semanticBlendRatio: 0.15,
+    controlBlendRatio: 0.10
+  },
+  
+  // 极强品牌化 - 最大程度的品牌统一
+  extreme: {
+    semanticBlendRatio: 0.20,
+    controlBlendRatio: 0.15
+  }
+};
+
+// 根据品牌需求选择策略
+function createBrandTheme(brandColor, strategy = 'moderate') {
+  const config = blendingStrategies[strategy];
+  
+  return generateThemePalette(brandColor, {
+    semanticColors: {
+      success: '#00C853',
+      warning: '#FF9800',
+      error: '#F44336',
+      info: '#2196F3'
+    },
+    ...config
+  });
+}
+```
+
+### 2. 语义色定制最佳实践
+
+```javascript
+// 行业特定的语义色配置
+const industrySemanticColors = {
+  // 金融行业
+  finance: {
+    success: '#00C853', // 绿色表示盈利
+    warning: '#FF9800', // 橙色表示风险
+    error: '#F44336',   // 红色表示亏损
+    info: '#2196F3'     // 蓝色表示信息
+  },
+  
+  // 医疗行业
+  healthcare: {
+    success: '#4CAF50', // 健康绿
+    warning: '#FF9800', // 注意橙
+    error: '#F44336',   // 危险红
+    info: '#03A9F4'     // 医疗蓝
+  },
+  
+  // 教育行业
+  education: {
+    success: '#8BC34A', // 成长绿
+    warning: '#FFC107', // 提醒黄
+    error: '#E91E63',   // 错误粉红
+    info: '#3F51B5'     // 知识紫蓝
+  }
+};
+
+// 创建行业特定主题
+function createIndustryTheme(brandColor, industry) {
+  const semanticColors = industrySemanticColors[industry] || industrySemanticColors.finance;
+  
+  return generateThemePalette(brandColor, {
+    semanticColors,
+    semanticBlendRatio: 0.08,
+    controlBlendRatio: 0.05
+  });
+}
+```
+
+### 3. 渐进式品牌化策略
+
+```javascript
+// 渐进式品牌化实现
+class ProgressiveBranding {
+  constructor(brandColor) {
+    this.brandColor = brandColor;
+    this.currentLevel = 0;
+    this.levels = [
+      { name: 'none', semanticBlendRatio: 0, controlBlendRatio: 0 },
+      { name: 'minimal', semanticBlendRatio: 0.03, controlBlendRatio: 0.02 },
+      { name: 'subtle', semanticBlendRatio: 0.05, controlBlendRatio: 0.03 },
+      { name: 'moderate', semanticBlendRatio: 0.08, controlBlendRatio: 0.05 },
+      { name: 'strong', semanticBlendRatio: 0.12, controlBlendRatio: 0.08 },
+      { name: 'maximum', semanticBlendRatio: 0.20, controlBlendRatio: 0.15 }
+    ];
+  }
+  
+  // 增加品牌化程度
+  increaseBranding() {
+    if (this.currentLevel < this.levels.length - 1) {
+      this.currentLevel++;
+      return this.generateCurrentTheme();
+    }
+    return null;
+  }
+  
+  // 减少品牌化程度
+  decreaseBranding() {
+    if (this.currentLevel > 0) {
+      this.currentLevel--;
+      return this.generateCurrentTheme();
+    }
+    return null;
+  }
+  
+  // 生成当前级别的主题
+  generateCurrentTheme() {
+    const level = this.levels[this.currentLevel];
+    
+    return {
+      level: level.name,
+      theme: generateThemePalette(this.brandColor, {
+        semanticColors: {
+          success: '#00C853',
+          warning: '#FF9800',
+          error: '#F44336',
+          info: '#2196F3'
+        },
+        semanticBlendRatio: level.semanticBlendRatio,
+        controlBlendRatio: level.controlBlendRatio
+      })
+    };
+  }
+}
+```
+
+### 4. 品牌色适配性检测
+
+```javascript
+// 品牌色适配性检测
+function analyzeBrandColor(brandColor) {
+  const hct = rgbToHct(hexToRgb(brandColor));
+  const [hue, chroma, tone] = hct;
+  
+  const analysis = {
+    hue,
+    chroma,
+    tone,
+    recommendations: []
+  };
+  
+  // 色度检测
+  if (chroma < 20) {
+    analysis.recommendations.push({
+      type: 'warning',
+      message: '色度较低，可能影响品牌识别度',
+      suggestion: '考虑使用更饱和的颜色作为品牌色'
+    });
+  }
+  
+  // 明度检测
+  if (tone < 20 || tone > 80) {
+    analysis.recommendations.push({
+      type: 'warning',
+      message: '明度过高或过低，可能影响可读性',
+      suggestion: '建议明度保持在20-80之间'
+    });
+  }
+  
+  // 色相检测
+  const problematicHues = [
+    { range: [45, 75], name: '黄绿色', issue: '可能与警告色冲突' },
+    { range: [345, 15], name: '红色', issue: '可能与错误色冲突' }
+  ];
+  
+  problematicHues.forEach(({ range, name, issue }) => {
+    if (isHueInRange(hue, range)) {
+      analysis.recommendations.push({
+        type: 'caution',
+        message: `品牌色为${name}，${issue}`,
+        suggestion: '建议调整语义色或增加混合比例以保持区分度'
+      });
+    }
+  });
+  
+  return analysis;
+}
+
+// 色相范围检测辅助函数
+function isHueInRange(hue, [start, end]) {
+  if (start <= end) {
+    return hue >= start && hue <= end;
+  } else {
+    return hue >= start || hue <= end;
+  }
+}
+```
+
+### 5. 主题一致性验证
+
+```javascript
+// 主题一致性验证工具
+class ThemeValidator {
+  constructor(theme) {
+    this.theme = theme;
+    this.issues = [];
+  }
+  
+  // 验证对比度
+  validateContrast() {
+    const contrastPairs = [
+      ['background', 'text'],
+      ['surface', 'text'],
+      ['primary-6', 'white'],
+      ['success-6', 'white'],
+      ['warning-6', 'white'],
+      ['error-6', 'white']
+    ];
+    
+    contrastPairs.forEach(([bg, fg]) => {
+      const contrast = this.calculateContrast(bg, fg);
+      if (contrast < 4.5) {
+        this.issues.push({
+          type: 'contrast',
+          severity: 'error',
+          message: `${bg} 和 ${fg} 的对比度不足 (${contrast.toFixed(2)})`
+        });
+      }
+    });
+  }
+  
+  // 验证色彩和谐性
+  validateHarmony() {
+    const semanticColors = ['success', 'warning', 'error', 'info'];
+    const brandColor = this.theme.control.primary[5];
+    
+    semanticColors.forEach(semantic => {
+      const semanticColor = this.theme.semantic[semantic][5];
+      const harmony = this.calculateHarmony(brandColor, semanticColor);
+      
+      if (harmony < 0.3) {
+        this.issues.push({
+          type: 'harmony',
+          severity: 'warning',
+          message: `${semantic} 色与品牌色和谐度较低`,
+          suggestion: '考虑增加混合比例或调整语义色基础色'
+        });
+      }
+    });
+  }
+  
+  // 生成验证报告
+  generateReport() {
+    this.issues = [];
+    this.validateContrast();
+    this.validateHarmony();
+    
+    return {
+      isValid: this.issues.filter(issue => issue.severity === 'error').length === 0,
+      issues: this.issues,
+      summary: {
+        errors: this.issues.filter(issue => issue.severity === 'error').length,
+        warnings: this.issues.filter(issue => issue.severity === 'warning').length
+      }
+    };
+  }
 }
 ```
 

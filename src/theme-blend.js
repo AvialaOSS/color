@@ -14,7 +14,7 @@
  * @param {string} rgb - RGB 颜色值，格式如 "#ff0000"
  * @returns {Object} HCT 颜色对象 {h, c, t}
  */
-function rgbToHct(rgb) {
+export function rgbToHct(rgb) {
   // 移除 # 符号
   const hex = rgb.replace('#', '');
   
@@ -58,7 +58,7 @@ function rgbToHct(rgb) {
  * @param {Object} hct - HCT 颜色对象 {h, c, t}
  * @returns {string} RGB 颜色值，格式如 "#ff0000"
  */
-function hctToRgb(hct) {
+export function hctToRgb(hct) {
   const { h, c, t } = hct;
   
   // 边界检查
@@ -108,7 +108,7 @@ function hctToRgb(hct) {
  * @param {number} ratio - 混合比例，0-1，0表示完全是color1，1表示完全是color2
  * @returns {string} 混合后的颜色 (RGB)
  */
-function blendInHct(color1, color2, ratio = 0.5) {
+export function blendInHct(color1, color2, ratio = 0.5) {
   const hct1 = rgbToHct(color1);
   const hct2 = rgbToHct(color2);
   
@@ -143,7 +143,7 @@ function blendInHct(color1, color2, ratio = 0.5) {
  * @param {number} harmonizeRatio - 调和强度，0-1，0表示不调和，1表示完全采用主题色的色相
  * @returns {string} 调和后的颜色 (RGB)
  */
-function harmonizeColor(themeColor, targetColor, harmonizeRatio = 0.15) {
+export function harmonizeColor(themeColor, targetColor, harmonizeRatio = 0.15) {
   const themeHct = rgbToHct(themeColor);
   const targetHct = rgbToHct(targetColor);
   
@@ -177,7 +177,7 @@ function harmonizeColor(themeColor, targetColor, harmonizeRatio = 0.15) {
  * @param {Object|Array} options - 配置选项，可以是对象 {tones: [...]} 或直接传入数组
  * @returns {Array} 主题色变体数组
  */
-function generateThemeVariants(themeColor, options = [10, 20, 30, 40, 50, 60, 70, 80, 90]) {
+export function generateThemeVariants(themeColor, options = [10, 20, 30, 40, 50, 60, 70, 80, 90]) {
   const themeHct = rgbToHct(themeColor);
   
   // 支持两种参数格式：对象 {tones: [...]} 或直接数组
@@ -199,22 +199,7 @@ function generateThemeVariants(themeColor, options = [10, 20, 30, 40, 50, 60, 70
   });
 }
 
-/**
- * 表意色混合 - 为成功、警告、错误等状态色添加主题色调
- * @param {string} themeColor - 主题色
- * @param {Object} semanticColors - 表意色对象，如 {success: '#4caf50', warning: '#ff9800', error: '#f44336'}
- * @param {number} blendRatio - 混合强度
- * @returns {Object} 混合后的表意色对象
- */
-function blendSemanticColors(themeColor, semanticColors, blendRatio = 0.15) {
-  const result = {};
-  
-  for (const [key, color] of Object.entries(semanticColors)) {
-    result[key] = harmonizeColor(themeColor, color, blendRatio);
-  }
-  
-  return result;
-}
+
 
 /**
  * UI 元素颜色混合 - 为按钮、卡片等 UI 元素生成主题化颜色
@@ -223,7 +208,7 @@ function blendSemanticColors(themeColor, semanticColors, blendRatio = 0.15) {
  * @param {number} blendRatio - 混合强度
  * @returns {Object} 混合后的 UI 颜色对象
  */
-function blendUIColors(themeColor, uiColors, blendRatio = 0.2) {
+export function blendUIColors(themeColor, uiColors, blendRatio = 0.2) {
   const result = {};
   
   for (const [key, color] of Object.entries(uiColors)) {
@@ -367,40 +352,43 @@ export function generateInterfaceColorSystem(themeColor, options = {}) {
  * @param {Object} options - 配置选项
  * @returns {Object} 完整的主题色板
  */
-function generateThemePalette(themeColor, options = {}) {
+export function generateThemePalette(themeColor, options = {}) {
   const {
     semanticColors = {
-      success: '#4caf50',
-      warning: '#ff9800', 
-      error: '#f44336',
-      info: '#2196f3'
+      success: '#52c41a',
+      warning: '#faad14',
+      error: '#ff4d4f',
+      info: '#1890ff'
     },
     uiColors = {
-      primary: themeColor,
-      'primary-light': '#ffffff',
-      'primary-lighter': '#f8f9ff',
-      'primary-dark': '#000000',
-      'primary-darker': '#0a0a0a',
-      'accent': '#722ed1',
-      'neutral-1': '#f7f8fa',
-      'neutral-2': '#f2f3f5',
-      'neutral-3': '#e5e6eb',
-      'neutral-4': '#c9cdd4',
-      'neutral-5': '#a9aeb8',
-      'neutral-6': '#86909c',
-      'background': '#ffffff',
-      'surface': '#f8f9fa',
-      'border': '#e5e6eb',
-      'disabled': '#c9cdd4'
+      background: '#ffffff',
+      surface: '#fafafa',
+      border: '#d9d9d9',
+      disabled: '#f5f5f5'
     },
     harmonizeRatio = 0.15,
     blendRatio = 0.12,
     generateVariants = true
   } = options;
   
+  // 生成语义色变体
+  const semanticVariants = generateSemanticColors(themeColor, { semanticColors, blendRatio: harmonizeRatio });
+  
+  // 将扁平的语义色变体重新组织为嵌套结构
+  const semantic = {};
+  Object.entries(semanticColors).forEach(([name]) => {
+    semantic[name] = {};
+    for (let i = 1; i <= 10; i++) {
+      const key = `${name}-${i}`;
+      if (semanticVariants[key]) {
+        semantic[name][i] = semanticVariants[key];
+      }
+    }
+  });
+  
   const palette = {
     theme: themeColor,
-    semantic: blendSemanticColors(themeColor, semanticColors, harmonizeRatio),
+    semantic,
     ui: blendUIColors(themeColor, uiColors, blendRatio)
   };
   
@@ -410,14 +398,3 @@ function generateThemePalette(themeColor, options = {}) {
   
   return palette;
 }
-
-export {
-  rgbToHct,
-  hctToRgb,
-  blendInHct,
-  harmonizeColor,
-  generateThemeVariants,
-  blendSemanticColors,
-  blendUIColors,
-  generateThemePalette
-};
