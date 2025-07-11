@@ -98,13 +98,13 @@ export function generateMonochromeLinear(baseColor, options = {}) {
   // 创建起始和结束颜色（保持色相和饱和度，只改变亮度）
   const startColor = Color({
     h: hsl.hue(),
-    s: hsl.saturationl(),
+    s: hsl.saturation(),
     l: maxLightness
   });
   
   const endColor = Color({
     h: hsl.hue(),
-    s: hsl.saturationl(),
+    s: hsl.saturation(),
     l: minLightness
   });
   
@@ -158,7 +158,7 @@ export function generateLinearHSL(startColor, endColor, options = {}) {
     
     // 在HSL空间进行线性插值
     let h = startHue + (endHue - startHue) * ratio;
-    const s = start.saturationl() + (end.saturationl() - start.saturationl()) * ratio;
+    const s = start.saturation() + (end.saturation() - start.saturation()) * ratio;
     const l = start.lightness() + (end.lightness() - start.lightness()) * ratio;
     
     // 确保色相在0-360范围内

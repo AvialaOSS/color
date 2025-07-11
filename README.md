@@ -12,7 +12,7 @@ This library provides four core functionalities:
 ## Usage
 
 ```bash
-npm i @arco-design/color
+npm i @aviala-design/color
 ```
 
 ```js

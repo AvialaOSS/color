@@ -30,6 +30,12 @@ export async function extractColorFromImage(image) {
 async function getImageData(image) {
   return new Promise((resolve, reject) => {
     try {
+      // 检查是否在浏览器环境中
+      if (typeof document === 'undefined') {
+        reject(new Error('图像颜色提取功能仅在浏览器环境中可用'));
+        return;
+      }
+      
       // 创建canvas元素
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
@@ -139,6 +145,12 @@ function quantizePixels(pixels) {
  */
 export function extractColorFromFile(file) {
   return new Promise((resolve, reject) => {
+    // 检查是否在浏览器环境中
+    if (typeof FileReader === 'undefined' || typeof Image === 'undefined') {
+      reject(new Error('文件读取功能仅在浏览器环境中可用'));
+      return;
+    }
+    
     // 检查文件类型
     if (!file.type.startsWith('image/')) {
       reject(new Error('请选择图片文件'));

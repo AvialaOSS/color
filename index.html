@@ -4,653 +4,169 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>颜色色卡系统</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css?v=1.2">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Aviala Design 色卡系统</h1>
-    <div class="color-input-group">
-      <div class="color-input">
-        <input type="text" id="colorInput" placeholder="请输入颜色值 (例如: #FF0000)" />
-        <button id="generateBtn"><i class="ri-palette-line"></i> 生成色卡</button>
-      </div>
-      <div class="color-input">
-        <div class="file-input-wrapper">
-          <input type="file" id="imageInput" accept="image/*" />
-          <label for="imageInput">选择图片</label>
+  <div class="main-layout">
+    <aside class="sidebar">
+      <h1>色卡生成工具</h1>
+      <div class="color-input-group">
+        <div class="color-input">
+          <input type="text" id="colorInput" placeholder="输入颜色值 (例: #FF0000)" />
+          <button id="generateBtn"><i class="ri-palette-line"></i> 生成</button>
         </div>
-        <button id="extractBtn"><i class="ri-image-line"></i> 从图片提取颜色</button>
-      </div>
-      <div class="color-input linear-input">
-        <input type="text" id="startColorInput" placeholder="起始颜色 (例如: #FF0000)" />
-        <input type="text" id="endColorInput" placeholder="结束颜色 (例如: #0000FF)" />
-        <select id="linearSteps">
-          <option value="5">5步</option>
-          <option value="8">8步</option>
-          <option value="10" selected>10步</option>
-          <option value="12">12步</option>
-        </select>
-        <button id="generateLinearBtn"><i class="ri-contrast-line"></i> 生成线性渐变</button>
-      </div>
-      <div class="color-input preset-linear">
-        <select id="linearPreset">
-          <option value="gray">灰色系渐变</option>
-          <option value="monochrome">单色调渐变</option>
-          <option value="hsl">HSL空间渐变</option>
-        </select>
-        <input type="text" id="presetColorInput" placeholder="基础颜色 (单色调/HSL用)" />
-        <button id="generatePresetBtn"><i class="ri-palette-fill"></i> 生成预设渐变</button>
-      </div>
-      <div class="color-input theme-blend">
-        <input type="text" id="themeColorInput" placeholder="主题色 (例如: #165DFF)" />
-        <input type="text" id="targetColorInput" placeholder="目标色 (例如: #F53F3F)" />
-        <select id="blendMode">
-          <option value="harmonize">调和模式</option>
-          <option value="blend">混合模式</option>
-          <option value="variants">主题变体</option>
-          <option value="palette">完整色板</option>
-          <option value="interface-system">界面色彩系统</option>
-        </select>
-        <input type="range" id="blendRatio" min="0" max="1" step="0.05" value="0.15" />
-        <span id="blendRatioValue">15%</span>
-        
-        <!-- 界面色彩系统专用配置 -->
-        <div id="interfaceSystemConfig" style="display: none; margin-top: 10px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: #f9f9f9;">
-          <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #666;">语义色基准色配置</h4>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-            <input type="text" id="successColor" placeholder="成功色 (默认: #52c41a)" />
-            <input type="text" id="warningColor" placeholder="警告色 (默认: #faad14)" />
-            <input type="text" id="errorColor" placeholder="错误色 (默认: #ff4d4f)" />
-            <input type="text" id="infoColor" placeholder="信息色 (默认: #1890ff)" />
+        <div class="color-input">
+          <div class="file-input-wrapper">
+            <input type="file" id="imageInput" accept="image/*" />
+            <label for="imageInput">选择图片</label>
           </div>
+          <button id="extractBtn"><i class="ri-image-line"></i> 提取主色</button>
         </div>
-        
-        <button id="generateThemeBtn"><i class="ri-brush-line"></i> 生成主题混合</button>
       </div>
-    </div>
-    <div id="notification" class="notification"></div>
-    <div id="customColorCard" class="color-card" style="display: none;">
-      <h3>自定义颜色</h3>
-      <div class="variants" id="customColorVariants"></div>
-    </div>
-    <div id="linearColorCard" class="color-card" style="display: none;">
-      <h3>线性渐变颜色</h3>
-      <div class="variants" id="linearColorVariants"></div>
-    </div>
-    <div id="colorPalette"></div>
+    </aside>
+    <main class="content">
+      <div id="notification" class="notification"></div>
+      <div id="customColorCard" class="color-card" style="display: none;">
+        <h3>自定义颜色</h3>
+        <div class="variants" id="customColorVariants"></div>
+      </div>
+      <div id="colorPalette"></div>
+    </main>
   </div>
 
   <script type="module">
-    // 修改导入路径，使用相对路径
-    import { getPresetColors, generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL, harmonizeColor, blendInHct, generateThemeVariants, generateThemePalette, generateInterfaceColorSystem } from './src/index.js';
+    import { getPresetColors } from './src/index.js';
     import generate from './src/generate.js';
     import { extractColorFromFile } from './src/image-color.js';
-    
-    // 通知功能
+
     function showNotification(message, type = 'info') {
       const notification = document.getElementById('notification');
       notification.textContent = message;
       notification.className = `notification ${type}`;
       notification.style.display = 'block';
-      
       setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => {
-          notification.style.display = 'none';
-          notification.style.opacity = '1';
-        }, 300);
-      }, 2000);
+        notification.style.display = 'none';
+      }, 3000);
     }
 
-    // 自定义颜色生成功能
     const colorInput = document.getElementById('colorInput');
     const generateBtn = document.getElementById('generateBtn');
     const customColorCard = document.getElementById('customColorCard');
     const customColorVariants = document.getElementById('customColorVariants');
 
-    // 生成色卡函数
     function generateColorPalette(color) {
       if (!color) return;
-
       try {
-        const variants = [];
-        // 生成亮色系列
         const lightColors = generate(color, { list: true });
-        variants.push({
-          type: '亮色',
-          colors: lightColors
-        });
-        // 生成暗色系列
         const darkColors = generate(color, { list: true, dark: true });
-        variants.push({
-          type: '暗色',
-          colors: darkColors
-        });
 
-        // 渲染结果
-        customColorVariants.innerHTML = variants.map(({ type, colors }) => 
-          `<div class="variant">
-            <h4>${type}</h4>
-            ${colors.map(color => 
-              `<div class="color-block" style="background:${color}" data-color="${color}">
-                <span>${color}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>`
-            ).join('')}
-          </div>`
-        ).join('');
+        customColorVariants.innerHTML = `
+          <div class="variant">
+            <h4>亮色系</h4>
+            <div class="color-blocks">${lightColors.map(c => createColorBlock(c)).join('')}</div>
+          </div>
+          <div class="variant">
+            <h4>暗色系</h4>
+            <div class="color-blocks">${darkColors.map(c => createColorBlock(c)).join('')}</div>
+          </div>
+        `;
 
         customColorCard.style.display = 'block';
-        window.scrollTo({ top: customColorCard.offsetTop - 20, behavior: 'smooth' });
         showNotification('色卡生成成功！', 'success');
-        
-        // 添加颜色复制功能
         addCopyFunctionality(customColorCard);
       } catch (error) {
-        showNotification('生成色卡失败: ' + error.message, 'error');
+        showNotification(`生成失败: ${error.message}`, 'error');
       }
     }
 
-    // 从输入框生成色卡
     generateBtn.addEventListener('click', () => {
       const color = colorInput.value.trim();
-      if (!color) {
+      if (color) {
+        generateColorPalette(color);
+      } else {
         showNotification('请输入有效的颜色值', 'error');
-        return;
       }
-      generateColorPalette(color);
     });
-    
-    // 支持回车键生成色卡
+
     colorInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const color = colorInput.value.trim();
-        if (color) {
-          generateColorPalette(color);
-        } else {
-          showNotification('请输入有效的颜色值', 'error');
-        }
-      }
+      if (e.key === 'Enter') generateBtn.click();
     });
-    
-    // 从图片提取颜色并生成色卡
+
     const imageInput = document.getElementById('imageInput');
     const extractBtn = document.getElementById('extractBtn');
-    
-    // 显示选择的文件名
+
     imageInput.addEventListener('change', () => {
       const file = imageInput.files[0];
       if (file) {
         const label = document.querySelector('label[for="imageInput"]');
-        label.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+        label.textContent = file.name.length > 15 ? `${file.name.substring(0, 12)}...` : file.name;
         label.classList.add('file-selected');
       }
     });
-    
+
     extractBtn.addEventListener('click', async () => {
       const file = imageInput.files[0];
       if (!file) {
         showNotification('请选择图片文件', 'error');
         return;
       }
-      
       try {
         extractBtn.disabled = true;
-        extractBtn.innerHTML = '<i class="ri-loader-line ri-spin"></i> 提取中...';
-        showNotification('正在从图片提取颜色...', 'info');
-        
-        // 提取颜色
+        extractBtn.innerHTML = '<i class="ri-loader-line ri-spin"></i> 提取中';
         const color = await extractColorFromFile(file);
-        
-        // 更新输入框的值
         colorInput.value = color;
-        
-        // 生成色卡
         generateColorPalette(color);
       } catch (error) {
-        showNotification('提取颜色失败: ' + error.message, 'error');
+        showNotification(`提取失败: ${error.message}`, 'error');
       } finally {
         extractBtn.disabled = false;
-        extractBtn.innerHTML = '<i class="ri-image-line"></i> 从图片提取颜色';
+        extractBtn.innerHTML = '<i class="ri-image-line"></i> 提取主色';
       }
     });
 
-    // 线性颜色生成功能
-    const startColorInput = document.getElementById('startColorInput');
-    const endColorInput = document.getElementById('endColorInput');
-    const linearSteps = document.getElementById('linearSteps');
-    const generateLinearBtn = document.getElementById('generateLinearBtn');
-    const linearPreset = document.getElementById('linearPreset');
-    const presetColorInput = document.getElementById('presetColorInput');
-    const generatePresetBtn = document.getElementById('generatePresetBtn');
-    const linearColorCard = document.getElementById('linearColorCard');
-    const linearColorVariants = document.getElementById('linearColorVariants');
-
-    // 生成线性渐变色卡函数
-    function generateLinearColorPalette(colors, title) {
-      if (!colors || colors.length === 0) return;
-
-      try {
-        // 渲染结果
-        linearColorVariants.innerHTML = `
-          <div class="variant">
-            <h4>${title}</h4>
-            ${colors.map(color => 
-              `<div class="color-block" style="background:${color}" data-color="${color}">
-                <span>${color}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>`
-            ).join('')}
-          </div>
-        `;
-
-        linearColorCard.style.display = 'block';
-        window.scrollTo({ top: linearColorCard.offsetTop - 20, behavior: 'smooth' });
-        showNotification('线性渐变色卡生成成功！', 'success');
-        
-        // 添加颜色复制功能
-        addCopyFunctionality(linearColorCard);
-      } catch (error) {
-        showNotification('生成线性渐变色卡失败: ' + error.message, 'error');
-      }
+    function createColorBlock(color) {
+      return `
+        <div class="color-block" style="background:${color}" data-color="${color}">
+          <span>${color}</span>
+          <div class="color-tooltip">复制</div>
+        </div>`;
     }
 
-    // 基础线性渐变生成
-    generateLinearBtn.addEventListener('click', () => {
-      const startColor = startColorInput.value.trim();
-      const endColor = endColorInput.value.trim();
-      const steps = parseInt(linearSteps.value);
-      
-      if (!startColor || !endColor) {
-        showNotification('请输入起始颜色和结束颜色', 'error');
-        return;
-      }
-      
-      try {
-        const colors = generateLinear(startColor, endColor, { steps });
-        generateLinearColorPalette(colors, `线性渐变 (${startColor} → ${endColor})`);
-      } catch (error) {
-        showNotification('生成线性渐变失败: ' + error.message, 'error');
-      }
-    });
-
-    // 预设渐变生成
-    generatePresetBtn.addEventListener('click', () => {
-      const preset = linearPreset.value;
-      const baseColor = presetColorInput.value.trim();
-      const steps = parseInt(linearSteps.value);
-      
-      try {
-        let colors, title;
-        
-        switch (preset) {
-          case 'gray':
-            colors = generateGrayLinear({ steps });
-            title = '灰色系渐变';
-            break;
-          case 'monochrome':
-            if (!baseColor) {
-              showNotification('请输入基础颜色', 'error');
-              return;
-            }
-            colors = generateMonochromeLinear(baseColor, { steps });
-            title = `单色调渐变 (${baseColor})`;
-            break;
-          case 'hsl':
-            if (!baseColor) {
-              showNotification('请输入基础颜色', 'error');
-              return;
-            }
-            // 为HSL演示，生成一个色相环渐变
-            const hslEndColor = baseColor; // 可以改为不同的颜色
-            colors = generateLinearHSL(baseColor, hslEndColor, { steps });
-            title = `HSL空间渐变 (${baseColor})`;
-            break;
-          default:
-            showNotification('未知的预设类型', 'error');
-            return;
-        }
-        
-        generateLinearColorPalette(colors, title);
-      } catch (error) {
-        showNotification('生成预设渐变失败: ' + error.message, 'error');
-      }
-    });
-
-    // 支持回车键生成线性渐变
-    [startColorInput, endColorInput].forEach(input => {
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          generateLinearBtn.click();
-        }
-      });
-    });
-
-    presetColorInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        generatePresetBtn.click();
-      }
-    });
-
-    // 主题混合功能
-    const themeColorInput = document.getElementById('themeColorInput');
-    const targetColorInput = document.getElementById('targetColorInput');
-    const blendMode = document.getElementById('blendMode');
-    const blendRatio = document.getElementById('blendRatio');
-    const interfaceSystemConfig = document.getElementById('interfaceSystemConfig');
-    const successColor = document.getElementById('successColor');
-    const warningColor = document.getElementById('warningColor');
-    const errorColor = document.getElementById('errorColor');
-    const infoColor = document.getElementById('infoColor');
-    
-    // 监听混合模式变化，显示/隐藏界面色彩系统配置
-    blendMode.addEventListener('change', () => {
-      if (blendMode.value === 'interface-system') {
-        interfaceSystemConfig.style.display = 'block';
-      } else {
-        interfaceSystemConfig.style.display = 'none';
-      }
-    });
-    const blendRatioValue = document.getElementById('blendRatioValue');
-    const generateThemeBtn = document.getElementById('generateThemeBtn');
-
-    // 更新混合比例显示
-    blendRatio.addEventListener('input', () => {
-      const value = Math.round(parseFloat(blendRatio.value) * 100);
-      blendRatioValue.textContent = value + '%';
-    });
-
-    // 生成主题混合色板
-    function generateThemeBlendPalette(result, title) {
-      const customColorCard = document.getElementById('customColorCard');
-      const customColorVariants = document.getElementById('customColorVariants');
-      
-      if (Array.isArray(result)) {
-        // 处理数组结果（变体或混合结果）
-        customColorVariants.innerHTML = `
-          <div class="variant">
-            <h4>${title}</h4>
-            ${result.map(color => 
-              `<div class="color-block" style="background:${color}" data-color="${color}">
-                <span>${color}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>`
-            ).join('')}
-          </div>
-        `;
-      } else if (typeof result === 'object') {
-        // 处理对象结果（完整色板）
-        let html = '';
-        
-        // 检查是否是单个主题色（字符串）而不是界面色彩系统的主题色对象
-        if (result.theme && typeof result.theme === 'string') {
-          html += `
-            <div class="variant">
-              <h4>主题色</h4>
-              <div class="color-grid">
-                <div class="color-block" style="background:${result.theme}" data-color="${result.theme}">
-                  <span>${result.theme}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-        
-        if (result.variants && result.variants.length > 0) {
-          html += `
-            <div class="variant">
-              <h4>主题变体</h4>
-              <div class="color-grid">
-                ${result.variants.map(color => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        if (result.semantic) {
-          html += `
-            <div class="variant">
-              <h4>语义色彩</h4>
-              <div class="color-grid">
-                ${Object.entries(result.semantic).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        // result.ui 已经不再使用，界面色彩系统使用 controls, semantic, theme 三个部分
-        
-        // 处理界面色彩系统的结果
-        if (result.controls) {
-          html += `
-            <div class="variant">
-              <h4>基础控件颜色 (灰色系1-12)</h4>
-              <div class="color-grid">
-                ${Object.entries(result.controls).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        // 检查是否是界面色彩系统的语义色（包含多个颜色变体）
-        if (result.semantic && typeof result.semantic === 'object' && Object.keys(result.semantic).length > 4) {
-          html += `
-            <div class="variant">
-              <h4>表意色 (success/warning/error/info 各1-10)</h4>
-              <div class="color-grid">
-                ${Object.entries(result.semantic).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        // 检查是否是界面色彩系统的主题色（包含多个颜色变体）
-        if (result.theme && typeof result.theme === 'object' && Object.keys(result.theme).length > 1) {
-          html += `
-            <div class="variant">
-              <h4>主题色 (theme-1 到 theme-10)</h4>
-              <div class="color-grid">
-                ${Object.entries(result.theme).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        customColorVariants.innerHTML = html;
-      } else {
-        // 处理单个颜色结果
-        customColorVariants.innerHTML = `
-          <div class="variant">
-            <h4>${title}</h4>
-            <div class="color-grid">
-              <div class="color-block" style="background:${result}" data-color="${result}">
-                <span>${result}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      customColorCard.querySelector('h3').textContent = title;
-      customColorCard.style.display = 'block';
-      window.scrollTo({ top: customColorCard.offsetTop - 20, behavior: 'smooth' });
-      
-      // 添加颜色复制功能
-      addCopyFunctionality(customColorCard);
-    }
-
-    generateThemeBtn.addEventListener('click', () => {
-      const themeColor = themeColorInput.value.trim();
-      const targetColor = targetColorInput.value.trim();
-      const mode = blendMode.value;
-      const ratio = parseFloat(blendRatio.value);
-      
-      if (!themeColor) {
-        showNotification('请输入主题色', 'error');
-        return;
-      }
-      
-      try {
-        let result, title;
-        
-        switch (mode) {
-          case 'harmonize':
-            if (!targetColor) {
-              showNotification('调和模式需要输入目标色', 'error');
-              return;
-            }
-            result = harmonizeColor(themeColor, targetColor, ratio);
-            title = `调和色彩 (${Math.round(ratio * 100)}%)`;
-            break;
-            
-          case 'blend':
-            if (!targetColor) {
-              showNotification('混合模式需要输入目标色', 'error');
-              return;
-            }
-            result = blendInHct(themeColor, targetColor, ratio);
-            title = `混合色彩 (${Math.round(ratio * 100)}%)`;
-            break;
-            
-          case 'variants':
-            result = generateThemeVariants(themeColor);
-            title = '主题变体';
-            break;
-            
-          case 'palette':
-            result = generateThemePalette(themeColor, {
-              harmonizeRatio: ratio,
-              blendRatio: ratio
-            });
-            title = '完整主题色板';
-            break;
-            
-          case 'interface-system':
-            const baseGray = '#666666'; // 默认基准灰色
-            const isDark = false; // 默认亮色模式
-            
-            // 获取用户自定义的语义色基准色
-            const customSemanticColors = {};
-            if (successColor.value.trim()) customSemanticColors.success = successColor.value.trim();
-            if (warningColor.value.trim()) customSemanticColors.warning = warningColor.value.trim();
-            if (errorColor.value.trim()) customSemanticColors.error = errorColor.value.trim();
-            if (infoColor.value.trim()) customSemanticColors.info = infoColor.value.trim();
-            
-            // 如果用户没有输入任何自定义颜色，使用默认值
-            const semanticColors = Object.keys(customSemanticColors).length > 0 ? {
-              success: '#52c41a',
-              warning: '#faad14', 
-              error: '#ff4d4f',
-              info: '#1890ff',
-              ...customSemanticColors
-            } : undefined;
-            
-            result = generateInterfaceColorSystem(themeColor, {
-              baseGray,
-              isDark,
-              semanticColors
-            });
-            title = '界面色彩系统';
-            break;
-            
-          default:
-            showNotification('未知的混合模式', 'error');
-            return;
-        }
-        
-        generateThemeBlendPalette(result, title);
-        showNotification('主题混合生成成功！', 'success');
-      } catch (error) {
-        showNotification('生成主题混合失败: ' + error.message, 'error');
-      }
-    });
-
-    // 支持回车键生成主题混合
-    [themeColorInput, targetColorInput, successColor, warningColor, errorColor, infoColor].forEach(input => {
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          generateThemeBtn.click();
-        }
-      });
-    });
-
-    // 添加颜色复制功能
     function addCopyFunctionality(container) {
-      const colorBlocks = container.querySelectorAll('.color-block');
-      colorBlocks.forEach(block => {
-        block.addEventListener('click', async () => {
-          const color = block.dataset.color || block.querySelector('span').textContent;
-          try {
-            await navigator.clipboard.writeText(color);
-            showNotification(`已复制颜色: ${color}`, 'success');
-          } catch (err) {
-            showNotification('复制失败，请手动复制', 'error');
-          }
+      container.querySelectorAll('.color-block').forEach(block => {
+        block.addEventListener('click', () => {
+          const color = block.dataset.color;
+          navigator.clipboard.writeText(color).then(() => {
+            showNotification(`已复制: ${color}`, 'success');
+          }, () => {
+            showNotification('复制失败', 'error');
+          });
         });
       });
     }
-    
+
     const palette = document.getElementById('colorPalette');
     const colors = getPresetColors();
 
-    Object.entries(colors).forEach(([name, variants]) => {
-      const colorCard = document.createElement('div');
-      colorCard.className = 'color-card';
-      
-      colorCard.innerHTML = `
+    palette.innerHTML = Object.entries(colors).map(([name, variants]) => `
+      <div class="color-card">
         <h3>${name}</h3>
         <div class="variants">
-          ${Object.entries(variants).filter(([type]) => type !== 'primary').map(([type, colorset]) => 
-            `<div class="variant">
+          ${Object.entries(variants).filter(([type]) => type !== 'primary').map(([type, colorset]) => `
+            <div class="variant">
               <h4>${type}</h4>
-              ${colorset.map(color => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
-            </div>`
-          ).join('')}
+              <div class="color-blocks">${colorset.map(c => createColorBlock(c)).join('')}</div>
+            </div>
+          `).join('')}
         </div>
-      `;
-      
-      palette.appendChild(colorCard);
-    });
-    
-    // 为所有预设色卡添加复制功能
+      </div>
+    `).join('');
+
     addCopyFunctionality(palette);
-    
-    // 页面加载完成后显示欢迎信息
+
     window.addEventListener('load', () => {
-      showNotification('欢迎使用 Aviala Design 色卡系统', 'success');
+      showNotification('欢迎使用色卡生成工具', 'info');
     });
   </script>
 </body>

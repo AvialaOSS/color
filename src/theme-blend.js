@@ -226,8 +226,7 @@ export function blendUIColors(themeColor, uiColors, blendRatio = 0.2) {
  */
 export function generateControlColors(themeColor, options = {}) {
   const { baseGray = '#666666' } = options;
-  const { blendRatio = 0.08, isDark = false } = options;
-  
+    
   const baseHct = rgbToHct(baseGray);
   const controlColors = {};
   
