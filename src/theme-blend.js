@@ -225,7 +225,11 @@ export function blendUIColors(themeColor, uiColors, blendRatio = 0.2) {
  * @returns {Object} 基础控件颜色对象
  */
 export function generateControlColors(themeColor, options = {}) {
-  const { baseGray = '#666666' } = options;
+  const { 
+    baseGray = '#666666',
+    blendRatio = 0.08,
+    isDark = false
+  } = options;
     
   const baseHct = rgbToHct(baseGray);
   const controlColors = {};
@@ -367,11 +371,24 @@ export function generateThemePalette(themeColor, options = {}) {
     },
     harmonizeRatio = 0.15,
     blendRatio = 0.12,
-    generateVariants = true
+    isDark = false
   } = options;
   
+  // 生成主题色阶（1-10）
+  const themeColors = generateThemeColors(themeColor, { isDark });
+  
+  // 生成中性色阶（1-12）
+  const controlColors = generateControlColors(themeColor, { 
+    blendRatio: blendRatio * 0.5, // 中性色混合比例稍低
+    isDark 
+  });
+  
   // 生成语义色变体
-  const semanticVariants = generateSemanticColors(themeColor, { semanticColors, blendRatio: harmonizeRatio });
+  const semanticVariants = generateSemanticColors(themeColor, { 
+    semanticColors, 
+    blendRatio: harmonizeRatio,
+    isDark 
+  });
   
   // 将扁平的语义色变体重新组织为嵌套结构
   const semantic = {};
@@ -386,14 +403,11 @@ export function generateThemePalette(themeColor, options = {}) {
   });
   
   const palette = {
-    theme: themeColor,
-    semantic,
+    theme: themeColors,     // 主题色阶 theme-1 到 theme-10
+    controls: controlColors, // 中性色阶 gray-1 到 gray-12
+    semantic,               // 功能色系
     ui: blendUIColors(themeColor, uiColors, blendRatio)
   };
-  
-  if (generateVariants) {
-    palette.variants = generateThemeVariants(themeColor);
-  }
   
   return palette;
 }
