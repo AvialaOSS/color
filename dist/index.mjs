@@ -1,348 +1,418 @@
-import m from "color";
-function K(n) {
-  return m(n).rgb().round().color.join(",");
+import w from "color";
+function O(t) {
+  return w(t).rgb().round().color.join(",");
 }
-const P = ["hex", "rgb", "hsl"];
-function z(n) {
-  return !n || P.indexOf(n) < 0 ? "hex" : n;
+const L = ["hex", "rgb", "hsl"];
+function k(t) {
+  return !t || L.indexOf(t) < 0 ? "hex" : t;
 }
-function E(n, o) {
-  const a = z(o);
-  return a === "hex" ? n[a]().toLowerCase() : n[a]().round().string();
+function H(t, n) {
+  const s = k(n);
+  return s === "hex" ? t[s]().toLowerCase() : t[s]().round().string();
 }
-function F(n, o, a) {
-  const e = m(n), t = e.hue(), r = e.saturationv(), s = e.value(), c = ((b) => b >= 60 && b <= 240 ? 2.5 : b >= 0 && b < 60 || b > 300 && b <= 360 ? 1.5 : 2)(t), u = 100, f = 9, l = 100, h = 30;
-  function d(b, w) {
+function D(t, n, s) {
+  const r = w(t), a = r.hue(), o = r.saturationv(), e = r.value(), c = ((b) => b >= 60 && b <= 240 ? 2.5 : b >= 0 && b < 60 || b > 300 && b <= 360 ? 1.5 : 2)(a), l = 100, f = 9, h = 100, u = 30;
+  function M(b, p) {
     let x;
-    return t >= 60 && t <= 240 ? x = b ? t - c * w : t + c * w : x = b ? t + c * w : t - c * w, x < 0 ? x += 360 : x >= 360 && (x -= 360), Math.round(x);
+    return a >= 60 && a <= 240 ? x = b ? a - c * p : a + c * p : x = b ? a + c * p : a - c * p, x < 0 ? x += 360 : x >= 360 && (x -= 360), Math.round(x);
   }
-  function g(b, w) {
+  function d(b, p) {
     let x;
     if (b)
-      x = r <= f ? r : r - (r - f) / 5.5 * Math.pow(w, 1.05);
+      x = o <= f ? o : o - (o - f) / 5.5 * Math.pow(p, 1.05);
     else {
-      const A = Math.min(u, r + 30);
-      x = r + (A - r) / 4.2 * Math.pow(w, 0.95);
+      const A = Math.min(l, o + 30);
+      x = o + (A - o) / 4.2 * Math.pow(p, 0.95);
     }
     return Math.max(0, Math.min(100, x));
   }
-  function p(b, w) {
-    return b ? Math.min(l, s + (l - s) / 5.2 * Math.pow(w, 0.9)) : s <= h ? s : Math.max(h, s - (s - h) / 4.2 * Math.pow(w, 1.05));
+  function g(b, p) {
+    return b ? Math.min(h, e + (h - e) / 5.2 * Math.pow(p, 0.9)) : e <= u ? e : Math.max(u, e - (e - u) / 4.2 * Math.pow(p, 1.05));
   }
-  const M = o < 6, y = M ? 6 - o : o - 6, S = o === 6 ? e : m({
-    h: d(M, y),
-    s: g(M, y),
-    v: p(M, y)
+  const m = n < 6, y = m ? 6 - n : n - 6, E = n === 6 ? r : w({
+    h: M(m, y),
+    s: d(m, y),
+    v: g(m, y)
   });
-  return E(S, a);
+  return H(E, s);
 }
-function v(n, o, a) {
-  const e = m(F(n, 10 - o + 1)), t = m(n), r = t.hue(), s = t.saturationv(), c = m({
-    h: t.hue(),
-    s: l(6),
-    v: t.value()
-  }).saturationv(), u = Math.ceil((c - 9) / 4), f = Math.ceil((100 - c) / 5);
-  function l(d) {
-    if (d < 6)
-      return c + (6 - d) * f;
-    if (d === 6) {
-      if (r >= 0 && r < 50)
-        return s - 15;
-      if (r >= 50 && r < 191)
-        return s - 20;
-      if (r >= 191 && r <= 360)
-        return s - 15;
+function v(t, n, s) {
+  const r = w(D(t, 10 - n + 1)), a = w(t), o = a.hue(), e = a.saturationv(), c = w({
+    h: a.hue(),
+    s: h(6),
+    v: a.value()
+  }).saturationv(), l = Math.ceil((c - 9) / 4), f = Math.ceil((100 - c) / 5);
+  function h(M) {
+    if (M < 6)
+      return c + (6 - M) * f;
+    if (M === 6) {
+      if (o >= 0 && o < 50)
+        return e - 15;
+      if (o >= 50 && o < 191)
+        return e - 20;
+      if (o >= 191 && o <= 360)
+        return e - 15;
     }
-    return c - u * (d - 6);
+    return c - l * (M - 6);
   }
-  const h = m({
-    h: e.hue(),
-    s: l(o),
-    v: e.value()
+  const u = w({
+    h: r.hue(),
+    s: h(n),
+    v: r.value()
   });
-  return E(h, a);
+  return H(u, s);
 }
-function I(n, o = {}) {
-  const { dark: a, list: e, index: t = 6, format: r = "hex" } = o;
-  if (e) {
-    const s = [], i = a ? v : F;
+function $(t, n = {}) {
+  const { dark: s, list: r, index: a = 6, format: o = "hex" } = n;
+  if (r) {
+    const e = [], i = s ? v : D;
     for (let c = 1; c <= 10; c++)
-      s.push(i(n, c, r));
-    return s;
+      e.push(i(t, c, o));
+    return e;
   }
-  return a ? v(n, t, r) : F(n, t, r);
+  return s ? v(t, a, o) : D(t, a, o);
 }
-async function B(n) {
+async function z(t) {
   try {
-    const o = await k(n), a = V(o);
-    return G(a);
-  } catch (o) {
-    throw console.error("提取图片颜色失败:", o), o;
+    const n = await P(t), s = G(n);
+    return V(s);
+  } catch (n) {
+    throw console.error("提取图片颜色失败:", n), n;
   }
 }
-async function k(n) {
-  return new Promise((o, a) => {
+async function P(t) {
+  return new Promise((n, s) => {
     try {
       if (typeof document > "u") {
-        a(new Error("图像颜色提取功能仅在浏览器环境中可用"));
+        s(new Error("图像颜色提取功能仅在浏览器环境中可用"));
         return;
       }
-      const e = document.createElement("canvas"), t = e.getContext("2d"), r = Math.min(n.width, 100), s = Math.min(n.height, 100), i = Math.min(r / n.width, s / n.height);
-      e.width = n.width * i, e.height = n.height * i, t.drawImage(n, 0, 0, e.width, e.height);
-      const c = t.getImageData(0, 0, e.width, e.height);
-      o(c);
-    } catch (e) {
-      a(e);
+      const r = document.createElement("canvas"), a = r.getContext("2d"), o = Math.min(t.width, 100), e = Math.min(t.height, 100), i = Math.min(o / t.width, e / t.height);
+      r.width = t.width * i, r.height = t.height * i, a.drawImage(t, 0, 0, r.width, r.height);
+      const c = a.getImageData(0, 0, r.width, r.height);
+      n(c);
+    } catch (r) {
+      s(r);
     }
   });
 }
-function V(n) {
-  const o = n.data, a = /* @__PURE__ */ new Map();
-  for (let t = 0; t < o.length; t += 4) {
-    const r = o[t], s = o[t + 1], i = o[t + 2];
-    if (o[t + 3] < 128) continue;
-    const u = Math.round(r / 16) * 16, f = Math.round(s / 16) * 16, l = Math.round(i / 16) * 16, h = `${u},${f},${l}`;
-    a.has(h) ? a.set(h, a.get(h) + 1) : a.set(h, 1);
+function G(t) {
+  const n = t.data, s = /* @__PURE__ */ new Map();
+  for (let a = 0; a < n.length; a += 4) {
+    const o = n[a], e = n[a + 1], i = n[a + 2];
+    if (n[a + 3] < 128) continue;
+    const l = Math.round(o / 16) * 16, f = Math.round(e / 16) * 16, h = Math.round(i / 16) * 16, u = `${l},${f},${h}`;
+    s.has(u) ? s.set(u, s.get(u) + 1) : s.set(u, 1);
   }
-  const e = [];
-  return a.forEach((t, r) => {
-    const [s, i, c] = r.split(",").map(Number);
-    e.push({ r: s, g: i, b: c, count: t });
-  }), e;
+  const r = [];
+  return s.forEach((a, o) => {
+    const [e, i, c] = o.split(",").map(Number);
+    r.push({ r: e, g: i, b: c, count: a });
+  }), r;
 }
-function G(n) {
-  n.sort((t, r) => r.count - t.count);
-  const o = n.filter((t) => {
-    const { r, g: s, b: i } = t, c = Math.max(r, s, i), u = Math.min(r, s, i), f = c - u, l = c === 0 ? 0 : f / c, h = c / 255;
-    return l > 0.15 && h > 0.2 && h < 0.8;
-  }), a = o.length > 0 ? o[0] : n[0];
-  return m({ r: a.r, g: a.g, b: a.b }).hex();
+function V(t) {
+  t.sort((a, o) => o.count - a.count);
+  const n = t.filter((a) => {
+    const { r: o, g: e, b: i } = a, c = Math.max(o, e, i), l = Math.min(o, e, i), f = c - l, h = c === 0 ? 0 : f / c, u = c / 255;
+    return h > 0.15 && u > 0.2 && u < 0.8;
+  }), s = n.length > 0 ? n[0] : t[0];
+  return w({ r: s.r, g: s.g, b: s.b }).hex();
 }
-function W(n) {
-  return new Promise((o, a) => {
+function U(t) {
+  return new Promise((n, s) => {
     if (typeof FileReader > "u" || typeof Image > "u") {
-      a(new Error("文件读取功能仅在浏览器环境中可用"));
+      s(new Error("文件读取功能仅在浏览器环境中可用"));
       return;
     }
-    if (!n.type.startsWith("image/")) {
-      a(new Error("请选择图片文件"));
+    if (!t.type.startsWith("image/")) {
+      s(new Error("请选择图片文件"));
       return;
     }
-    const e = new FileReader();
-    e.onload = async (t) => {
+    const r = new FileReader();
+    r.onload = async (a) => {
       try {
-        const r = new Image();
-        r.onload = async () => {
+        const o = new Image();
+        o.onload = async () => {
           try {
-            const s = await B(r);
-            o(s);
-          } catch (s) {
-            a(s);
+            const e = await z(o);
+            n(e);
+          } catch (e) {
+            s(e);
           }
-        }, r.onerror = () => a(new Error("图片加载失败")), r.src = t.target.result;
-      } catch (r) {
-        a(r);
+        }, o.onerror = () => s(new Error("图片加载失败")), o.src = a.target.result;
+      } catch (o) {
+        s(o);
       }
-    }, e.onerror = () => a(new Error("文件读取失败")), e.readAsDataURL(n);
+    }, r.onerror = () => s(new Error("文件读取失败")), r.readAsDataURL(t);
   });
 }
-function $(n, o, a = {}) {
-  const { steps: e = 10, format: t = "hex", includeEnds: r = !0 } = a;
-  if (e < 2)
+function B(t, n, s = {}) {
+  const { steps: r = 10, format: a = "hex", includeEnds: o = !0 } = s;
+  if (r < 2)
     throw new Error("步数必须至少为2");
-  const s = m(n), i = m(o), c = [], u = r ? e : e + 2, f = 1 / (u - 1);
-  for (let l = 0; l < u; l++) {
-    const h = l * f, d = Math.round(s.red() + (i.red() - s.red()) * h), g = Math.round(s.green() + (i.green() - s.green()) * h), p = Math.round(s.blue() + (i.blue() - s.blue()) * h), M = m({ r: d, g, b: p });
-    !r && (l === 0 || l === u - 1) || c.push(E(M, t));
+  const e = w(t), i = w(n), c = [], l = o ? r : r + 2, f = 1 / (l - 1);
+  for (let h = 0; h < l; h++) {
+    const u = h * f, M = Math.round(e.red() + (i.red() - e.red()) * u), d = Math.round(e.green() + (i.green() - e.green()) * u), g = Math.round(e.blue() + (i.blue() - e.blue()) * u), m = w({ r: M, g: d, b: g });
+    !o && (h === 0 || h === l - 1) || c.push(H(m, a));
   }
   return c;
 }
-function j(n = {}) {
+function K(t = {}) {
   const {
-    startGray: o = "#ffffff",
-    endGray: a = "#000000",
-    steps: e = 10,
-    format: t = "hex"
-  } = n;
-  return $(o, a, { steps: e, format: t, includeEnds: !0 });
+    startGray: n = "#ffffff",
+    endGray: s = "#000000",
+    steps: r = 10,
+    format: a = "hex"
+  } = t;
+  return B(n, s, { steps: r, format: a, includeEnds: !0 });
 }
-function J(n, o = {}) {
-  const { steps: a = 10, format: e = "hex", lightnessRange: t = 80 } = o, s = m(n).hsl(), i = s.lightness(), c = Math.min(95, i + t / 2), u = Math.max(5, i - t / 2), f = m({
-    h: s.hue(),
-    s: s.saturation(),
+function W(t, n = {}) {
+  const { steps: s = 10, format: r = "hex", lightnessRange: a = 80 } = n, e = w(t).hsl(), i = e.lightness(), c = Math.min(95, i + a / 2), l = Math.max(5, i - a / 2), f = w({
+    h: e.hue(),
+    s: e.saturation(),
     l: c
-  }), l = m({
-    h: s.hue(),
-    s: s.saturation(),
-    l: u
+  }), h = w({
+    h: e.hue(),
+    s: e.saturation(),
+    l
   });
-  return $(f.hex(), l.hex(), { steps: a, format: e, includeEnds: !0 });
+  return B(f.hex(), h.hex(), { steps: s, format: r, includeEnds: !0 });
 }
-function Q(n, o, a = {}) {
-  const { steps: e = 10, format: t = "hex", includeEnds: r = !0 } = a;
-  if (e < 2)
+function J(t, n, s = {}) {
+  const { steps: r = 10, format: a = "hex", includeEnds: o = !0 } = s;
+  if (r < 2)
     throw new Error("步数必须至少为2");
-  const s = m(n).hsl(), i = m(o).hsl(), c = [], u = r ? e : e + 2, f = 1 / (u - 1);
-  let l = s.hue() || 0, h = i.hue() || 0;
-  const d = h - l;
-  Math.abs(d) > 180 && (d > 0 ? l += 360 : h += 360);
-  for (let g = 0; g < u; g++) {
-    const p = g * f;
-    let M = l + (h - l) * p;
-    const y = s.saturation() + (i.saturation() - s.saturation()) * p, S = s.lightness() + (i.lightness() - s.lightness()) * p;
-    M = M % 360, M < 0 && (M += 360);
-    const b = m({ h: M, s: y, l: S });
-    !r && (g === 0 || g === u - 1) || c.push(E(b, t));
+  const e = w(t).hsl(), i = w(n).hsl(), c = [], l = o ? r : r + 2, f = 1 / (l - 1);
+  let h = e.hue() || 0, u = i.hue() || 0;
+  const M = u - h;
+  Math.abs(M) > 180 && (M > 0 ? h += 360 : u += 360);
+  for (let d = 0; d < l; d++) {
+    const g = d * f;
+    let m = h + (u - h) * g;
+    const y = e.saturation() + (i.saturation() - e.saturation()) * g, E = e.lightness() + (i.lightness() - e.lightness()) * g;
+    m = m % 360, m < 0 && (m += 360);
+    const b = w({ h: m, s: y, l: E });
+    !o && (d === 0 || d === l - 1) || c.push(H(b, a));
   }
   return c;
 }
-function C(n) {
-  const o = n.replace("#", ""), a = parseInt(o.substr(0, 2), 16) / 255, e = parseInt(o.substr(2, 2), 16) / 255, t = parseInt(o.substr(4, 2), 16) / 255, r = Math.max(a, e, t), s = Math.min(a, e, t), i = r - s;
+function S(t) {
+  if (!t || typeof t != "string")
+    throw new Error("Invalid RGB color: must be a string");
+  const n = t.replace("#", "");
+  if (!/^[0-9A-Fa-f]{6}$/.test(n))
+    throw new Error("Invalid RGB color format: must be #rrggbb or rrggbb");
+  const s = parseInt(n.slice(0, 2), 16) / 255, r = parseInt(n.slice(2, 4), 16) / 255, a = parseInt(n.slice(4, 6), 16) / 255, o = Math.max(s, r, a), e = Math.min(s, r, a), i = o - e;
   let c = 0;
-  i !== 0 && (r === a ? c = (e - t) / i % 6 : r === e ? c = (t - a) / i + 2 : c = (a - e) / i + 4), c = Math.round(c * 60), c < 0 && (c += 360);
-  const u = Math.round((0.299 * a + 0.587 * e + 0.114 * t) * 100), f = (r + s) / 2, l = i === 0 ? 0 : i / (1 - Math.abs(2 * f - 1)), h = Math.round(l * Math.min(u, 100 - u));
-  return { h: c, c: h, t: u };
+  i !== 0 && (o === s ? c = (r - a) / i % 6 : o === r ? c = (a - s) / i + 2 : c = (s - r) / i + 4), c = Math.round(c * 60), c < 0 && (c += 360);
+  const l = Math.round((0.299 * s + 0.587 * r + 0.114 * a) * 100), f = (o + e) / 2;
+  let h = 0;
+  i !== 0 && f !== 0 && f !== 1 && (h = i / (1 - Math.abs(2 * f - 1)));
+  let u = 0;
+  return l > 0 && l < 100 && (u = Math.round(h * Math.min(l, 100 - l))), { h: c, c: Math.max(0, u), t: Math.max(0, Math.min(100, l)) };
 }
-function D(n) {
-  const { h: o, c: a, t: e } = n, t = (o % 360 + 360) % 360, r = Math.max(0, Math.min(150, a)), s = Math.max(0, Math.min(100, e)), i = s / 100, c = s === 0 || s === 100 ? 0 : r / Math.min(s, 100 - s), u = (1 - Math.abs(2 * i - 1)) * Math.min(1, c), f = u * (1 - Math.abs(t / 60 % 2 - 1)), l = i - u / 2;
-  let h, d, g;
-  t >= 0 && t < 60 ? [h, d, g] = [u, f, 0] : t >= 60 && t < 120 ? [h, d, g] = [f, u, 0] : t >= 120 && t < 180 ? [h, d, g] = [0, u, f] : t >= 180 && t < 240 ? [h, d, g] = [0, f, u] : t >= 240 && t < 300 ? [h, d, g] = [f, 0, u] : [h, d, g] = [u, 0, f];
-  const p = (M) => {
-    const y = Math.max(0, Math.min(1, M + l)), S = Math.round(y * 255).toString(16);
-    return S.length === 1 ? "0" + S : S;
+function R(t, n = {}) {
+  if (!t || typeof t != "object" || t.h === void 0 || t.c === void 0 || t.t === void 0)
+    throw new Error("Invalid HCT color: must be an object with h, c, t properties");
+  const { h: s, c: r, t: a } = t, { maxChroma: o = 200 } = n, e = (s % 360 + 360) % 360, i = Math.max(0, Math.min(o, r)), c = Math.max(0, Math.min(100, a)), l = c / 100;
+  let f = 0;
+  if (c > 0 && c < 100 && i > 0) {
+    const E = Math.min(c, 100 - c);
+    f = E > 0 ? i / E : 0;
+  }
+  const h = (1 - Math.abs(2 * l - 1)) * Math.min(1, f), u = h * (1 - Math.abs(e / 60 % 2 - 1)), M = l - h / 2;
+  let d, g, m;
+  e >= 0 && e < 60 ? [d, g, m] = [h, u, 0] : e >= 60 && e < 120 ? [d, g, m] = [u, h, 0] : e >= 120 && e < 180 ? [d, g, m] = [0, h, u] : e >= 180 && e < 240 ? [d, g, m] = [0, u, h] : e >= 240 && e < 300 ? [d, g, m] = [u, 0, h] : [d, g, m] = [h, 0, u];
+  const y = (E) => {
+    const b = Math.max(0, Math.min(1, E + M)), p = Math.round(b * 255).toString(16);
+    return p.length === 1 ? "0" + p : p;
   };
-  return `#${p(h)}${p(d)}${p(g)}`;
+  return `#${y(d)}${y(g)}${y(m)}`;
 }
-function R(n, o, a = 0.5) {
-  const e = C(n), t = C(o);
-  let r = e.h, s = t.h, i = s - r;
-  Math.abs(i) > 180 && (i > 0 ? r += 360 : s += 360);
-  const c = (r + (s - r) * a) % 360, u = e.c + (t.c - e.c) * a, f = e.t + (t.t - e.t) * a;
-  return D({
-    h: c < 0 ? c + 360 : c,
-    c: Math.max(0, Math.round(u)),
-    t: Math.max(0, Math.min(100, Math.round(f)))
+function F(t, n, s = 0.5) {
+  if (!t || !n)
+    throw new Error("Both colors are required for blending");
+  const r = Math.max(0, Math.min(1, s)), a = S(t), o = S(n);
+  let e = a.h, i = o.h, c = i - e;
+  Math.abs(c) > 180 && (c > 0 ? e += 360 : i += 360, c = i - e);
+  const l = (e + c * r) % 360, f = a.c + (o.c - a.c) * r, h = a.t + (o.t - a.t) * r;
+  return R({
+    h: l < 0 ? l + 360 : l,
+    c: Math.max(0, Math.round(f)),
+    t: Math.max(0, Math.min(100, Math.round(h)))
   });
 }
-function X(n, o, a = 0.15) {
-  const e = C(n), t = C(o);
-  let r = t.h, s = e.h, i = s - r;
-  Math.abs(i) > 180 && (i > 0 ? r += 360 : s += 360, i = s - r);
-  const c = (r + i * a) % 360;
-  return D({
-    h: c < 0 ? c + 360 : c,
-    c: t.c,
+function Q(t, n, s = 0.15) {
+  if (!t || !n)
+    throw new Error("Both theme color and target color are required");
+  const r = Math.max(0, Math.min(1, s)), a = S(t), o = S(n);
+  let e = o.h, i = a.h, c = i - e;
+  Math.abs(c) > 180 && (c > 0 ? e += 360 : i += 360, c = i - e);
+  const l = (e + c * r) % 360;
+  return R({
+    h: l < 0 ? l + 360 : l,
+    c: o.c,
     // 保持原有色度
-    t: t.t
+    t: o.t
     // 保持原有色调
   });
 }
-function O(n, o = [10, 20, 30, 40, 50, 60, 70, 80, 90]) {
-  const a = C(n);
-  let e;
-  return Array.isArray(o) ? e = o : o && o.tones && Array.isArray(o.tones) ? e = o.tones : e = [10, 20, 30, 40, 50, 60, 70, 80, 90], e.map((t) => D({
-    h: a.h,
-    c: a.c,
-    t
+function X(t, n = [10, 20, 30, 40, 50, 60, 70, 80, 90]) {
+  if (!t)
+    throw new Error("Theme color is required");
+  const s = S(t);
+  let r;
+  if (Array.isArray(n) ? r = n : n && n.tones && Array.isArray(n.tones) ? r = n.tones : r = [10, 20, 30, 40, 50, 60, 70, 80, 90], !Array.isArray(r) || r.length === 0)
+    throw new Error("Tone steps must be a non-empty array");
+  const a = r.filter((o) => typeof o == "number" && o >= 0 && o <= 100);
+  if (a.length === 0)
+    throw new Error("No valid tone values found (must be numbers between 0-100)");
+  return a.map((o) => R({
+    h: s.h,
+    c: s.c,
+    t: o
   }));
 }
-function T(n, o, a = 0.2) {
-  const e = {};
-  for (const [t, r] of Object.entries(o))
-    e[t] = R(n, r, a);
-  return e;
+function j(t, n, s = 0.2) {
+  if (!t)
+    throw new Error("Theme color is required");
+  if (!n || typeof n != "object")
+    throw new Error("UI colors must be an object");
+  const r = Math.max(0, Math.min(1, s)), a = {};
+  for (const [o, e] of Object.entries(n))
+    try {
+      a[o] = F(t, e, r);
+    } catch (i) {
+      console.warn(`Failed to blend color for key "${o}": ${i.message}`), a[o] = e;
+    }
+  return a;
 }
-function N(n, o = {}) {
-  const { baseGray: a = "#666666" } = o, { blendRatio: e = 0.08, isDark: t = !1 } = o, r = C(a), s = {};
-  return (t ? [95, 90, 85, 80, 70, 60, 50, 40, 30, 20, 15, 10] : [10, 15, 20, 30, 40, 50, 60, 70, 80, 85, 90, 95]).forEach((c, u) => {
-    const f = { h: r.h, c: r.c, t: c }, l = R(D(f), n, e);
-    s[`gray-${u + 1}`] = l;
-  }), s;
-}
-function L(n, o = {}) {
+function I(t, n = {}) {
+  if (!t)
+    throw new Error("Theme color is required");
   const {
-    semanticColors: a = {
+    baseGray: s = "#666666",
+    blendRatio: r = 0.08,
+    isDark: a = !1
+  } = n, o = Math.max(0, Math.min(1, r)), e = S(s), i = {};
+  return (a ? [95, 90, 85, 80, 70, 60, 50, 40, 30, 20, 15, 10] : [10, 15, 20, 30, 40, 50, 60, 70, 80, 85, 90, 95]).forEach((l, f) => {
+    const h = { h: e.h, c: e.c, t: l }, u = F(R(h), t, o);
+    i[`gray-${f + 1}`] = u;
+  }), i;
+}
+function T(t, n = {}) {
+  if (!t)
+    throw new Error("Theme color is required");
+  const {
+    semanticColors: s = {
       success: "#52c41a",
       warning: "#faad14",
       error: "#ff4d4f",
       info: "#1890ff"
     },
-    blendRatio: e = 0.12,
-    isDark: t = !1
-  } = o, r = {};
-  return Object.entries(a).forEach(([s, i]) => {
-    const c = {}, u = C(i);
-    (t ? [90, 80, 70, 60, 50, 40, 30, 25, 20, 15] : [15, 25, 35, 45, 55, 65, 75, 85, 90, 95]).forEach((l, h) => {
-      const d = { h: u.h, c: u.c, t: l }, g = R(D(d), n, e);
-      c[`${s}-${h + 1}`] = g;
-    }), Object.assign(r, c);
-  }), r;
+    blendRatio: r = 0,
+    isDark: a = !1
+  } = n;
+  if (!s || typeof s != "object")
+    throw new Error("Semantic colors must be an object");
+  const o = Math.max(0, Math.min(1, r)), e = {};
+  return Object.entries(s).forEach(([i, c]) => {
+    if (!c || typeof c != "string") {
+      console.warn(`Invalid color for semantic color "${i}": ${c}`);
+      return;
+    }
+    try {
+      const l = {}, f = S(c);
+      (a ? [90, 80, 70, 60, 50, 40, 30, 25, 20, 15] : [15, 25, 35, 45, 55, 65, 75, 85, 90, 95]).forEach((u, M) => {
+        const d = { h: f.h, c: f.c, t: u }, g = F(R(d), t, o);
+        l[`${i}-${M + 1}`] = g;
+      }), Object.assign(e, l);
+    } catch (l) {
+      console.warn(`Failed to generate variants for semantic color "${i}": ${l.message}`);
+    }
+  }), e;
 }
-function q(n, o = {}) {
-  const { isDark: a = !1 } = o, e = C(n), t = {};
-  return (a ? [90, 80, 70, 60, 50, 40, 30, 25, 20, 15] : [15, 25, 35, 45, 55, 65, 75, 85, 90, 95]).forEach((s, i) => {
-    const c = { h: e.h, c: e.c, t: s };
-    t[`theme-${i + 1}`] = D(c);
-  }), t;
+function q(t, n = {}) {
+  if (!t)
+    throw new Error("Theme color is required");
+  const { isDark: s = !1 } = n, r = S(t), a = {};
+  return (s ? [90, 80, 70, 60, 50, 40, 30, 25, 20, 15] : [15, 25, 35, 45, 55, 65, 75, 85, 90, 95]).forEach((e, i) => {
+    const c = { h: r.h, c: r.c, t: e };
+    a[`theme-${i + 1}`] = R(c);
+  }), a;
 }
-function Y(n, o = {}) {
+function Y(t, n = {}) {
+  if (!t)
+    throw new Error("Theme color is required");
   const {
-    baseGray: a = "#666666",
-    isDark: e = !1,
-    semanticColors: t,
-    controlBlendRatio: r = 0.08,
-    semanticBlendRatio: s = 0.12
-  } = o;
+    baseGray: s = "#666666",
+    isDark: r = !1,
+    semanticColors: a,
+    controlBlendRatio: o = 0.08,
+    semanticBlendRatio: e = 0.12
+  } = n, i = Math.max(0, Math.min(1, o)), c = Math.max(0, Math.min(1, e));
   return {
     // 1. 基础控件颜色（灰色系1-12）
-    controls: N(n, {
-      baseGray: a,
-      blendRatio: r,
-      isDark: e
+    controls: I(t, {
+      baseGray: s,
+      blendRatio: i,
+      isDark: r
     }),
     // 2. 表意色（1-10）
-    semantic: L(n, {
-      semanticColors: t,
-      blendRatio: s,
-      isDark: e
+    semantic: T(t, {
+      semanticColors: a,
+      blendRatio: c,
+      isDark: r
     }),
     // 3. 主题色（1-10）
-    theme: q(n, { isDark: e })
+    theme: q(t, { isDark: r })
   };
 }
-function Z(n, o = {}) {
+function Z(t, n = {}) {
+  if (!t)
+    throw new Error("Theme color is required");
   const {
-    semanticColors: a = {
+    semanticColors: s = {
       success: "#52c41a",
       warning: "#faad14",
       error: "#ff4d4f",
       info: "#1890ff"
     },
-    uiColors: e = {
+    uiColors: r = {
       background: "#ffffff",
       surface: "#fafafa",
       border: "#d9d9d9",
       disabled: "#f5f5f5"
     },
-    harmonizeRatio: t = 0.15,
-    blendRatio: r = 0.12,
-    generateVariants: s = !0
-  } = o, i = L(n, { semanticColors: a, blendRatio: t }), c = {};
-  Object.entries(a).forEach(([f]) => {
-    c[f] = {};
-    for (let l = 1; l <= 10; l++) {
-      const h = `${f}-${l}`;
-      i[h] && (c[f][l] = i[h]);
+    harmonizeRatio: a = 0.15,
+    blendRatio: o = 0.12,
+    isDark: e = !1
+  } = n, i = Math.max(0, Math.min(1, a)), c = Math.max(0, Math.min(1, o)), l = q(t, { isDark: e }), f = I(t, {
+    blendRatio: c * 0.5,
+    // 中性色混合比例稍低
+    isDark: e
+  }), h = T(t, {
+    semanticColors: s,
+    blendRatio: i,
+    isDark: e
+  }), u = {};
+  return Object.entries(s).forEach(([d]) => {
+    u[d] = {};
+    for (let g = 1; g <= 10; g++) {
+      const m = `${d}-${g}`;
+      h[m] && (u[d][g] = h[m]);
     }
-  });
-  const u = {
-    theme: n,
-    semantic: c,
-    ui: T(n, e, r)
+  }), {
+    theme: l,
+    // 主题色阶 theme-1 到 theme-10
+    controls: f,
+    // 中性色阶 gray-1 到 gray-12
+    semantic: u,
+    // 功能色系
+    ui: j(t, r, c)
   };
-  return s && (u.variants = O(n)), u;
 }
-const H = {
+const C = {
   red: "#F53F3F",
   orangered: "#F77234",
   orange: "#FF7D00",
@@ -358,10 +428,10 @@ const H = {
   magenta: "#F5319D"
 };
 function _() {
-  const n = {};
-  return Object.keys(H).forEach((o) => {
-    n[o] = {}, n[o].light = I(H[o], { list: !0 }), n[o].dark = I(H[o], { list: !0, dark: !0 }), n[o].primary = H[o];
-  }), n.gray = {}, n.gray.light = [
+  const t = {};
+  return Object.keys(C).forEach((n) => {
+    t[n] = {}, t[n].light = $(C[n], { list: !0 }), t[n].dark = $(C[n], { list: !0, dark: !0 }), t[n].primary = C[n];
+  }), t.gray = {}, t.gray.light = [
     "#f7f8fa",
     "#f2f3f5",
     "#e5e6eb",
@@ -372,7 +442,7 @@ function _() {
     "#4e5969",
     "#272e3b",
     "#1d2129"
-  ], n.gray.dark = [
+  ], t.gray.dark = [
     "#17171a",
     "#2e2e30",
     "#484849",
@@ -383,28 +453,28 @@ function _() {
     "#c5c5c5",
     "#dfdfdf",
     "#f6f6f6"
-  ], n.gray.primary = n.gray.light[6], n;
+  ], t.gray.primary = t.gray.light[6], t;
 }
 export {
-  R as blendInHct,
-  T as blendUIColors,
-  H as colorList,
-  W as extractColorFromFile,
-  B as extractColorFromImage,
-  I as generate,
-  N as generateControlColors,
-  j as generateGrayLinear,
+  F as blendInHct,
+  j as blendUIColors,
+  C as colorList,
+  U as extractColorFromFile,
+  z as extractColorFromImage,
+  $ as generate,
+  I as generateControlColors,
+  K as generateGrayLinear,
   Y as generateInterfaceColorSystem,
-  $ as generateLinear,
-  Q as generateLinearHSL,
-  J as generateMonochromeLinear,
-  L as generateSemanticColors,
+  B as generateLinear,
+  J as generateLinearHSL,
+  W as generateMonochromeLinear,
+  T as generateSemanticColors,
   q as generateThemeColors,
   Z as generateThemePalette,
-  O as generateThemeVariants,
+  X as generateThemeVariants,
   _ as getPresetColors,
-  K as getRgbStr,
-  X as harmonizeColor,
-  D as hctToRgb,
-  C as rgbToHct
+  O as getRgbStr,
+  Q as harmonizeColor,
+  R as hctToRgb,
+  S as rgbToHct
 };
