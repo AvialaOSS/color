@@ -17,9 +17,10 @@ export function rgbToHct(rgb: string): Object;
 /**
  * 将 HCT 颜色转换为 RGB
  * @param {Object} hct - HCT 颜色对象 {h, c, t}
+ * @param {Object} options - 配置选项
  * @returns {string} RGB 颜色值，格式如 "#ff0000"
  */
-export function hctToRgb(hct: Object): string;
+export function hctToRgb(hct: Object, options?: Object): string;
 /**
  * 在 HCT 颜色空间中混合两种颜色
  * @param {string} color1 - 第一种颜色 (RGB)

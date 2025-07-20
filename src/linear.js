@@ -91,20 +91,20 @@ export function generateMonochromeLinear(baseColor, options = {}) {
   const hsl = base.hsl();
   
   // 计算起始和结束亮度
-  const baseLightness = hsl.lightness();
+  const baseLightness = base.lightness();
   const maxLightness = Math.min(95, baseLightness + lightnessRange / 2);
   const minLightness = Math.max(5, baseLightness - lightnessRange / 2);
   
   // 创建起始和结束颜色（保持色相和饱和度，只改变亮度）
   const startColor = Color({
-    h: hsl.hue(),
-    s: hsl.saturation(),
+    h: hsl.color[0],
+    s: hsl.color[1],
     l: maxLightness
   });
   
   const endColor = Color({
-    h: hsl.hue(),
-    s: hsl.saturation(),
+    h: hsl.color[0],
+    s: hsl.color[1],
     l: minLightness
   });
   
@@ -140,8 +140,8 @@ export function generateLinearHSL(startColor, endColor, options = {}) {
   const stepSize = 1 / (actualSteps - 1);
   
   // 处理色相的循环特性
-  let startHue = start.hue() || 0;
-  let endHue = end.hue() || 0;
+  let startHue = start.color[0] || 0;
+  let endHue = end.color[0] || 0;
   
   // 选择最短的色相路径
   const hueDiff = endHue - startHue;
@@ -158,8 +158,8 @@ export function generateLinearHSL(startColor, endColor, options = {}) {
     
     // 在HSL空间进行线性插值
     let h = startHue + (endHue - startHue) * ratio;
-    const s = start.saturation() + (end.saturation() - start.saturation()) * ratio;
-    const l = start.lightness() + (end.lightness() - start.lightness()) * ratio;
+    const s = start.color[1] + (end.color[1] - start.color[1]) * ratio;
+    const l = start.color[2] + (end.color[2] - start.color[2]) * ratio;
     
     // 确保色相在0-360范围内
     h = h % 360;
