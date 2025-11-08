@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug HCT Values</title>
+  <script type="module">
+    import { rgbToHct, hctToRgb } from './src/theme-blend.js';
+
+    // 测试不同的 baseGray 值
+    const colors = [
+      '#989898',  // 中性灰
+      '#666666',  // 默认值
+      '#7A8B99',  // 偏冷灰
+      '#998877',  // 偏暖灰
+      '#808080',  // 纯灰
+    ];
+
+    console.log('=== baseGray 的 HCT 值分析 ===\n');
+    
+    colors.forEach(color => {
+      const hct = rgbToHct(color);
+      console.log(`${color}:`);
+      console.log(`  H (色相): ${hct.h}°`);
+      console.log(`  C (色度): ${hct.c}`);
+      console.log(`  T (明度): ${hct.t}`);
+      console.log('');
+    });
+
+    // 测试生成的灰色
+    console.log('\n=== 生成 gray-6 (Tone=50) 的效果 ===\n');
+    
+    colors.forEach(color => {
+      const baseHct = rgbToHct(color);
+      const grayHct = {h: baseHct.h, c: baseHct.c, t: 50};
+      const gray = hctToRgb(grayHct);
+      console.log(`baseGray: ${color} -> gray-6: ${gray}`);
+    });
+  </script>
+</head>
+<body>
+  <h1>打开浏览器控制台查看结果</h1>
+</body>
+</html>

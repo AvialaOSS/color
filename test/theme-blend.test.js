@@ -81,16 +81,26 @@ describe('Theme Blend Functions', () => {
     expect(palette).toHaveProperty('theme');
     expect(palette).toHaveProperty('semantic');
     expect(palette).toHaveProperty('ui');
-    expect(palette).toHaveProperty('variants');
+    expect(palette).toHaveProperty('controls');
     
-    expect(palette.theme).toBe(testThemeColor);
-    expect(Array.isArray(palette.variants)).toBe(true);
+    // Check theme colors (theme-1 to theme-10)
+    expect(typeof palette.theme).toBe('object');
+    expect(Object.keys(palette.theme)).toHaveLength(10);
+    
+    // Check controls (gray-1 to gray-12)
+    expect(typeof palette.controls).toBe('object');
+    expect(Object.keys(palette.controls)).toHaveLength(12);
     
     // Check semantic colors
     expect(palette.semantic).toHaveProperty('success');
     expect(palette.semantic).toHaveProperty('warning');
     expect(palette.semantic).toHaveProperty('error');
     expect(palette.semantic).toHaveProperty('info');
+    
+    // Each semantic color should have 10 variants
+    Object.values(palette.semantic).forEach(colorVariants => {
+      expect(Object.keys(colorVariants)).toHaveLength(10);
+    });
     
     // Check UI colors
     expect(palette.ui).toHaveProperty('background');
@@ -102,20 +112,27 @@ describe('Theme Blend Functions', () => {
   test('generateThemePalette should work with custom options', () => {
     const customOptions = {
       semanticColors: {
-        primary: '#2196f3',
-        secondary: '#4caf50'
+        success: '#00C853',
+        warning: '#FF9800',
+        error: '#F44336',
+        info: '#2196F3'
       },
       harmonizeRatio: 0.3,
-      blendRatio: 0.4,
-      generateVariants: false
+      blendRatio: 0.4
     };
     
     const palette = generateThemePalette(testThemeColor, customOptions);
     
-    expect(palette.semantic).toHaveProperty('primary');
-    expect(palette.semantic).toHaveProperty('secondary');
-    expect(palette.semantic).not.toHaveProperty('success');
-    expect(palette).not.toHaveProperty('variants');
+    expect(palette.semantic).toHaveProperty('success');
+    expect(palette.semantic).toHaveProperty('warning');
+    expect(palette.semantic).toHaveProperty('error');
+    expect(palette.semantic).toHaveProperty('info');
+    
+    // All semantic colors should have 10 variants each
+    expect(Object.keys(palette.semantic.success)).toHaveLength(10);
+    expect(Object.keys(palette.semantic.warning)).toHaveLength(10);
+    expect(Object.keys(palette.semantic.error)).toHaveLength(10);
+    expect(Object.keys(palette.semantic.info)).toHaveLength(10);
   });
   
   test('generateControlColors should generate control colors', () => {

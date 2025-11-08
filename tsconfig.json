@@ -1,23 +1,41 @@
 {
   "compilerOptions": {
+    // 目标环境
     "target": "ES2020",
-    "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
+    
+    // 模块解析
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    
+    // JavaScript 项目配置
+    "allowJs": true,                  // 允许编译 JS 文件
+    "checkJs": true,                  // 启用 JS 文件的类型检查
+    "maxNodeModuleJsDepth": 1,        // 限制 node_modules 中 JS 的类型推断深度
+    
+    // 类型声明生成
+    "declaration": true,              // 生成 .d.ts 文件
+    "declarationMap": true,           // 生成 .d.ts.map 文件，方便调试
+    "emitDeclarationOnly": true,      // 仅生成类型定义，不生成 JS（由 Vite 处理）
+    
+    // 输出配置
+    "outDir": "dist",
     "noEmit": false,
+    
+    // 严格模式
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "allowJs": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    
+    // 其他配置
+    "skipLibCheck": true,             // 跳过声明文件的类型检查，提高性能
+    "esModuleInterop": true,          // 更好的 ESM/CommonJS 互操作性
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*.js"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "test", "demo"]
 }

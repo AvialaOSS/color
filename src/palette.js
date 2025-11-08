@@ -3,7 +3,13 @@ import { getColorString } from './utils.js';
 
 // 色板
 
-// 动态梯度算法
+/**
+ * 使用动态梯度算法生成单个色板颜色
+ * @param {string} originColor - 基础颜色
+ * @param {number} i - 色板索引 (1-10)
+ * @param {string} format - 输出格式：'hex' | 'rgb' | 'hsl'
+ * @returns {string} 生成的颜色字符串
+ */
 function colorPalette(originColor, i, format) {
   const color = Color(originColor);
   const h = color.hue();
@@ -11,6 +17,7 @@ function colorPalette(originColor, i, format) {
   const v = color.value();
 
   // 根据色相区域动态调整步长
+  /** @param {number} hue */
   const getHueStep = (hue) => {
     if (hue >= 60 && hue <= 240) {
       return 2.5; // 绿色-蓝色区域可以用更大的步长
@@ -28,6 +35,10 @@ function colorPalette(originColor, i, format) {
   const maxValue = 100;
   const minValue = 30;
 
+  /**
+   * @param {boolean} isLight
+   * @param {number} i
+   */
   function getNewHue(isLight, i) {
     let hue;
     if (h >= 60 && h <= 240) {
@@ -43,6 +54,10 @@ function colorPalette(originColor, i, format) {
     return Math.round(hue);
   }
 
+  /**
+   * @param {boolean} isLight
+   * @param {number} i
+   */
   function getNewSaturation(isLight, i) {
     let newSaturation;
 
@@ -57,6 +72,10 @@ function colorPalette(originColor, i, format) {
     return Math.max(0, Math.min(100, newSaturation)); // 确保在有效范围内
   }
 
+  /**
+   * @param {boolean} isLight
+   * @param {number} i
+   */
   function getNewValue(isLight, i) {
     if (isLight) {
       // 亮色明度调整，使过渡更自然
