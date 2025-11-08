@@ -161,6 +161,9 @@ export function generateMonochromeLinear(baseColor, options = {}) {
   
   // 优先使用直接指定的端点值（固定端点模式）
   if (minLightness !== null && maxLightness !== null) {
+    if (minLightness > maxLightness) {
+      throw new Error('minLightness 不能大于 maxLightness');
+    }
     finalMaxLightness = Math.max(0, Math.min(100, maxLightness));
     finalMinLightness = Math.max(0, Math.min(100, minLightness));
   } else {

@@ -463,7 +463,7 @@ export function generateControlColors(themeColor, options = {}) {
   }
   
   const { 
-    baseGray = '#989898ff',
+    baseGray = '#989898',
     blendRatio = 0.08,
     isDark = false,
     steps = 12,  // 默认 12 个等级，可以增加到 24、36 等以获得更细腻的梯度
