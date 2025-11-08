@@ -2,7 +2,7 @@
 
 > 🤖 此文档由 `npm run docs:generate` 自动生成，请勿手动编辑
 
-> 最后更新时间: 2025/11/9 00:37:04
+> 最后更新时间: 2025/11/9 02:33:51
 
 ## 目录
 
@@ -192,11 +192,19 @@ import { generateMonochromeLinear } from '@aviala-design/color';
 const blueShades = generateMonochromeLinear('#3491FA', { steps: 10 });
 // 生成从浅蓝到深蓝的10个颜色，保持色相和饱和度
 
-// 自定义亮度范围
+// 自定义亮度范围（基于中心扩展模式）
 const customShades = generateMonochromeLinear('#ff6b6b', {
   steps: 7,
   lightnessRange: 60  // 亮度变化范围
 });
+
+// 直接指定最大和最小亮度（固定端点模式）
+const fixedRange = generateMonochromeLinear('#3491FA', {
+  steps: 12,
+  minLightness: 10,   // 最深色接近黑色
+  maxLightness: 98    // 最浅色接近白色
+});
+// 推荐用于需要接近纯白/纯黑的场景
 
 // 生成HSL格式
 const hslShades = generateMonochromeLinear('#00b894', {
@@ -527,43 +535,9 @@ function generateInterfaceColorSystem(themeColor, options = {})
 
 ### `generateThemePalette`
 
-生成完整的主题色板
-
 **签名：**
 ```typescript
 function generateThemePalette(themeColor, options = {})
-```
-
-**参数：**
-
-- `themeColor`: `string` - 主题色
-- `options` (可选): `*` - 配置选项
-
-**返回值：**
-
-- `{theme: object, controls: object, semantic: object, ui: object` - } 完整的主题色板
-
-**示例：**
-
-```javascript
-import { generateThemePalette } from '@aviala-design/color';
-
-// 生成完整主题色板
-const palette = generateThemePalette('#3491FA');
-console.log(palette.theme);     // 主题色变体
-console.log(palette.controls);  // 控件颜色
-console.log(palette.semantic);  // 语义色系
-console.log(palette.ui);        // UI 元素颜色
-
-// 自定义完整色板
-const customPalette = generateThemePalette('#6200EE', {
-  isDark: true,
-  semanticColors: {
-    success: '#00C853',
-    error: '#D50000'
-  },
-  harmonizeRatio: 0.2
-});
 ```
 
 ---
