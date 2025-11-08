@@ -1,785 +1,652 @@
 # API 参考文档
 
-本文档提供了 Aviala Design Color 库的完整 API 参考。
+> 🤖 此文档由 `npm run docs:generate` 自动生成，请勿手动编辑
+
+> 最后更新时间: 2025/11/9 00:37:04
 
 ## 目录
 
-- [核心函数](#核心函数)
-  - [generate](#generate)
-  - [getPresetColors](#getpresetcolors)
-  - [getRgbStr](#getrgbstr)
+- [色板生成](#色板生成)
+  - [`generate`](#generate)
+- [工具函数](#工具函数)
+  - [`getRgbStr`](#getrgbstr)
+  - [`getColorString`](#getcolorstring)
 - [线性颜色生成](#线性颜色生成)
-  - [generateLinear](#generatelinear)
-  - [generateGrayLinear](#generategraylinear)
-  - [generateMonochromeLinear](#generatemonochromelinear)
-  - [generateLinearHSL](#generatelinearhsl)
+  - [`generateLinear`](#generatelinear)
+  - [`generateGrayLinear`](#generategraylinear)
+  - [`generateMonochromeLinear`](#generatemonochromelinear)
+  - [`generateLinearHSL`](#generatelinearhsl)
 - [图片取色](#图片取色)
-  - [extractColorFromImage](#extractcolorfromimage)
-  - [extractColorFromFile](#extractcolorfromfile)
-- [主题混合](#主题混合)
-  - [rgbToHct](#rgbtohct)
-  - [hctToRgb](#hcttorgb)
-  - [blendInHct](#blendinhct)
-  - [harmonizeColor](#harmonizecolor)
-  - [generateThemeVariants](#generatethemevariants)
-  - [blendUIColors](#blenduicolors)
-  - [generateThemePalette](#generatethemepalette)
-- [类型定义](#类型定义)
-- [错误处理](#错误处理)
+  - [`extractColorFromImage`](#extractcolorfromimage)
+  - [`extractColorFromFile`](#extractcolorfromfile)
+- [主题混合 (HCT)](#主题混合-hct)
+  - [`rgbToHct`](#rgbtohct)
+  - [`hctToRgb`](#hcttorgb)
+  - [`blendInHct`](#blendinhct)
+  - [`harmonizeColor`](#harmonizecolor)
+  - [`generateThemeVariants`](#generatethemevariants)
+  - [`blendUIColors`](#blenduicolors)
+  - [`generateControlColors`](#generatecontrolcolors)
+  - [`generateSemanticColors`](#generatesemanticcolors)
+  - [`generateThemeColors`](#generatethemecolors)
+  - [`generateInterfaceColorSystem`](#generateinterfacecolorsystem)
+  - [`generateThemePalette`](#generatethemepalette)
+- [入口导出](#入口导出)
+  - [`getPresetColors`](#getpresetcolors)
+  - [`colorList`](#colorlist)
 
-## 核心函数
+---
 
-### generate
+## 色板生成
 
-基于基础颜色生成色盘的核心函数。
+### `generate`
 
+**签名：**
 ```typescript
-function generate(color: string, options?: GenerateOptions): string | string[]
+function generate(color, options = {})
+```
+
+---
+
+## 工具函数
+
+### `getRgbStr`
+
+将颜色转换为 RGB 字符串格式（逗号分隔，无空格）
+
+**签名：**
+```typescript
+function getRgbStr(color)
 ```
 
 **参数：**
-- `color`: string - 基础颜色，支持十六进制格式（如 '#FF5733'）
-- `options`: GenerateOptions - 可选配置项
 
-**GenerateOptions 接口：**
-```typescript
-interface GenerateOptions {
-  index?: number;     // 指定返回色盘中的第几个颜色，范围1-10，默认为6
-  dark?: boolean;     // 是否生成暗色模式的色盘，默认为false
-  list?: boolean;     // 是否返回完整色盘列表，默认为false
-  format?: 'hex' | 'rgb' | 'hsl'; // 返回颜色的格式，默认为'hex'
-}
-```
+- `color`: `string | import('color')` - 颜色值，支持任何 color.js 支持的格式
 
 **返回值：**
-- 当 `list` 为 true 时，返回 `string[]` - 包含10个颜色的数组
-- 当 `list` 为 false 时，返回 `string` - 指定索引位置的单个颜色
+
+- `string` - RGB 字符串，格式如 "255,0,0"
 
 **示例：**
+
 ```javascript
-import { generate } from '@aviala-design/color';
-
-// 获取基础颜色（索引6）
-const baseColor = generate('#165DFF');
-console.log(baseColor); // '#165DFF'
-
-// 获取完整色盘
-const palette = generate('#165DFF', { list: true });
-console.log(palette); // ['#E8F3FF', '#BEDAFF', ...]
-
-// 获取暗色模式色盘
-const darkPalette = generate('#165DFF', { list: true, dark: true });
-
-// 获取特定索引的颜色
-const lightColor = generate('#165DFF', { index: 3 });
-const darkColor = generate('#165DFF', { index: 8 });
-
-// 获取RGB格式的颜色
-const rgbColor = generate('#165DFF', { format: 'rgb' });
-console.log(rgbColor); // 'rgb(22, 93, 255)'
+getRgbStr('#FF0000') // '255,0,0'
+getRgbStr('rgb(255, 0, 0)') // '255,0,0'
 ```
 
-### getPresetColors
+---
 
-获取预设的14种颜色色盘。
+### `getColorString`
 
+**签名：**
 ```typescript
-function getPresetColors(): PresetColors
+function getColorString(color, format)
 ```
 
-**返回值：**
-```typescript
-interface PresetColors {
-  [colorName: string]: {
-    light: string[];    // 亮色模式色盘（10个颜色）
-    dark: string[];     // 暗色模式色盘（10个颜色）
-    primary: string;    // 主色调
-  }
-}
-```
-
-**预设颜色列表：**
-- `red` - 红色系
-- `orangered` - 橙红色系
-- `orange` - 橙色系
-- `gold` - 金色系
-- `yellow` - 黄色系
-- `lime` - 青柠色系
-- `green` - 绿色系
-- `cyan` - 青色系
-- `blue` - 蓝色系
-- `arcoblue` - Arco蓝色系
-- `purple` - 紫色系
-- `pinkpurple` - 粉紫色系
-- `magenta` - 品红色系
-- `gray` - 灰色系
-
-**示例：**
-```javascript
-import { getPresetColors } from '@aviala-design/color';
-
-const colors = getPresetColors();
-
-// 获取红色系色盘
-console.log(colors.red.light);   // 亮色模式红色色盘
-console.log(colors.red.dark);    // 暗色模式红色色盘
-console.log(colors.red.primary); // 红色主色调 '#F53F3F'
-
-// 遍历所有预设颜色
-Object.entries(colors).forEach(([name, colorSet]) => {
-  console.log(`${name}: ${colorSet.primary}`);
-});
-```
-
-### getRgbStr
-
-将颜色转换为RGB字符串格式。
-
-```typescript
-function getRgbStr(color: string): string
-```
-
-**参数：**
-- `color`: string - 颜色值，支持十六进制格式
-
-**返回值：**
-- `string` - RGB值的字符串表示，格式为 "r,g,b"
-
-**示例：**
-```javascript
-import { getRgbStr } from '@aviala-design/color';
-
-const rgbString = getRgbStr('#F53F3F');
-console.log(rgbString); // '245,63,63'
-
-const rgbString2 = getRgbStr('#165DFF');
-console.log(rgbString2); // '22,93,255'
-```
+---
 
 ## 线性颜色生成
 
-### generateLinear
+### `generateLinear`
 
-在两个颜色之间进行线性插值。
+线性颜色生成器 在两个颜色之间进行线性插值，生成指定数量的颜色 特别适用于灰色系和单色调渐变
 
+**签名：**
 ```typescript
-function generateLinear(
-  startColor: string, 
-  endColor: string, 
-  options?: LinearOptions
-): string[]
+function generateLinear(startColor, endColor, options = {})
 ```
 
 **参数：**
-- `startColor`: string - 起始颜色
-- `endColor`: string - 结束颜色
-- `options`: LinearOptions - 可选配置项
 
-**LinearOptions 接口：**
-```typescript
-interface LinearOptions {
-  steps?: number;        // 生成的颜色数量，默认为10
-  includeEnds?: boolean; // 是否包含端点颜色，默认为true
-  format?: 'hex' | 'rgb' | 'hsl'; // 返回颜色的格式，默认为'hex'
-}
-```
+- `startColor`: `string` - 起始颜色
+- `endColor`: `string` - 结束颜色
+
+**返回值：**
+
+- `string[]` - 颜色数组
 
 **示例：**
+
 ```javascript
 import { generateLinear } from '@aviala-design/color';
 
-// 基础用法
-const colors = generateLinear('#ff0000', '#0000ff');
-console.log(colors); // 从红色到蓝色的10个颜色
+// 生成从白色到黑色的10个颜色
+const grayScale = generateLinear('#ffffff', '#000000', { steps: 10 });
+// ['#ffffff', '#e3e3e3', '#c7c7c7', ..., '#000000']
 
-// 自定义步数
-const colors5 = generateLinear('#ff0000', '#0000ff', { steps: 5 });
+// 生成RGB格式的渐变
+const gradient = generateLinear('#ff0000', '#0000ff', { 
+  steps: 5, 
+  format: 'rgb' 
+});
+// ['rgb(255, 0, 0)', 'rgb(191, 0, 63)', ..., 'rgb(0, 0, 255)']
 
-// 不包含端点
-const middleColors = generateLinear('#ff0000', '#0000ff', {
-  steps: 8,
-  includeEnds: false
+// 不包含端点的渐变
+const middle = generateLinear('#ff0000', '#0000ff', { 
+  steps: 3, 
+  includeEnds: false 
+});
+// 只返回中间的颜色，不包含起始和结束颜色
+```
+
+---
+
+### `generateGrayLinear`
+
+生成灰色系线性渐变 从白色到黑色或指定的灰色范围
+
+**签名：**
+```typescript
+function generateGrayLinear(options = {})
+```
+
+**返回值：**
+
+- `string[]` - 灰色系颜色数组
+
+**示例：**
+
+```javascript
+import { generateGrayLinear } from '@aviala-design/color';
+
+// 生成默认灰色渐变（白到黑，10个颜色）
+const grays = generateGrayLinear();
+// ['#ffffff', '#e3e3e3', ..., '#000000']
+
+// 自定义灰色范围
+const customGrays = generateGrayLinear({
+  startGray: '#f0f0f0',
+  endGray: '#333333',
+  steps: 5
 });
 
-// RGB格式输出
-const rgbColors = generateLinear('#ff0000', '#0000ff', {
+// 生成RGB格式的灰色
+const rgbGrays = generateGrayLinear({ format: 'rgb', steps: 8 });
+```
+
+---
+
+### `generateMonochromeLinear`
+
+生成单色调线性渐变 基于一个基础颜色，生成从浅到深的渐变
+
+**签名：**
+```typescript
+function generateMonochromeLinear(baseColor, options = {})
+```
+
+**参数：**
+
+- `baseColor`: `string` - 基础颜色
+
+**返回值：**
+
+- `string[]` - 单色调颜色数组
+
+**示例：**
+
+```javascript
+import { generateMonochromeLinear } from '@aviala-design/color';
+
+// 生成蓝色的单色调渐变
+const blueShades = generateMonochromeLinear('#3491FA', { steps: 10 });
+// 生成从浅蓝到深蓝的10个颜色，保持色相和饱和度
+
+// 自定义亮度范围
+const customShades = generateMonochromeLinear('#ff6b6b', {
+  steps: 7,
+  lightnessRange: 60  // 亮度变化范围
+});
+
+// 生成HSL格式
+const hslShades = generateMonochromeLinear('#00b894', {
+  format: 'hsl',
+  steps: 5
+});
+```
+
+---
+
+### `generateLinearHSL`
+
+在HSL空间进行线性插值 适用于需要更自然色彩过渡的场景
+
+**签名：**
+```typescript
+function generateLinearHSL(startColor, endColor, options = {})
+```
+
+**参数：**
+
+- `startColor`: `string` - 起始颜色
+- `endColor`: `string` - 结束颜色
+
+**返回值：**
+
+- `string[]` - 颜色数组
+
+**示例：**
+
+```javascript
+import { generateLinearHSL } from '@aviala-design/color';
+
+// 在 HSL 空间生成从黄色到紫色的渐变
+const gradient = generateLinearHSL('#FFD700', '#9B59B6', { steps: 8 });
+// 通过色相环插值，产生更自然的彩虹效果
+
+// 包含端点值
+const withEnds = generateLinearHSL('#FF6B6B', '#4ECDC4', {
+  steps: 5,
+  includeEnds: true
+});
+// 结果的第一个是 #FF6B6B，最后一个是 #4ECDC4
+
+// 输出为 RGB 格式
+const rgbGradient = generateLinearHSL('hsl(0, 100%, 50%)', 'hsl(240, 100%, 50%)', {
+  steps: 6,
   format: 'rgb'
 });
 ```
 
-### generateGrayLinear
-
-生成灰色系线性渐变。
-
-```typescript
-function generateGrayLinear(options?: GrayLinearOptions): string[]
-```
-
-**GrayLinearOptions 接口：**
-```typescript
-interface GrayLinearOptions {
-  startGray?: string;    // 起始灰色，默认为'#ffffff'
-  endGray?: string;      // 结束灰色，默认为'#000000'
-  steps?: number;        // 生成的颜色数量，默认为10
-  includeEnds?: boolean; // 是否包含端点颜色，默认为true
-  format?: 'hex' | 'rgb' | 'hsl'; // 返回颜色的格式，默认为'hex'
-}
-```
-
-**示例：**
-```javascript
-import { generateGrayLinear } from '@aviala-design/color';
-
-// 标准灰色系（白到黑）
-const grayScale = generateGrayLinear();
-
-// 自定义灰色范围
-const customGray = generateGrayLinear({
-  startGray: '#f0f0f0',
-  endGray: '#333333',
-  steps: 8
-});
-```
-
-### generateMonochromeLinear
-
-生成单色调线性渐变。
-
-```typescript
-function generateMonochromeLinear(
-  baseColor: string, 
-  options?: MonochromeLinearOptions
-): string[]
-```
-
-**MonochromeLinearOptions 接口：**
-```typescript
-interface MonochromeLinearOptions {
-  steps?: number;        // 生成的颜色数量，默认为10
-  lightnessRange?: [number, number]; // 明度范围，默认为[0.1, 0.9]
-  includeEnds?: boolean; // 是否包含端点颜色，默认为true
-  format?: 'hex' | 'rgb' | 'hsl'; // 返回颜色的格式，默认为'hex'
-}
-```
-
-**示例：**
-```javascript
-import { generateMonochromeLinear } from '@aviala-design/color';
-
-// 基础单色调渐变
-const monoColors = generateMonochromeLinear('#165DFF');
-
-// 自定义明度范围
-const customMono = generateMonochromeLinear('#165DFF', {
-  lightnessRange: [0.2, 0.8],
-  steps: 8
-});
-```
-
-### generateLinearHSL
-
-在HSL颜色空间中进行线性插值。
-
-```typescript
-function generateLinearHSL(
-  startColor: string, 
-  endColor: string, 
-  options?: LinearOptions
-): string[]
-```
-
-**参数和选项与 generateLinear 相同**
-
-**示例：**
-```javascript
-import { generateLinearHSL } from '@aviala-design/color';
-
-// HSL空间插值
-const hslColors = generateLinearHSL('#ff0000', '#00ff00');
-
-// 色相环渐变
-const hueGradient = generateLinearHSL('#ff0000', '#ff0000', {
-  steps: 12 // 生成色相环
-});
-```
+---
 
 ## 图片取色
 
-### extractColorFromImage
+### `extractColorFromImage`
 
-从已加载的图片元素中提取主色调。
+从图片中提取主色调
 
+**签名：**
 ```typescript
-function extractColorFromImage(image: HTMLImageElement): Promise<string>
+function extractColorFromImage(image)
 ```
 
 **参数：**
-- `image`: HTMLImageElement - 已加载的图片元素
+
+- `image`: `HTMLImageElement` - 图片元素
 
 **返回值：**
+
 - `Promise<string>` - 提取的主色调（十六进制格式）
 
 **示例：**
+
 ```javascript
 import { extractColorFromImage } from '@aviala-design/color';
 
-const imageElement = document.getElementById('myImage');
+// 从已加载的图片元素提取主色调
+const img = document.getElementById('myImage');
+const dominantColor = await extractColorFromImage(img);
+console.log(dominantColor); // '#3491FA'
 
-imageElement.onload = async () => {
-  try {
-    const dominantColor = await extractColorFromImage(imageElement);
-    console.log('主色调:', dominantColor); // '#FF5733'
-  } catch (error) {
-    console.error('提取失败:', error);
-  }
+// 动态创建图片并提取颜色
+const img = new Image();
+img.crossOrigin = 'anonymous';
+img.onload = async () => {
+  const color = await extractColorFromImage(img);
+  document.body.style.backgroundColor = color;
 };
+img.src = 'https://example.com/image.jpg';
 ```
 
-### extractColorFromFile
+---
 
-从文件对象中读取图片并提取主色调。
+### `extractColorFromFile`
 
+获取图片的像素数据
+
+**签名：**
 ```typescript
-function extractColorFromFile(file: File): Promise<string>
+function extractColorFromFile(file)
 ```
 
 **参数：**
-- `file`: File - 图片文件对象
+
+- `image`: `HTMLImageElement` - 图片元素
 
 **返回值：**
-- `Promise<string>` - 提取的主色调（十六进制格式）
 
-**示例：**
-```javascript
-import { extractColorFromFile } from '@aviala-design/color';
+- `Promise<ImageData>` - 图片的像素数据
 
-const fileInput = document.getElementById('fileInput');
+---
 
-fileInput.addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    try {
-      const dominantColor = await extractColorFromFile(file);
-      console.log('提取的主色调:', dominantColor);
-    } catch (error) {
-      console.error('提取失败:', error);
-    }
-  }
-});
+## 主题混合 (HCT)
+
+### `rgbToHct`
+
+主题色混合模块 基于 Material Design 3 的 HCT 颜色空间实现颜色混合和调和 HCT (Hue, Chroma, Tone) 颜色空间结合了 CAM16 和 CIE-Lab 的优势： - H (Hue): 色相，0-360度 - C (Chroma): 色度，颜色的饱和度 - T (Tone): 色调，亮度从黑色(0)到白色(100)
+
+**签名：**
+```typescript
+function rgbToHct(rgb)
 ```
 
-## 主题混合
+---
 
-### rgbToHct
+### `hctToRgb`
 
-将RGB颜色转换为HCT色彩空间。
+将 HCT 颜色转换为 RGB
 
+**签名：**
 ```typescript
-function rgbToHct(color: string): HCTColor
+function hctToRgb(hct, options = {})
 ```
 
 **参数：**
-- `color`: string - RGB颜色值（支持hex、rgb格式）
+
+- `hct`: `HCT` - HCT 颜色对象 {h, c, t}
 
 **返回值：**
-- `HCTColor` - HCT色彩空间对象 `{ h: number, c: number, t: number }`
+
+- `string` - RGB 颜色值，格式如 "#ff0000"
 
 **示例：**
-```javascript
-import { rgbToHct } from '@aviala-design/color';
 
-const hct = rgbToHct('#165DFF');
-console.log(hct); // { h: 225, c: 87, t: 64 }
-```
-
-### hctToRgb
-
-将HCT色彩空间转换为RGB颜色。
-
-```typescript
-function hctToRgb(hct: HCTColor): string
-```
-
-**参数：**
-- `hct`: HCTColor - HCT色彩空间对象
-
-**返回值：**
-- `string` - 十六进制颜色值
-
-**示例：**
 ```javascript
 import { hctToRgb } from '@aviala-design/color';
 
-const rgb = hctToRgb({ h: 225, c: 87, t: 64 });
-console.log(rgb); // '#165DFF'
+// 从 HCT 颜色空间转回 RGB
+const rgb = hctToRgb({ h: 210, c: 45, t: 60 });
+console.log(rgb); // '#3491FA'
+
+// 在 HCT 空间调整颜色后转换
+const hct = { h: 120, c: 50, t: 70 };
+const rgb = hctToRgb(hct);
+document.body.style.backgroundColor = rgb;
 ```
 
-### blendInHct
+---
 
-在HCT色彩空间中混合两种颜色。
+### `blendInHct`
 
+**签名：**
 ```typescript
-function blendInHct(
-  color1: string, 
-  color2: string, 
-  ratio: number
-): string
+function blendInHct(color1, color2, ratio = 0.5)
 ```
 
 **参数：**
-- `color1`: string - 第一种颜色
-- `color2`: string - 第二种颜色
-- `ratio`: number - 混合比例（0-1）
 
-**返回值：**
-- `string` - 混合后的颜色
+- `val`: `number`
 
-**示例：**
-```javascript
-import { blendInHct } from '@aviala-design/color';
+---
 
-const blended = blendInHct('#165DFF', '#F53F3F', 0.5);
-console.log(blended); // 混合后的颜色
-```
+### `harmonizeColor`
 
-### harmonizeColor
+颜色调和 - 让目标颜色向主题色的色相靠拢
 
-将目标色向主题色调和。
-
+**签名：**
 ```typescript
-function harmonizeColor(
-  themeColor: string, 
-  targetColor: string, 
-  ratio: number
-): string
+function harmonizeColor(themeColor, targetColor, harmonizeRatio = 0.15)
 ```
 
 **参数：**
-- `themeColor`: string - 主题色
-- `targetColor`: string - 目标色
-- `ratio`: number - 调和比例（0-1）
+
+- `themeColor`: `string` - 主题色 (RGB)
+- `targetColor`: `string` - 目标颜色 (RGB)
+- `harmonizeRatio`: `number` - 调和强度，0-1，0表示不调和，1表示完全采用主题色的色相
 
 **返回值：**
-- `string` - 调和后的颜色
+
+- `string` - 调和后的颜色 (RGB)
 
 **示例：**
+
 ```javascript
 import { harmonizeColor } from '@aviala-design/color';
 
-const harmonized = harmonizeColor('#165DFF', '#F53F3F', 0.15);
-console.log(harmonized); // 调和后的错误色
+// 让错误色与品牌色保持和谐
+const themeColor = '#3491FA';  // 蓝色主题
+const errorColor = '#FF0000';  // 红色
+const harmonized = harmonizeColor(themeColor, errorColor, 0.15);
+// 错误色会带有一点蓝色调，与主题更协调
+
+// 调和语义色系
+const primaryColor = '#6200EE';
+const success = harmonizeColor(primaryColor, '#4CAF50');
+const warning = harmonizeColor(primaryColor, '#FF9800');
+const error = harmonizeColor(primaryColor, '#F44336');
 ```
 
-### generateThemeVariants
+---
 
-基于主题色生成明度变体。
+### `generateThemeVariants`
 
+生成主题色变体 - 基于主题色生成不同明度的颜色变体
+
+**签名：**
 ```typescript
-function generateThemeVariants(
-  themeColor: string, 
-  options?: ThemeVariantsOptions
-): string[]
+function generateThemeVariants(themeColor, options)
 ```
 
 **参数：**
-- `themeColor`: string - 主题色
-- `options`: ThemeVariantsOptions - 可选配置
+
+- `themeColor`: `string` - 主题色 (RGB)
 
 **返回值：**
-- `string[]` - 主题变体数组
+
+- `string[]` - 主题色变体数组
 
 **示例：**
+
 ```javascript
 import { generateThemeVariants } from '@aviala-design/color';
 
-const variants = generateThemeVariants('#165DFF');
-console.log(variants); // ['#f0f5ff', '#d6e4ff', ...]
+// 生成默认的色调变体
+const variants = generateThemeVariants('#3491FA');
+// 返回 9 个色调的变体 (10, 20, 30, ..., 90)
+
+// 自定义色调值
+const customVariants = generateThemeVariants('#FF5722', {
+  tones: [20, 40, 60, 80, 95]
+});
+
+// 数组形式传参
+const variants = generateThemeVariants('#6200EE', [30, 50, 70]);
 ```
 
+---
 
+### `blendUIColors`
 
-### blendUIColors
+UI 元素颜色混合 - 为按钮、卡片等 UI 元素生成主题化颜色
 
-将主题色混合到界面色中。
-
+**签名：**
 ```typescript
-function blendUIColors(
-  themeColor: string, 
-  uiColors: Record<string, string>, 
-  ratio: number
-): Record<string, string>
+function blendUIColors(themeColor, uiColors, blendRatio = 0.2)
 ```
 
 **参数：**
-- `themeColor`: string - 主题色
-- `uiColors`: Record<string, string> - 界面色对象
-- `ratio`: number - 混合比例（0-1）
+
+- `themeColor`: `string` - 主题色
+- `blendRatio` (可选): `number` - 混合强度
 
 **返回值：**
-- `Record<string, string>` - 混合后的界面色对象
+
+- `{[key: string]: string` - } 混合后的 UI 颜色对象
 
 **示例：**
+
 ```javascript
 import { blendUIColors } from '@aviala-design/color';
 
+// 为 UI 元素注入品牌色
+const brandColor = '#3491FA';
 const uiColors = {
-  background: '#FFFFFF',
-  surface: '#F7F8FA',
-  border: '#E5E6EB'
+  button: '#E0E0E0',
+  card: '#F5F5F5',
+  input: '#FFFFFF'
 };
+const themed = blendUIColors(brandColor, uiColors, 0.1);
+// 所有 UI 颜色会带有品牌色调
 
-const blended = blendUIColors('#165DFF', uiColors, 0.05);
-```
-
-### generateInterfaceColorSystem
-
-生成完整的界面色彩系统，包含控件色、语义色和主题色。
-
-```typescript
-function generateInterfaceColorSystem(
-  themeColor: string, 
-  options?: InterfaceColorSystemOptions
-): InterfaceColorSystem
-```
-
-**参数：**
-- `themeColor`: string - 主题色
-- `options`: InterfaceColorSystemOptions - 可选配置
-
-**InterfaceColorSystemOptions 接口：**
-```typescript
-interface InterfaceColorSystemOptions {
-  baseGray?: string;              // 基础灰色，默认 '#666666'
-  isDark?: boolean;               // 是否为暗色模式，默认 false
-  semanticColors?: Record<string, string>; // 自定义语义色
-  controlBlendRatio?: number;     // 控件色混合比例，默认 0.08
-  semanticBlendRatio?: number;    // 语义色混合比例，默认 0.12
-}
-```
-
-**返回值：**
-- `InterfaceColorSystem` - 界面色彩系统对象
-
-**InterfaceColorSystem 接口：**
-```typescript
-interface InterfaceColorSystem {
-  controls: Record<string, string>;  // 控件色 (gray-1 到 gray-12)
-  semantic: Record<string, string>;  // 语义色 (success-1 到 success-10, warning-1 到 warning-10, 等)
-  theme: Record<string, string>;     // 主题色 (theme-1 到 theme-10)
-}
-```
-
-**示例：**
-```javascript
-import { generateInterfaceColorSystem } from '@aviala-design/color';
-
-// 基础用法
-const colorSystem = generateInterfaceColorSystem('#165DFF');
-
-// 自定义语义色
-const customSystem = generateInterfaceColorSystem('#165DFF', {
-  semanticColors: {
-    success: '#00b96b',
-    warning: '#faad14',
-    error: '#ff7875',
-    info: '#1890ff'
-  },
-  isDark: false
+// 创建主题化组件色板
+const result = blendUIColors('#6200EE', {
+  surface: '#FFFFFF',
+  background: '#F5F5F5',
+  divider: '#E0E0E0'
 });
-
-console.log(customSystem);
-/*
-{
-  controls: {
-    'gray-1': '#ffffff',
-    'gray-2': '#fafafa',
-    // ... gray-3 到 gray-12
-  },
-  semantic: {
-    'success-1': '#f6ffed',
-    'success-2': '#d9f7be',
-    // ... success-3 到 success-10
-    'warning-1': '#fffbe6',
-    // ... 其他语义色
-  },
-  theme: {
-    'theme-1': '#f0f5ff',
-    'theme-2': '#d6e4ff',
-    // ... theme-3 到 theme-10
-  }
-}
-*/
 ```
 
-### generateThemePalette
+---
 
-生成完整的主题色板。
+### `generateControlColors`
 
+**签名：**
 ```typescript
-function generateThemePalette(
-  themeColor: string, 
-  options?: ThemePaletteOptions
-): ThemePalette
+function generateControlColors(themeColor, options = {})
+```
+
+---
+
+### `generateSemanticColors`
+
+**签名：**
+```typescript
+function generateSemanticColors(themeColor, options = {})
+```
+
+---
+
+### `generateThemeColors`
+
+**签名：**
+```typescript
+function generateThemeColors(themeColor, options = {})
+```
+
+---
+
+### `generateInterfaceColorSystem`
+
+**签名：**
+```typescript
+function generateInterfaceColorSystem(themeColor, options = {})
+```
+
+---
+
+### `generateThemePalette`
+
+生成完整的主题色板
+
+**签名：**
+```typescript
+function generateThemePalette(themeColor, options = {})
 ```
 
 **参数：**
-- `themeColor`: string - 主题色
-- `options`: ThemePaletteOptions - 可选配置
+
+- `themeColor`: `string` - 主题色
+- `options` (可选): `*` - 配置选项
 
 **返回值：**
-- `ThemePalette` - 完整主题色板对象
+
+- `{theme: object, controls: object, semantic: object, ui: object` - } 完整的主题色板
 
 **示例：**
+
 ```javascript
 import { generateThemePalette } from '@aviala-design/color';
 
-const palette = generateThemePalette('#165DFF');
-console.log(palette);
-/*
-{
-  theme: '#165DFF',
-  variants: ['#f0f5ff', '#d6e4ff', ...],
-  semantic: { success: '...', warning: '...', error: '...' },
-  ui: { background: '...', surface: '...', border: '...' }
-}
-*/
+// 生成完整主题色板
+const palette = generateThemePalette('#3491FA');
+console.log(palette.theme);     // 主题色变体
+console.log(palette.controls);  // 控件颜色
+console.log(palette.semantic);  // 语义色系
+console.log(palette.ui);        // UI 元素颜色
+
+// 自定义完整色板
+const customPalette = generateThemePalette('#6200EE', {
+  isDark: true,
+  semanticColors: {
+    success: '#00C853',
+    error: '#D50000'
+  },
+  harmonizeRatio: 0.2
+});
 ```
 
-## 类型定义
+---
 
+## 入口导出
+
+### `getPresetColors`
+
+预设颜色常量 包含 13 种常用的品牌色和语义色
+
+**签名：**
 ```typescript
-// 颜色格式类型
-type ColorFormat = 'hex' | 'rgb' | 'hsl';
-
-// 生成选项
-interface GenerateOptions {
-  index?: number;
-  dark?: boolean;
-  list?: boolean;
-  format?: ColorFormat;
-}
-
-// 线性插值选项
-interface LinearOptions {
-  steps?: number;
-  includeEnds?: boolean;
-  format?: ColorFormat;
-}
-
-// 灰色线性选项
-interface GrayLinearOptions extends LinearOptions {
-  startGray?: string;
-  endGray?: string;
-}
-
-// 单色调线性选项
-interface MonochromeLinearOptions extends LinearOptions {
-  lightnessRange?: [number, number];
-}
-
-// 预设颜色集合
-interface ColorSet {
-  light: string[];
-  dark: string[];
-  primary: string;
-}
-
-interface PresetColors {
-  [colorName: string]: ColorSet;
-}
-
-// HCT色彩空间
-interface HCTColor {
-  h: number; // 色相 (0-360)
-  c: number; // 饱和度 (0-150+)
-  t: number; // 明度 (0-100)
-}
-
-// 主题变体选项
-interface ThemeVariantsOptions {
-  tones?: number[]; // 自定义明度值，默认 [10, 20, 30, 40, 50, 60, 70, 80, 90]
-}
-
-// 主题色板选项
-interface ThemePaletteOptions {
-  semanticColors?: Record<string, string>; // 自定义语义色
-  uiColors?: Record<string, string>;       // 自定义界面色
-  harmonizeRatio?: number;                 // 调和比例 (0-1)，默认 0.15
-  blendRatio?: number;                     // 混合比例 (0-1)，默认 0.05
-  generateVariants?: boolean;              // 是否生成变体，默认 true
-  tones?: number[];                        // 自定义明度值
-}
-
-// 主题色板结果
-interface ThemePalette {
-  theme: string;                           // 主题色
-  variants?: string[];                     // 主题变体
-  semantic: Record<string, string>;       // 语义色
-  ui: Record<string, string>;             // 界面色
-}
-
-// 界面色彩系统选项
-interface InterfaceColorSystemOptions {
-  baseGray?: string;                       // 基础灰色，默认 '#666666'
-  isDark?: boolean;                        // 是否为暗色模式，默认 false
-  semanticColors?: Record<string, string>; // 自定义语义色
-  controlBlendRatio?: number;              // 控件色混合比例，默认 0.08
-  semanticBlendRatio?: number;             // 语义色混合比例，默认 0.12
-}
-
-// 界面色彩系统结果
-interface InterfaceColorSystem {
-  controls: Record<string, string>;       // 控件色 (gray-1 到 gray-12)
-  semantic: Record<string, string>;       // 语义色 (success-1 到 success-10, warning-1 到 warning-10, 等)
-  theme: Record<string, string>;          // 主题色 (theme-1 到 theme-10)
-}
+function getPresetColors()
 ```
 
-## 错误处理
+**示例：**
 
-库中的函数可能抛出以下类型的错误：
-
-### 颜色解析错误
 ```javascript
-try {
-  const colors = generate('invalid-color');
-} catch (error) {
-  console.error('无效的颜色格式:', error.message);
-}
+import { colorList } from '@aviala-design/color';
+
+// 使用预设颜色
+console.log(colorList.blue); // '#3491FA'
+console.log(colorList.green); // '#00B42A'
 ```
 
-### 图片处理错误
+---
+
+### `colorList`
+
+预设颜色常量 包含 13 种常用的品牌色和语义色
+
+**签名：**
+```typescript
+const colorList: {
+ *   red: string,
+ *   orangered: string,
+ *   orange: string,
+ *   gold: string,
+ *   yellow: string,
+ *   lime: string,
+ *   green: string,
+ *   cyan: string,
+ *   blue: string,
+ *   arcoblue: string,
+ *   purple: string,
+ *   pinkpurple: string,
+ *   magenta: string
+ * 
+```
+
+**返回值：**
+
+- `{
+ *   red: string,
+ *   orangered: string,
+ *   orange: string,
+ *   gold: string,
+ *   yellow: string,
+ *   lime: string,
+ *   green: string,
+ *   cyan: string,
+ *   blue: string,
+ *   arcoblue: string,
+ *   purple: string,
+ *   pinkpurple: string,
+ *   magenta: string
+ * `
+
+**示例：**
+
 ```javascript
-try {
-  const color = await extractColorFromFile(file);
-} catch (error) {
-  if (error.message.includes('请选择图片文件')) {
-    console.error('文件类型错误');
-  } else if (error.message.includes('图片加载失败')) {
-    console.error('图片损坏或格式不支持');
-  } else {
-    console.error('处理失败:', error.message);
-  }
-}
+import { colorList } from '@aviala-design/color';
+
+// 使用预设颜色
+console.log(colorList.blue); // '#3491FA'
+console.log(colorList.green); // '#00B42A'
 ```
 
-### 参数验证错误
-```javascript
-try {
-  const colors = generateLinear('#ff0000', '#0000ff', { steps: -1 });
-} catch (error) {
-  console.error('参数错误:', error.message);
-}
-```
+---
 
-## 最佳实践
 
-1. **颜色格式一致性**：在项目中保持颜色格式的一致性，建议使用十六进制格式作为标准。
+## 注意事项
 
-2. **错误处理**：始终使用 try-catch 包装异步操作，特别是图片处理功能。
-
-3. **性能优化**：对于大量颜色生成操作，考虑使用缓存机制。
-
-4. **可访问性**：生成的颜色应确保足够的对比度，特别是在UI设计中。
-
-5. **色盘使用**：在设计系统中，建议使用预设色盘作为基础，确保品牌一致性。
+- 本文档基于源代码中的 JSDoc 注释自动生成
+- 如需更新文档，请修改源代码中的 JSDoc 注释后运行 `npm run docs:generate`
+- 完整示例和教程请参考 `/docs` 目录下的其他文档

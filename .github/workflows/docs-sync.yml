@@ -1,0 +1,119 @@
+name: 文档同步检查
+
+on:
+  pull_request:
+    paths:
+      - 'src/**/*.js'
+      - 'docs/**/*.md'
+  push:
+    branches:
+      - main
+      - bugfix
+    paths:
+      - 'src/**/*.js'
+      - 'docs/**/*.md'
+
+jobs:
+  validate-docs:
+    name: 验证文档同步
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: 验证文档与代码同步
+        run: npm run docs:validate
+      
+      - name: 检查文档是否需要更新
+        if: failure()
+        run: |
+          echo "::warning::文档验证失败！请运行 'npm run docs:generate' 更新文档"
+          echo "::warning::或检查源代码中的 JSDoc 注释是否完整"
+
+  suggest-update:
+    name: 提示更新文档
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: 检查源代码变更
+        id: check-changes
+        run: |
+          # 检查是否修改了源代码
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^src/.*\.js$'; then
+            echo "src_changed=true" >> $GITHUB_OUTPUT
+          fi
+          
+          # 检查是否修改了文档
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^docs/'; then
+            echo "docs_changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 生成新文档
+        if: steps.check-changes.outputs.src_changed == 'true'
+        run: npm run docs:generate
+      
+      - name: 检查文档是否需要更新
+        if: steps.check-changes.outputs.src_changed == 'true'
+        id: check-doc-diff
+        run: |
+          if git diff --quiet docs/api-reference.md; then
+            echo "需要更新文档: 否"
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+          else
+            echo "需要更新文档: 是"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 评论 PR 提示更新文档
+        if: steps.check-doc-diff.outputs.needs_update == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📚 文档更新提醒
+              
+              检测到您修改了源代码，但 API 文档可能需要更新。
+              
+              ### 🔧 如何更新
+              
+              请在本地运行以下命令更新文档：
+              \`\`\`bash
+              npm run docs:generate
+              \`\`\`
+              
+              然后提交更新后的文档文件。
+              
+              ### ℹ️ 自动生成的文档
+              
+              为了保持文档与代码同步，我们使用自动化脚本从 JSDoc 注释生成 API 文档。
+              请确保您的代码包含完整的 JSDoc 注释。`
+            })

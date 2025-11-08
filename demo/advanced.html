@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@aviala-design/color - 完整功能演示</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #3491FA;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f7fa;
+      --text-primary: #1d2129;
+      --text-secondary: #4e5969;
+      --border-color: #e5e6eb;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.95;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--bg-primary);
+      padding: 1rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+      background: var(--bg-secondary);
+    }
+
+    .tab-btn.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .input-group label {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .input-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(52, 145, 250, 0.1);
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2980e8;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: #e5e6eb;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .color-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .color-item:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .color-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-family: 'Courier New', monospace;
+    }
+
+    .color-item:hover .color-label {
+      opacity: 1;
+    }
+
+    .palette-showcase {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .palette-item {
+      background: var(--bg-primary);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .palette-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--bg-secondary);
+    }
+
+    .palette-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .palette-colors {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .palette-color {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .palette-color:hover {
+      transform: scale(1.1);
+      box-shadow: var(--shadow-md);
+      z-index: 10;
+    }
+
+    .gradient-preview {
+      height: 80px;
+      border-radius: var(--radius-md);
+      margin-top: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .notification {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      z-index: 1000;
+      animation: slideIn 0.3s;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification.success {
+      border-left-color: #00b42a;
+    }
+
+    .notification.error {
+      border-left-color: #f53f3f;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slider {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-secondary);
+      outline: none;
+      appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .slider-value {
+      min-width: 50px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .theme-system-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .theme-section {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: var(--radius-md);
+    }
+
+    .theme-section-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .theme-colors {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .theme-color {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .theme-color:hover {
+      transform: scale(1.15);
+      z-index: 10;
+      box-shadow: var(--shadow-md);
+    }
+
+    .file-upload {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .file-upload:hover {
+      border-color: var(--primary-color);
+      background: rgba(52, 145, 250, 0.05);
+    }
+
+    .file-upload input {
+      display: none;
+    }
+
+    .file-upload-icon {
+      font-size: 3rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+
+      .color-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      }
+
+      .tabs {
+        padding: 0.5rem;
+      }
+
+      .tab-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>@aviala-design/color</h1>
+    <p>强大的颜色工具库 - 完整功能演示</p>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="palette"><i class="ri-palette-line"></i> 色板生成</button>
+      <button class="tab-btn" data-tab="linear"><i class="ri-contrast-drop-line"></i> 线性渐变</button>
+      <button class="tab-btn" data-tab="theme"><i class="ri-magic-line"></i> 主题混合</button>
+      <button class="tab-btn" data-tab="image"><i class="ri-image-line"></i> 图片取色</button>
+      <button class="tab-btn" data-tab="preset"><i class="ri-gallery-line"></i> 预设色板</button>
+    </div>
+
+    <!-- 色板生成 -->
+    <div class="tab-content active" id="palette">
+      <div class="card">
+        <div class="card-title"><i class="ri-palette-fill"></i> 生成色板</div>
+        <div class="input-group">
+          <label>
+            <span class="input-label">输入颜色</span>
+            <input type="text" id="paletteColor" placeholder="#3491FA" value="#3491FA">
+          </label>
+          <label>
+            <span class="input-label">色板模式</span>
+            <select id="paletteMode">
+              <option value="light">浅色模式</option>
+              <option value="dark">深色模式</option>
+              <option value="both">双模式</option>
+            </select>
+          </label>
+          <label>
+            <span class="input-label">输出格式</span>
+            <select id="paletteFormat">
+              <option value="hex">HEX</option>
+              <option value="rgb">RGB</option>
+              <option value="hsl">HSL</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn btn-primary" onclick="generatePalette()">
+          <i class="ri-brush-line"></i> 生成色板
+        </button>
+      </div>
+      <div id="paletteResult"></div>
+    </div>
+
+    <!-- 线性渐变 -->
+    <div class="tab-content" id="linear">
+      <div class="card">
+        <div class="card-title"><i class="ri-contrast-drop-fill"></i> 线性渐变生成</div>
+        <div class="input-group">
+          <label>
+            <span class="input-label">起始颜色</span>
+            <input type="text" id="linearStart" placeholder="#FF6B6B" value="#FF6B6B">
+          </label>
+          <label>
+            <span class="input-label">结束颜色</span>
+            <input type="text" id="linearEnd" placeholder="#4ECDC4" value="#4ECDC4">
+          </label>
+          <label>
+            <span class="input-label">步数</span>
+            <input type="number" id="linearSteps" value="10" min="2" max="20">
+          </label>
+          <label>
+            <span class="input-label">渐变空间</span>
+            <select id="linearSpace">
+              <option value="rgb">RGB 空间</option>
+              <option value="hsl">HSL 空间</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn btn-primary" onclick="generateLinearGradient()">
+          <i class="ri-contrast-drop-2-line"></i> 生成渐变
+        </button>
+      </div>
+      <div id="linearResult"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="ri-gradienter-line"></i> 灰度渐变</div>
+        <div class="input-group">
+          <label>
+            <span class="input-label">步数</span>
+            <input type="number" id="graySteps" value="10" min="2" max="20">
+          </label>
+        </div>
+        <button class="btn btn-primary" onclick="generateGrayGradient()">
+          <i class="ri-gradienter-line"></i> 生成灰度渐变
+        </button>
+      </div>
+      <div id="grayResult"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="ri-contrast-2-line"></i> 单色调渐变</div>
+        <div class="input-group">
+          <label>
+            <span class="input-label">基础颜色</span>
+            <input type="text" id="monochromeColor" placeholder="#3491FA" value="#3491FA">
+          </label>
+          <label>
+            <span class="input-label">步数</span>
+            <input type="number" id="monochromeSteps" value="10" min="2" max="20">
+          </label>
+        </div>
+        <button class="btn btn-primary" onclick="generateMonochrome()">
+          <i class="ri-contrast-2-fill"></i> 生成单色调
+        </button>
+      </div>
+      <div id="monochromeResult"></div>
+    </div>
+
+    <!-- 主题混合 -->
+    <div class="tab-content" id="theme">
+      <div class="card">
+        <div class="card-title"><i class="ri-magic-fill"></i> HCT 主题系统</div>
+        <div class="input-group">
+          <label>
+            <span class="input-label">主题色</span>
+            <input type="text" id="themeColor" placeholder="#3491FA" value="#3491FA">
+          </label>
+          <label>
+            <span class="input-label">模式</span>
+            <select id="themeMode">
+              <option value="light">浅色模式</option>
+              <option value="dark">深色模式</option>
+            </select>
+          </label>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+          <div style="margin-bottom: 1rem;">
+            <span class="input-label" style="display: block; margin-bottom: 0.5rem;">
+              <i class="ri-settings-3-line"></i> 高级设置 - 混合强度
+            </span>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              调整主题色与各类组件颜色的混合强度，数值越大，主题色影响越明显
+            </p>
+          </div>
+          
+          <div class="slider-container" style="margin-bottom: 1rem;">
+            <span class="input-label" style="min-width: 120px;">控件色混合:</span>
+            <input type="range" class="slider" id="controlBlendRatio" min="0" max="30" value="8">
+            <span class="slider-value" id="controlBlendValue">8%</span>
+          </div>
+          
+          <div class="slider-container" style="margin-bottom: 1rem;">
+            <span class="input-label" style="min-width: 120px;">语义色混合:</span>
+            <input type="range" class="slider" id="semanticBlendRatio" min="0" max="30" value="12">
+            <span class="slider-value" id="semanticBlendValue">12%</span>
+          </div>
+          
+          <details style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
+            <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary); user-select: none;">
+              <i class="ri-flask-line"></i> 更多控件色参数
+            </summary>
+            <div style="margin-top: 1rem;">
+              <label>
+                <span class="input-label">基础灰色 (baseGray)</span>
+                <input type="text" id="baseGray" placeholder="#989898" value="#989898">
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                  通过调整基础灰色的<strong>亮度</strong>来控制整体灰度系统的深浅
+                </p>
+              </label>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">灰度梯度等级:</span>
+                  <input type="range" class="slider" id="controlSteps" min="12" max="48" step="6" value="12">
+                  <span class="slider-value" id="controlStepsValue">12</span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                  控制灰度梯度的细腻程度。12 级为标准，24 级更细腻，48 级极致细腻
+                </p>
+              </div>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">最浅亮度 (%):</span>
+                  <input type="range" class="slider" id="maxLightness" min="85" max="100" step="1" value="98">
+                  <span class="slider-value" id="maxLightnessValue">98</span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                  最浅色的亮度。95=浅灰 (#f2f2f2)，98=接近白 (#fafafa)，100=纯白 (#ffffff)
+                </p>
+              </div>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">最深亮度 (%):</span>
+                  <input type="range" class="slider" id="minLightness" min="0" max="20" step="1" value="10">
+                  <span class="slider-value" id="minLightnessValue">10</span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                  最深色的亮度。15=深灰，10=接近黑，0=纯黑 (#000000)
+                </p>
+              </div>
+              
+              <div style="margin-top: 1rem; padding: 0.75rem; background: #e3f2fd; border-left: 3px solid #2196f3; border-radius: 4px;">
+                <p style="font-size: 0.75rem; line-height: 1.6; margin: 0; color: #1565c0;">
+                  💡 <strong>参数说明：</strong>
+                  <br>• <strong>baseGray</strong>：影响整体亮度基准和色调倾向
+                  <br>• <strong>梯度等级</strong>：控制颜色数量（12/24/36/48 级）
+                  <br>• <strong>最浅/最深亮度</strong>：精确控制灰度范围（推荐：98-10）
+                </p>
+              </div>
+            </div>
+          </details>
+        </div>
+        
+        <button class="btn btn-primary" onclick="generateThemeSystem()" style="margin-top: 1rem;">
+          <i class="ri-palette-fill"></i> 生成完整主题系统
+        </button>
+      </div>
+      
+      <div id="themeSystemResult"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="ri-drop-fill"></i> 颜色混合</div>
+        <div class="input-group">
+          <label>
+            <span class="input-label">颜色 1</span>
+            <input type="text" id="blendColor1" placeholder="#3491FA" value="#3491FA">
+          </label>
+          <label>
+            <span class="input-label">颜色 2</span>
+            <input type="text" id="blendColor2" placeholder="#FFFFFF" value="#FFFFFF">
+          </label>
+        </div>
+        <div class="slider-container">
+          <span class="input-label">混合比例:</span>
+          <input type="range" class="slider" id="blendRatio" min="0" max="100" value="50">
+          <span class="slider-value" id="blendRatioValue">50%</span>
+        </div>
+        <button class="btn btn-primary" onclick="blendColors()" style="margin-top: 1rem;">
+          <i class="ri-drop-line"></i> 混合颜色
+        </button>
+      </div>
+      <div id="blendResult"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="ri-hand-heart-line"></i> 颜色调和</div>
+        <div class="input-group">
+          <label>
+            <span class="input-label">主题色</span>
+            <input type="text" id="harmonizeTheme" placeholder="#3491FA" value="#3491FA">
+          </label>
+          <label>
+            <span class="input-label">目标色</span>
+            <input type="text" id="harmonizeTarget" placeholder="#FF0000" value="#FF0000">
+          </label>
+        </div>
+        <div class="slider-container">
+          <span class="input-label">调和强度:</span>
+          <input type="range" class="slider" id="harmonizeRatio" min="0" max="100" value="15">
+          <span class="slider-value" id="harmonizeRatioValue">15%</span>
+        </div>
+        <button class="btn btn-primary" onclick="harmonizeColors()" style="margin-top: 1rem;">
+          <i class="ri-hand-heart-fill"></i> 调和颜色
+        </button>
+      </div>
+      <div id="harmonizeResult"></div>
+    </div>
+
+    <!-- 图片取色 -->
+    <div class="tab-content" id="image">
+      <div class="card">
+        <div class="card-title"><i class="ri-image-fill"></i> 从图片提取主色调</div>
+        <div class="file-upload" onclick="document.getElementById('imageInput').click()">
+          <input type="file" id="imageInput" accept="image/*" onchange="extractImageColor()">
+          <div class="file-upload-icon"><i class="ri-upload-cloud-line"></i></div>
+          <p>点击或拖拽图片到此处</p>
+          <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">支持 JPG, PNG, GIF 等格式</p>
+        </div>
+      </div>
+      <div id="imageResult"></div>
+    </div>
+
+    <!-- 预设色板 -->
+    <div class="tab-content" id="preset">
+      <div class="card">
+        <div class="card-title"><i class="ri-gallery-fill"></i> 预设颜色色板</div>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+          包含 13 种精心设计的预设颜色，每种颜色都有完整的浅色和深色色板
+        </p>
+      </div>
+      <div id="presetResult" class="palette-showcase"></div>
+    </div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script type="module">
+    import { 
+      generate, 
+      generateLinear, 
+      generateGrayLinear,
+      generateMonochromeLinear,
+      generateLinearHSL,
+      blendInHct,
+      harmonizeColor,
+      generateInterfaceColorSystem,
+      generateThemePalette,
+      getPresetColors,
+      extractColorFromFile
+    } from '../src/index.js';
+
+    // 全局变量
+    window.colorUtils = {
+      generate,
+      generateLinear,
+      generateGrayLinear,
+      generateMonochromeLinear,
+      generateLinearHSL,
+      blendInHct,
+      harmonizeColor,
+      generateInterfaceColorSystem,
+      generateThemePalette,
+      getPresetColors,
+      extractColorFromFile
+    };
+
+    // 通知系统
+    window.showNotification = function(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.style.display = 'block';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 3000);
+    };
+
+    // Tab 切换
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(tab).classList.add('active');
+      });
+    });
+
+    // 颜色复制功能
+    window.copyColor = function(color) {
+      navigator.clipboard.writeText(color).then(() => {
+        showNotification(`已复制: ${color}`);
+      });
+    };
+
+    // 滑块更新
+    document.getElementById('blendRatio')?.addEventListener('input', (e) => {
+      document.getElementById('blendRatioValue').textContent = e.target.value + '%';
+    });
+
+    document.getElementById('harmonizeRatio')?.addEventListener('input', (e) => {
+      document.getElementById('harmonizeRatioValue').textContent = e.target.value + '%';
+    });
+    
+    document.getElementById('controlBlendRatio')?.addEventListener('input', (e) => {
+      document.getElementById('controlBlendValue').textContent = e.target.value + '%';
+    });
+    
+    document.getElementById('semanticBlendRatio')?.addEventListener('input', (e) => {
+      document.getElementById('semanticBlendValue').textContent = e.target.value + '%';
+    });
+
+    document.getElementById('controlSteps')?.addEventListener('input', (e) => {
+      document.getElementById('controlStepsValue').textContent = e.target.value;
+    });
+
+    document.getElementById('maxLightness')?.addEventListener('input', (e) => {
+      document.getElementById('maxLightnessValue').textContent = e.target.value;
+    });
+
+    document.getElementById('minLightness')?.addEventListener('input', (e) => {
+      document.getElementById('minLightnessValue').textContent = e.target.value;
+    });
+
+    // 验证 baseGray 输入
+    document.getElementById('baseGray')?.addEventListener('blur', (e) => {
+      const value = e.target.value.trim();
+      if (value && !/^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(value)) {
+        showNotification('请输入有效的十六进制颜色，例如：#989898 或 #989898FF', 'error');
+        e.target.value = '#989898';
+      }
+    });
+
+    // 加载预设色板
+    function loadPresetColors() {
+      const colors = getPresetColors();
+      const container = document.getElementById('presetResult');
+      
+      container.innerHTML = Object.entries(colors).map(([name, data]) => `
+        <div class="palette-item">
+          <div class="palette-header">
+            <div class="palette-name">${name}</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary);">
+              ${data.primary || data.light?.[5] || '#000'}
+            </div>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-secondary);">浅色</div>
+            <div class="palette-colors">
+              ${(data.light || []).map(color => `
+                <div class="palette-color" style="background: ${color}" onclick="copyColor('${color}')" title="${color}"></div>
+              `).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-secondary);">深色</div>
+            <div class="palette-colors">
+              ${(data.dark || []).map(color => `
+                <div class="palette-color" style="background: ${color}" onclick="copyColor('${color}')" title="${color}"></div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 页面加载完成后加载预设色板
+    loadPresetColors();
+
+    // 导出全局函数供 HTML 调用
+    window.generatePalette = function() {
+      try {
+        const color = document.getElementById('paletteColor').value;
+        const mode = document.getElementById('paletteMode').value;
+        const format = document.getElementById('paletteFormat').value;
+
+        let html = '<div class="card">';
+        
+        if (mode === 'light' || mode === 'both') {
+          const lightColors = generate(color, { list: true, format });
+          html += `
+            <div style="margin-bottom: ${mode === 'both' ? '2rem' : '0'}">
+              <div style="font-weight: 600; margin-bottom: 1rem; color: var(--text-secondary);">浅色模式</div>
+              <div class="color-grid">
+                ${lightColors.map((c, i) => `
+                  <div class="color-item" style="background: ${c}" onclick="copyColor('${c}')">
+                    <div class="color-label">${c}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (mode === 'dark' || mode === 'both') {
+          const darkColors = generate(color, { list: true, dark: true, format });
+          html += `
+            <div>
+              <div style="font-weight: 600; margin-bottom: 1rem; color: var(--text-secondary);">深色模式</div>
+              <div class="color-grid">
+                ${darkColors.map((c, i) => `
+                  <div class="color-item" style="background: ${c}" onclick="copyColor('${c}')">
+                    <div class="color-label">${c}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        html += '</div>';
+        document.getElementById('paletteResult').innerHTML = html;
+        showNotification('色板生成成功！');
+      } catch (error) {
+        showNotification('生成失败: ' + error.message, 'error');
+      }
+    };
+
+    window.generateLinearGradient = function() {
+      try {
+        const start = document.getElementById('linearStart').value;
+        const end = document.getElementById('linearEnd').value;
+        const steps = parseInt(document.getElementById('linearSteps').value);
+        const space = document.getElementById('linearSpace').value;
+
+        const colors = space === 'hsl' 
+          ? generateLinearHSL(start, end, { steps })
+          : generateLinear(start, end, { steps });
+
+        const gradient = `linear-gradient(to right, ${colors.join(', ')})`;
+        
+        document.getElementById('linearResult').innerHTML = `
+          <div class="card">
+            <div class="gradient-preview" style="background: ${gradient}"></div>
+            <div class="color-grid" style="margin-top: 1rem;">
+              ${colors.map(c => `
+                <div class="color-item" style="background: ${c}" onclick="copyColor('${c}')">
+                  <div class="color-label">${c}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        showNotification('渐变生成成功！');
+      } catch (error) {
+        showNotification('生成失败: ' + error.message, 'error');
+      }
+    };
+
+    window.generateGrayGradient = function() {
+      try {
+        const steps = parseInt(document.getElementById('graySteps').value);
+        const colors = generateGrayLinear({ steps });
+        const gradient = `linear-gradient(to right, ${colors.join(', ')})`;
+        
+        document.getElementById('grayResult').innerHTML = `
+          <div class="card">
+            <div class="gradient-preview" style="background: ${gradient}"></div>
+            <div class="color-grid" style="margin-top: 1rem;">
+              ${colors.map(c => `
+                <div class="color-item" style="background: ${c}" onclick="copyColor('${c}')">
+                  <div class="color-label">${c}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        showNotification('灰度渐变生成成功！');
+      } catch (error) {
+        showNotification('生成失败: ' + error.message, 'error');
+      }
+    };
+
+    window.generateMonochrome = function() {
+      try {
+        const color = document.getElementById('monochromeColor').value;
+        const steps = parseInt(document.getElementById('monochromeSteps').value);
+        const colors = generateMonochromeLinear(color, { steps });
+        const gradient = `linear-gradient(to right, ${colors.join(', ')})`;
+        
+        document.getElementById('monochromeResult').innerHTML = `
+          <div class="card">
+            <div class="gradient-preview" style="background: ${gradient}"></div>
+            <div class="color-grid" style="margin-top: 1rem;">
+              ${colors.map(c => `
+                <div class="color-item" style="background: ${c}" onclick="copyColor('${c}')">
+                  <div class="color-label">${c}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        showNotification('单色调渐变生成成功！');
+      } catch (error) {
+        showNotification('生成失败: ' + error.message, 'error');
+      }
+    };
+
+    window.generateThemeSystem = function() {
+      try {
+        const color = document.getElementById('themeColor').value;
+        const isDark = document.getElementById('themeMode').value === 'dark';
+        const controlBlend = parseInt(document.getElementById('controlBlendRatio').value) / 100;
+        const semanticBlend = parseInt(document.getElementById('semanticBlendRatio').value) / 100;
+        
+        // 读取 baseGray 参数
+        let baseGray = document.getElementById('baseGray').value.trim();
+        if (!baseGray) baseGray = '#989898';
+        if (!baseGray.startsWith('#')) baseGray = '#' + baseGray;
+        
+        // 读取灰度梯度等级
+        const controlSteps = parseInt(document.getElementById('controlSteps').value) || 12;
+        
+        // 读取亮度端点值
+        const maxLightness = parseInt(document.getElementById('maxLightness').value) || 98;
+        const minLightness = parseInt(document.getElementById('minLightness').value) || 10;
+        
+        const system = generateInterfaceColorSystem(color, { 
+          isDark,
+          controlBlendRatio: controlBlend,
+          semanticBlendRatio: semanticBlend,
+          baseGray: baseGray,
+          controlSteps: controlSteps,
+          controlMaxLightness: maxLightness,
+          controlMinLightness: minLightness
+        });
+        
+        let html = '<div class="card"><div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">';
+        html += '<div style="font-size: 0.875rem; color: var(--text-secondary);">';
+        html += `<strong>混合配置:</strong> 控件色 ${(controlBlend * 100).toFixed(0)}% | 语义色 ${(semanticBlend * 100).toFixed(0)}% | 基础灰色 ${baseGray} | 灰度等级 ${controlSteps} | 亮度范围 ${minLightness}-${maxLightness}%`;
+        html += '<div style="margin-top: 0.5rem; font-size: 0.8rem;">混合强度影响主题色对组件颜色的渗透程度，适度的混合可以让整体设计更加统一协调。</div>';
+        html += '</div></div>';
+        html += '<div class="theme-system-grid">';
+        
+        // 主题色
+        html += `
+          <div class="theme-section">
+            <div class="theme-section-title">主题色 (10)</div>
+            <div class="theme-colors">
+              ${Object.values(system.theme).map((c, i) => `
+                <div class="theme-color" style="background: ${c}" onclick="copyColor('${c}')" title="theme-${i+1}: ${c}"></div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        
+        // 控件色
+        html += `
+          <div class="theme-section">
+            <div class="theme-section-title">控件色 (${Object.keys(system.controls).length}) - 混合 ${(controlBlend * 100).toFixed(0)}%</div>
+            <div class="theme-colors">
+              ${Object.values(system.controls).map((c, i) => `
+                <div class="theme-color" style="background: ${c}" onclick="copyColor('${c}')" title="gray-${i+1}: ${c}"></div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        
+        // 语义色
+        html += `
+          <div class="theme-section">
+            <div class="theme-section-title">语义色 - 混合 ${(semanticBlend * 100).toFixed(0)}%</div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              ${Object.entries(system.semantic).map(([name, colors]) => `
+                <div>
+                  <div style="font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-secondary); text-transform: capitalize;">${name}</div>
+                  <div class="theme-colors">
+                    ${Object.values(colors).map((c, i) => `
+                      <div class="theme-color" style="background: ${c}" onclick="copyColor('${c}')" title="${name}-${i+1}: ${c}"></div>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        
+        html += '</div></div>';
+        
+        document.getElementById('themeSystemResult').innerHTML = html;
+        showNotification('主题系统生成成功！');
+      } catch (error) {
+        showNotification('生成失败: ' + error.message, 'error');
+      }
+    };
+
+    window.blendColors = function() {
+      try {
+        const color1 = document.getElementById('blendColor1').value;
+        const color2 = document.getElementById('blendColor2').value;
+        const ratio = parseInt(document.getElementById('blendRatio').value) / 100;
+        
+        const result = blendInHct(color1, color2, ratio);
+        
+        document.getElementById('blendResult').innerHTML = `
+          <div class="card">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <div style="flex: 1; text-align: center;">
+                <div style="width: 100%; height: 100px; background: ${color1}; border-radius: var(--radius-md); margin-bottom: 0.5rem;"></div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">颜色 1</div>
+                <div style="font-family: monospace;">${color1}</div>
+              </div>
+              <div style="font-size: 2rem; color: var(--text-secondary);">→</div>
+              <div style="flex: 1; text-align: center;">
+                <div style="width: 100%; height: 100px; background: ${result}; border-radius: var(--radius-md); margin-bottom: 0.5rem; cursor: pointer;" onclick="copyColor('${result}')"></div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">混合结果</div>
+                <div style="font-family: monospace;">${result}</div>
+              </div>
+              <div style="font-size: 2rem; color: var(--text-secondary);">←</div>
+              <div style="flex: 1; text-align: center;">
+                <div style="width: 100%; height: 100px; background: ${color2}; border-radius: var(--radius-md); margin-bottom: 0.5rem;"></div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">颜色 2</div>
+                <div style="font-family: monospace;">${color2}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        showNotification('颜色混合成功！');
+      } catch (error) {
+        showNotification('混合失败: ' + error.message, 'error');
+      }
+    };
+
+    window.harmonizeColors = function() {
+      try {
+        const theme = document.getElementById('harmonizeTheme').value;
+        const target = document.getElementById('harmonizeTarget').value;
+        const ratio = parseInt(document.getElementById('harmonizeRatio').value) / 100;
+        
+        const result = harmonizeColor(theme, target, ratio);
+        
+        document.getElementById('harmonizeResult').innerHTML = `
+          <div class="card">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <div style="flex: 1; text-align: center;">
+                <div style="width: 100%; height: 100px; background: ${theme}; border-radius: var(--radius-md); margin-bottom: 0.5rem;"></div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">主题色</div>
+                <div style="font-family: monospace;">${theme}</div>
+              </div>
+              <div style="font-size: 2rem; color: var(--text-secondary);">+</div>
+              <div style="flex: 1; text-align: center;">
+                <div style="width: 100%; height: 100px; background: ${target}; border-radius: var(--radius-md); margin-bottom: 0.5rem;"></div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">目标色</div>
+                <div style="font-family: monospace;">${target}</div>
+              </div>
+              <div style="font-size: 2rem; color: var(--text-secondary);">→</div>
+              <div style="flex: 1; text-align: center;">
+                <div style="width: 100%; height: 100px; background: ${result}; border-radius: var(--radius-md); margin-bottom: 0.5rem; cursor: pointer;" onclick="copyColor('${result}')"></div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">调和结果</div>
+                <div style="font-family: monospace;">${result}</div>
+              </div>
+            </div>
+            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 0.875rem; color: var(--text-secondary);">
+              <strong>说明:</strong> 调和让目标色向主题色的色相靠拢，保持目标色的色度和亮度，使颜色体系更加协调统一。
+            </div>
+          </div>
+        `;
+        showNotification('颜色调和成功！');
+      } catch (error) {
+        showNotification('调和失败: ' + error.message, 'error');
+      }
+    };
+
+    window.extractImageColor = async function() {
+      try {
+        const file = document.getElementById('imageInput').files[0];
+        if (!file) return;
+
+        showNotification('正在提取主色调...', 'info');
+        const color = await extractColorFromFile(file);
+        
+        // 自动生成色板
+        const lightColors = generate(color, { list: true });
+        const darkColors = generate(color, { list: true, dark: true });
+        
+        document.getElementById('imageResult').innerHTML = `
+          <div class="card">
+            <div style="display: flex; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 200px;">
+                <img src="${URL.createObjectURL(file)}" style="width: 100%; border-radius: var(--radius-md); box-shadow: var(--shadow-md);" />
+              </div>
+              <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="text-align: center;">
+                  <div style="width: 150px; height: 150px; background: ${color}; border-radius: var(--radius-md); margin: 0 auto 1rem; box-shadow: var(--shadow-lg); cursor: pointer;" onclick="copyColor('${color}')"></div>
+                  <div style="font-size: 1.5rem; font-weight: 600; font-family: monospace;">${color}</div>
+                  <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">提取的主色调</div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+              <div style="font-weight: 600; margin-bottom: 1rem;">基于主色调生成的色板</div>
+              <div style="margin-bottom: 1.5rem;">
+                <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">浅色模式</div>
+                <div class="color-grid">
+                  ${lightColors.map(c => `
+                    <div class="color-item" style="background: ${c}" onclick="copyColor('${c}')">
+                      <div class="color-label">${c}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">深色模式</div>
+                <div class="color-grid">
+                  ${darkColors.map(c => `
+                    <div class="color-item" style="background: ${c}" onclick="copyColor('${c}')">
+                      <div class="color-label">${c}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        showNotification('主色调提取成功！');
+      } catch (error) {
+        showNotification('提取失败: ' + error.message, 'error');
+      }
+    };
+  </script>
+</body>
+</html>

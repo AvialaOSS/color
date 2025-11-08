@@ -14,9 +14,17 @@
   },
   "scripts": {
     "test": "jest",
+    "dev": "vite --open /demo/advanced.html",
     "build": "vite build",
     "preview": "vite preview",
-    "prepublishOnly": "npm run build"
+    "type-check": "tsc --noEmit",
+    "docs:generate": "node scripts/generate-docs.js",
+    "docs:validate": "node scripts/validate-docs.js",
+    "docs:sync-readme": "node scripts/sync-readme.js",
+    "docs:all": "npm run docs:generate && npm run docs:sync-readme",
+    "predocs:generate": "npm run type-check",
+    "prepublishOnly": "npm run build && npm run docs:all",
+    "prepare": "node -e \"try{require('fs').mkdirSync('.husky')}catch(e){}\" && node -e \"try{require('fs').copyFileSync('.husky/pre-commit.sample', '.husky/pre-commit')}catch(e){}\""
   },
   "keywords": [
     "Color",
@@ -26,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aviala-design/color"
+    "url": "https://github.com/avialaOSS/color"
   },
   "dependencies": {
     "color": "^3.1.3"
