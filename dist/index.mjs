@@ -12,7 +12,7 @@ function z(t) {
     t
   );
 }
-function v(t, n) {
+function L(t, n) {
   const c = z(n);
   return c === "hex" ? t[c]().toLowerCase() : t[c]().round().string();
 }
@@ -27,8 +27,8 @@ function D(t, n, c) {
     if (p)
       x = s <= f ? s : s - (s - f) / 5.5 * Math.pow(b, 1.05);
     else {
-      const L = Math.min(l, s + 30);
-      x = s + (L - s) / 4.2 * Math.pow(b, 0.95);
+      const v = Math.min(l, s + 30);
+      x = s + (v - s) / 4.2 * Math.pow(b, 0.95);
     }
     return Math.max(0, Math.min(100, x));
   }
@@ -40,7 +40,7 @@ function D(t, n, c) {
     s: M(m, E),
     v: g(m, E)
   });
-  return v(y, c);
+  return L(y, c);
 }
 function H(t, n, c) {
   const r = w(D(t, 10 - n + 1, "hex")), o = w(t), s = o.hue(), e = o.saturationv();
@@ -66,7 +66,7 @@ function H(t, n, c) {
     s: i(n),
     v: r.value()
   });
-  return v(h, c);
+  return L(h, c);
 }
 function B(t, n = {}) {
   const { dark: c, list: r, index: o = 6, format: s = "hex" } = n;
@@ -167,7 +167,7 @@ function $(t, n, c = {}) {
   const e = w(t), i = w(n), a = [], l = s ? r : r + 2, f = 1 / (l - 1);
   for (let u = 0; u < l; u++) {
     const h = u * f, d = Math.round(e.red() + (i.red() - e.red()) * h), M = Math.round(e.green() + (i.green() - e.green()) * h), g = Math.round(e.blue() + (i.blue() - e.blue()) * h), m = w({ r: d, g: M, b: g });
-    !s && (u === 0 || u === l - 1) || a.push(v(m, o));
+    !s && (u === 0 || u === l - 1) || a.push(L(m, o));
   }
   return a;
 }
@@ -189,9 +189,11 @@ function j(t, n = {}) {
     maxLightness: e = null
   } = n, i = w(t);
   let a, l;
-  if (s !== null && e !== null)
+  if (s !== null && e !== null) {
+    if (s > e)
+      throw new Error("minLightness 不能大于 maxLightness");
     a = Math.max(0, Math.min(100, e)), l = Math.max(0, Math.min(100, s));
-  else {
+  } else {
     const h = i.lightness();
     a = Math.min(95, h + o / 2), l = Math.max(5, h - o / 2);
   }
@@ -218,10 +220,10 @@ function Q(t, n, c = {}) {
   for (let y = 0; y < l; y++) {
     const p = y * f;
     let b = u + (h - u) * p;
-    const x = M + (g - M) * p, L = m + (E - m) * p;
+    const x = M + (g - M) * p, v = m + (E - m) * p;
     b = b % 360, b < 0 && (b += 360);
-    const A = w({ h: b, s: x, l: L });
-    !s && (y === 0 || y === l - 1) || a.push(v(A, o));
+    const A = w({ h: b, s: x, l: v });
+    !s && (y === 0 || y === l - 1) || a.push(L(A, o));
   }
   return a;
 }
@@ -321,7 +323,7 @@ function I(t, n = {}) {
   if (!t)
     throw new Error("Theme color is required");
   const {
-    baseGray: c = "#989898ff",
+    baseGray: c = "#989898",
     blendRatio: r = 0.08,
     isDark: o = !1,
     steps: s = 12,
