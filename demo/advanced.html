@@ -617,9 +617,10 @@
             <span class="slider-value" id="semanticBlendValue">12%</span>
           </div>
           
+          <!-- 控件色参数 -->
           <details style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
             <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary); user-select: none;">
-              <i class="ri-flask-line"></i> 更多控件色参数
+              <i class="ri-flask-line"></i> 控件色（灰度）参数
             </summary>
             <div style="margin-top: 1rem;">
               <label>
@@ -633,7 +634,7 @@
               <div style="margin-top: 1rem;">
                 <div class="slider-container">
                   <span class="input-label" style="min-width: 120px;">灰度梯度等级:</span>
-                  <input type="range" class="slider" id="controlSteps" min="12" max="48" step="6" value="12">
+                  <input type="range" class="slider" id="controlSteps" min="6" max="48" step="1" value="12">
                   <span class="slider-value" id="controlStepsValue">12</span>
                 </div>
                 <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
@@ -647,9 +648,6 @@
                   <input type="range" class="slider" id="maxLightness" min="85" max="100" step="1" value="98">
                   <span class="slider-value" id="maxLightnessValue">98</span>
                 </div>
-                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                  最浅色的亮度。95=浅灰 (#f2f2f2)，98=接近白 (#fafafa)，100=纯白 (#ffffff)
-                </p>
               </div>
               
               <div style="margin-top: 1rem;">
@@ -658,26 +656,117 @@
                   <input type="range" class="slider" id="minLightness" min="0" max="20" step="1" value="10">
                   <span class="slider-value" id="minLightnessValue">10</span>
                 </div>
-                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                  最深色的亮度。15=深灰，10=接近黑，0=纯黑 (#000000)
-                </p>
-              </div>
-              
-              <div style="margin-top: 1rem; padding: 0.75rem; background: #e3f2fd; border-left: 3px solid #2196f3; border-radius: 4px;">
-                <p style="font-size: 0.75rem; line-height: 1.6; margin: 0; color: #1565c0;">
-                  💡 <strong>参数说明：</strong>
-                  <br>• <strong>baseGray</strong>：影响整体亮度基准和色调倾向
-                  <br>• <strong>梯度等级</strong>：控制颜色数量（12/24/36/48 级）
-                  <br>• <strong>最浅/最深亮度</strong>：精确控制灰度范围（推荐：98-10）
-                </p>
               </div>
             </div>
           </details>
+          
+          <!-- 语义色参数 -->
+          <details style="margin-top: 0.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
+            <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary); user-select: none;">
+              <i class="ri-emotion-line"></i> 语义色参数
+            </summary>
+            <div style="margin-top: 1rem;">
+              <div style="margin-bottom: 1rem;">
+                <span class="input-label" style="display: block; margin-bottom: 0.75rem;">自定义语义色基础色</span>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 20px; height: 20px; background: #52c41a; border-radius: 4px; flex-shrink: 0;"></span>
+                    <input type="text" id="semanticSuccess" value="#52c41a" style="flex: 1; padding: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">成功</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 20px; height: 20px; background: #faad14; border-radius: 4px; flex-shrink: 0;"></span>
+                    <input type="text" id="semanticWarning" value="#faad14" style="flex: 1; padding: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">警告</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 20px; height: 20px; background: #ff4d4f; border-radius: 4px; flex-shrink: 0;"></span>
+                    <input type="text" id="semanticError" value="#ff4d4f" style="flex: 1; padding: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">错误</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 20px; height: 20px; background: #1890ff; border-radius: 4px; flex-shrink: 0;"></span>
+                    <input type="text" id="semanticInfo" value="#1890ff" style="flex: 1; padding: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">信息</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">语义色等级数:</span>
+                  <input type="range" class="slider" id="semanticSteps" min="6" max="20" step="1" value="10">
+                  <span class="slider-value" id="semanticStepsValue">10</span>
+                </div>
+              </div>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">最浅亮度 (%):</span>
+                  <input type="range" class="slider" id="semanticMaxLightness" min="85" max="98" step="1" value="95">
+                  <span class="slider-value" id="semanticMaxLightnessValue">95</span>
+                </div>
+              </div>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">最深亮度 (%):</span>
+                  <input type="range" class="slider" id="semanticMinLightness" min="10" max="30" step="1" value="15">
+                  <span class="slider-value" id="semanticMinLightnessValue">15</span>
+                </div>
+              </div>
+            </div>
+          </details>
+          
+          <!-- 主题色参数 -->
+          <details style="margin-top: 0.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
+            <summary style="cursor: pointer; font-weight: 600; color: var(--text-primary); user-select: none;">
+              <i class="ri-palette-line"></i> 主题色参数
+            </summary>
+            <div style="margin-top: 1rem;">
+              <div class="slider-container">
+                <span class="input-label" style="min-width: 120px;">主题色等级数:</span>
+                <input type="range" class="slider" id="themeSteps" min="6" max="20" step="1" value="10">
+                <span class="slider-value" id="themeStepsValue">10</span>
+              </div>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">最浅亮度 (%):</span>
+                  <input type="range" class="slider" id="themeMaxLightness" min="85" max="98" step="1" value="95">
+                  <span class="slider-value" id="themeMaxLightnessValue">95</span>
+                </div>
+              </div>
+              
+              <div style="margin-top: 1rem;">
+                <div class="slider-container">
+                  <span class="input-label" style="min-width: 120px;">最深亮度 (%):</span>
+                  <input type="range" class="slider" id="themeMinLightness" min="10" max="30" step="1" value="15">
+                  <span class="slider-value" id="themeMinLightnessValue">15</span>
+                </div>
+              </div>
+            </div>
+          </details>
+          
+          <!-- 参数说明 -->
+          <div style="margin-top: 1rem; padding: 0.75rem; background: #e3f2fd; border-left: 3px solid #2196f3; border-radius: 4px;">
+            <p style="font-size: 0.75rem; line-height: 1.6; margin: 0; color: #1565c0;">
+              💡 <strong>参数说明：</strong>
+              <br>• <strong>混合强度</strong>：主题色渗透到各组件的程度，让整体风格更统一
+              <br>• <strong>亮度范围</strong>：控制色阶从最浅到最深的范围
+              <br>• <strong>等级数</strong>：生成的颜色数量，越多梯度越细腻
+            </p>
+          </div>
         </div>
         
-        <button class="btn btn-primary" onclick="generateThemeSystem()" style="margin-top: 1rem;">
-          <i class="ri-palette-fill"></i> 生成完整主题系统
-        </button>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <button class="btn btn-primary" onclick="generateThemeSystem()" style="flex: 1;">
+            <i class="ri-palette-fill"></i> 生成完整主题系统
+          </button>
+          <button class="btn btn-secondary" onclick="exportThemeSystem()" title="导出为 JSON">
+            <i class="ri-download-line"></i>
+          </button>
+        </div>
       </div>
       
       <div id="themeSystemResult"></div>
@@ -692,6 +781,14 @@
           <label>
             <span class="input-label">颜色 2</span>
             <input type="text" id="blendColor2" placeholder="#FFFFFF" value="#FFFFFF">
+          </label>
+          <label>
+            <span class="input-label">混合模式</span>
+            <select id="blendMode">
+              <option value="lab">Lab 空间 (默认)</option>
+              <option value="hct">HCT 线性</option>
+              <option value="hue-only">仅混合色相</option>
+            </select>
           </label>
         </div>
         <div class="slider-container">
@@ -845,6 +942,45 @@
 
     document.getElementById('minLightness')?.addEventListener('input', (e) => {
       document.getElementById('minLightnessValue').textContent = e.target.value;
+    });
+
+    // 语义色参数滑块
+    document.getElementById('semanticSteps')?.addEventListener('input', (e) => {
+      document.getElementById('semanticStepsValue').textContent = e.target.value;
+    });
+
+    document.getElementById('semanticMaxLightness')?.addEventListener('input', (e) => {
+      document.getElementById('semanticMaxLightnessValue').textContent = e.target.value;
+    });
+
+    document.getElementById('semanticMinLightness')?.addEventListener('input', (e) => {
+      document.getElementById('semanticMinLightnessValue').textContent = e.target.value;
+    });
+
+    // 主题色参数滑块
+    document.getElementById('themeSteps')?.addEventListener('input', (e) => {
+      document.getElementById('themeStepsValue').textContent = e.target.value;
+    });
+
+    document.getElementById('themeMaxLightness')?.addEventListener('input', (e) => {
+      document.getElementById('themeMaxLightnessValue').textContent = e.target.value;
+    });
+
+    document.getElementById('themeMinLightness')?.addEventListener('input', (e) => {
+      document.getElementById('themeMinLightnessValue').textContent = e.target.value;
+    });
+
+    // 语义色输入框颜色预览更新
+    ['semanticSuccess', 'semanticWarning', 'semanticError', 'semanticInfo'].forEach(id => {
+      const input = document.getElementById(id);
+      if (input) {
+        input.addEventListener('input', (e) => {
+          const preview = e.target.previousElementSibling;
+          if (preview && /^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+            preview.style.background = e.target.value;
+          }
+        });
+      }
     });
 
     // 验证 baseGray 输入
@@ -1033,34 +1169,64 @@
         if (!baseGray) baseGray = '#989898';
         if (!baseGray.startsWith('#')) baseGray = '#' + baseGray;
         
-        // 读取灰度梯度等级
+        // 读取控件色参数
         const controlSteps = parseInt(document.getElementById('controlSteps').value) || 12;
-        
-        // 读取亮度端点值
         const maxLightness = parseInt(document.getElementById('maxLightness').value) || 98;
         const minLightness = parseInt(document.getElementById('minLightness').value) || 10;
         
+        // 读取语义色参数
+        const semanticSteps = parseInt(document.getElementById('semanticSteps').value) || 10;
+        const semanticMaxLightness = parseInt(document.getElementById('semanticMaxLightness').value) || 95;
+        const semanticMinLightness = parseInt(document.getElementById('semanticMinLightness').value) || 15;
+        
+        // 读取自定义语义色
+        const semanticColors = {
+          success: document.getElementById('semanticSuccess').value || '#52c41a',
+          warning: document.getElementById('semanticWarning').value || '#faad14',
+          error: document.getElementById('semanticError').value || '#ff4d4f',
+          info: document.getElementById('semanticInfo').value || '#1890ff'
+        };
+        
+        // 读取主题色参数
+        const themeSteps = parseInt(document.getElementById('themeSteps').value) || 10;
+        const themeMaxLightness = parseInt(document.getElementById('themeMaxLightness').value) || 95;
+        const themeMinLightness = parseInt(document.getElementById('themeMinLightness').value) || 15;
+        
         const system = generateInterfaceColorSystem(color, { 
           isDark,
+          baseGray,
+          semanticColors,
+          // 控件色参数
           controlBlendRatio: controlBlend,
-          semanticBlendRatio: semanticBlend,
-          baseGray: baseGray,
-          controlSteps: controlSteps,
+          controlSteps,
           controlMaxLightness: maxLightness,
-          controlMinLightness: minLightness
+          controlMinLightness: minLightness,
+          // 语义色参数
+          semanticBlendRatio: semanticBlend,
+          semanticSteps,
+          semanticMaxLightness,
+          semanticMinLightness,
+          // 主题色参数
+          themeSteps,
+          themeMaxLightness,
+          themeMinLightness
         });
         
+        // 配置摘要
         let html = '<div class="card"><div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">';
-        html += '<div style="font-size: 0.875rem; color: var(--text-secondary);">';
-        html += `<strong>混合配置:</strong> 控件色 ${(controlBlend * 100).toFixed(0)}% | 语义色 ${(semanticBlend * 100).toFixed(0)}% | 基础灰色 ${baseGray} | 灰度等级 ${controlSteps} | 亮度范围 ${minLightness}-${maxLightness}%`;
-        html += '<div style="margin-top: 0.5rem; font-size: 0.8rem;">混合强度影响主题色对组件颜色的渗透程度，适度的混合可以让整体设计更加统一协调。</div>';
+        html += '<div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.8;">';
+        html += `<strong>📊 生成配置</strong><br>`;
+        html += `• 控件色: ${controlSteps} 级 (亮度 ${minLightness}%-${maxLightness}%) | 混合 ${(controlBlend * 100).toFixed(0)}%<br>`;
+        html += `• 语义色: ${semanticSteps} 级 (亮度 ${semanticMinLightness}%-${semanticMaxLightness}%) | 混合 ${(semanticBlend * 100).toFixed(0)}%<br>`;
+        html += `• 主题色: ${themeSteps} 级 (亮度 ${themeMinLightness}%-${themeMaxLightness}%)`;
         html += '</div></div>';
         html += '<div class="theme-system-grid">';
         
         // 主题色
+        const themeCount = Object.keys(system.theme).length;
         html += `
           <div class="theme-section">
-            <div class="theme-section-title">主题色 (10)</div>
+            <div class="theme-section-title">主题色 (${themeCount})</div>
             <div class="theme-colors">
               ${Object.values(system.theme).map((c, i) => `
                 <div class="theme-color" style="background: ${c}" onclick="copyColor('${c}')" title="theme-${i+1}: ${c}"></div>
@@ -1081,17 +1247,29 @@
           </div>
         `;
         
-        // 语义色
+        // 语义色 - 将扁平结构转换为分组结构
+        const semanticGroups = {};
+        Object.entries(system.semantic).forEach(([key, color]) => {
+          const match = key.match(/^(.+)-(\d+)$/);
+          if (match) {
+            const [, name, index] = match;
+            if (!semanticGroups[name]) semanticGroups[name] = [];
+            semanticGroups[name].push({ index: parseInt(index), color });
+          }
+        });
+        // 按索引排序
+        Object.values(semanticGroups).forEach(arr => arr.sort((a, b) => a.index - b.index));
+        
         html += `
           <div class="theme-section">
             <div class="theme-section-title">语义色 - 混合 ${(semanticBlend * 100).toFixed(0)}%</div>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-              ${Object.entries(system.semantic).map(([name, colors]) => `
+              ${Object.entries(semanticGroups).map(([name, colors]) => `
                 <div>
                   <div style="font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-secondary); text-transform: capitalize;">${name}</div>
                   <div class="theme-colors">
-                    ${Object.values(colors).map((c, i) => `
-                      <div class="theme-color" style="background: ${c}" onclick="copyColor('${c}')" title="${name}-${i+1}: ${c}"></div>
+                    ${colors.map(({color, index}) => `
+                      <div class="theme-color" style="background: ${color}" onclick="copyColor('${color}')" title="${name}-${index}: ${color}"></div>
                     `).join('')}
                   </div>
                 </div>
@@ -1102,6 +1280,9 @@
         
         html += '</div></div>';
         
+        // 存储系统供导出
+        lastGeneratedSystem = system;
+        
         document.getElementById('themeSystemResult').innerHTML = html;
         showNotification('主题系统生成成功！');
       } catch (error) {
@@ -1109,34 +1290,66 @@
       }
     };
 
+    // 存储最新生成的主题系统用于导出
+    let lastGeneratedSystem = null;
+
+    window.exportThemeSystem = function() {
+      if (!lastGeneratedSystem) {
+        showNotification('请先生成主题系统', 'error');
+        return;
+      }
+      
+      const dataStr = JSON.stringify(lastGeneratedSystem, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'theme-colors.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showNotification('主题系统已导出为 JSON 文件');
+    };
+
     window.blendColors = function() {
       try {
         const color1 = document.getElementById('blendColor1').value;
         const color2 = document.getElementById('blendColor2').value;
         const ratio = parseInt(document.getElementById('blendRatio').value) / 100;
+        const mode = document.getElementById('blendMode').value;
         
-        const result = blendInHct(color1, color2, ratio);
+        const result = blendInHct(color1, color2, ratio, { mode });
+        
+        const modeNames = {
+          'lab': 'Lab 空间混合',
+          'hct': 'HCT 线性混合',
+          'hue-only': '仅混合色相'
+        };
         
         document.getElementById('blendResult').innerHTML = `
           <div class="card">
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <div style="flex: 1; text-align: center;">
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 80px; text-align: center;">
                 <div style="width: 100%; height: 100px; background: ${color1}; border-radius: var(--radius-md); margin-bottom: 0.5rem;"></div>
                 <div style="font-size: 0.875rem; color: var(--text-secondary);">颜色 1</div>
-                <div style="font-family: monospace;">${color1}</div>
+                <div style="font-family: monospace; font-size: 0.8rem;">${color1}</div>
               </div>
-              <div style="font-size: 2rem; color: var(--text-secondary);">→</div>
-              <div style="flex: 1; text-align: center;">
-                <div style="width: 100%; height: 100px; background: ${result}; border-radius: var(--radius-md); margin-bottom: 0.5rem; cursor: pointer;" onclick="copyColor('${result}')"></div>
+              <div style="font-size: 1.5rem; color: var(--text-secondary);">→</div>
+              <div style="flex: 1; min-width: 80px; text-align: center;">
+                <div style="width: 100%; height: 100px; background: ${result}; border-radius: var(--radius-md); margin-bottom: 0.5rem; cursor: pointer; box-shadow: var(--shadow-md);" onclick="copyColor('${result}')"></div>
                 <div style="font-size: 0.875rem; color: var(--text-secondary);">混合结果</div>
-                <div style="font-family: monospace;">${result}</div>
+                <div style="font-family: monospace; font-size: 0.8rem;">${result}</div>
               </div>
-              <div style="font-size: 2rem; color: var(--text-secondary);">←</div>
-              <div style="flex: 1; text-align: center;">
+              <div style="font-size: 1.5rem; color: var(--text-secondary);">←</div>
+              <div style="flex: 1; min-width: 80px; text-align: center;">
                 <div style="width: 100%; height: 100px; background: ${color2}; border-radius: var(--radius-md); margin-bottom: 0.5rem;"></div>
                 <div style="font-size: 0.875rem; color: var(--text-secondary);">颜色 2</div>
-                <div style="font-family: monospace;">${color2}</div>
+                <div style="font-family: monospace; font-size: 0.8rem;">${color2}</div>
               </div>
+            </div>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 0.8rem; color: var(--text-secondary);">
+              <strong>模式:</strong> ${modeNames[mode]} | <strong>比例:</strong> ${(ratio * 100).toFixed(0)}%
             </div>
           </div>
         `;
