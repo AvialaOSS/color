@@ -2,7 +2,7 @@
 
 > 🤖 此文档由 `npm run docs:generate` 自动生成，请勿手动编辑
 
-> 最后更新时间: 2025/11/9 02:33:51
+> 最后更新时间: 2025/11/25 21:21:09
 
 ## 目录
 
@@ -23,6 +23,15 @@
   - [`rgbToHct`](#rgbtohct)
   - [`hctToRgb`](#hcttorgb)
   - [`blendInHct`](#blendinhct)
+  - [`colorDifference`](#colordifference)
+  - [`adjustTone`](#adjusttone)
+  - [`adjustChroma`](#adjustchroma)
+  - [`adjustHue`](#adjusthue)
+  - [`rotateHue`](#rotatehue)
+  - [`getComplementary`](#getcomplementary)
+  - [`getTriadic`](#gettriadic)
+  - [`getSplitComplementary`](#getsplitcomplementary)
+  - [`getAnalogous`](#getanalogous)
   - [`harmonizeColor`](#harmonizecolor)
   - [`generateThemeVariants`](#generatethemevariants)
   - [`blendUIColors`](#blenduicolors)
@@ -322,7 +331,7 @@ function extractColorFromFile(file)
 
 ### `rgbToHct`
 
-主题色混合模块 基于 Material Design 3 的 HCT 颜色空间实现颜色混合和调和 HCT (Hue, Chroma, Tone) 颜色空间结合了 CAM16 和 CIE-Lab 的优势： - H (Hue): 色相，0-360度 - C (Chroma): 色度，颜色的饱和度 - T (Tone): 色调，亮度从黑色(0)到白色(100)
+主题色混合模块 基于 Material Design 3 的 HCT 颜色空间实现颜色混合和调和 HCT (Hue, Chroma, Tone) 颜色空间结合了 CAM16 和 CIE-Lab 的优势： - H (Hue): 色相，0-360度（使用 Lab 空间计算） - C (Chroma): 色度，颜色的鲜艳程度（使用 Lab 空间计算） - T (Tone): 色调/亮度，CIE L* 值 (0-100) 本实现使用 CIE Lab 颜色空间近似 HCT，提供准确的感知一致性
 
 **签名：**
 ```typescript
@@ -333,7 +342,7 @@ function rgbToHct(rgb)
 
 ### `hctToRgb`
 
-将 HCT 颜色转换为 RGB
+将 HCT 颜色转换为 RGB 使用 CIE Lab 颜色空间作为中间转换
 
 **签名：**
 ```typescript
@@ -354,8 +363,8 @@ function hctToRgb(hct, options = {})
 import { hctToRgb } from '@aviala-design/color';
 
 // 从 HCT 颜色空间转回 RGB
-const rgb = hctToRgb({ h: 210, c: 45, t: 60 });
-console.log(rgb); // '#3491FA'
+const rgb = hctToRgb({ h: 278.7, c: 60.7, t: 59.8 });
+console.log(rgb); // '#3491fa'
 
 // 在 HCT 空间调整颜色后转换
 const hct = { h: 120, c: 50, t: 70 };
@@ -367,20 +376,294 @@ document.body.style.backgroundColor = rgb;
 
 ### `blendInHct`
 
+在 HCT 颜色空间中混合两种颜色 支持多种混合模式：Lab 空间混合（默认）、HCT 线性混合、色相混合
+
 **签名：**
 ```typescript
-function blendInHct(color1, color2, ratio = 0.5)
+function blendInHct(color1, color2, ratio = 0.5, options = {})
 ```
 
 **参数：**
 
-- `val`: `number`
+- `color1`: `string` - 第一种颜色 (RGB)
+- `color2`: `string` - 第二种颜色 (RGB)
+- `ratio`: `number` - 混合比例，0-1，0表示完全是color1，1表示完全是color2
+
+**返回值：**
+
+- `string` - 混合后的颜色 (RGB)
+
+**示例：**
+
+```javascript
+import { blendInHct } from '@aviala-design/color';
+
+// 混合品牌色和背景色（默认 Lab 空间混合）
+const blended = blendInHct('#3491FA', '#FFFFFF', 0.3);
+
+// 使用 HCT 线性混合
+const blended = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hct' });
+
+// 只混合色相，保持第一个颜色的色度和明度
+const blended = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hue-only' });
+```
+
+---
+
+### `colorDifference`
+
+在 Lab 颜色空间中混合两种颜色 提供最感知一致的混合结果
+
+**签名：**
+```typescript
+function colorDifference(color1, color2)
+```
+
+**参数：**
+
+- `color1`: `string` - 第一种颜色 (RGB)
+- `color2`: `string` - 第二种颜色 (RGB)
+- `ratio`: `number` - 混合比例
+
+**返回值：**
+
+- `string` - 混合后的颜色 (RGB)
+
+---
+
+### `adjustTone`
+
+调整颜色的明度（Tone）
+
+**签名：**
+```typescript
+function adjustTone(color, tone)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+- `tone`: `number` - 目标明度 (0-100)
+
+**返回值：**
+
+- `string` - 调整后的颜色 (RGB)
+
+**示例：**
+
+```javascript
+import { adjustTone } from '@aviala-design/color';
+
+// 将颜色调整到 80% 明度
+const lighter = adjustTone('#3491FA', 80);
+```
+
+---
+
+### `adjustChroma`
+
+调整颜色的色度（Chroma）
+
+**签名：**
+```typescript
+function adjustChroma(color, chroma)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+- `chroma`: `number` - 目标色度
+
+**返回值：**
+
+- `string` - 调整后的颜色 (RGB)
+
+**示例：**
+
+```javascript
+import { adjustChroma } from '@aviala-design/color';
+
+// 降低颜色鲜艳度
+const muted = adjustChroma('#FF0000', 30);
+```
+
+---
+
+### `adjustHue`
+
+调整颜色的色相（Hue）
+
+**签名：**
+```typescript
+function adjustHue(color, hue)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+- `hue`: `number` - 目标色相 (0-360)
+
+**返回值：**
+
+- `string` - 调整后的颜色 (RGB)
+
+**示例：**
+
+```javascript
+import { adjustHue } from '@aviala-design/color';
+
+// 将色相旋转到 120 度（绿色区域）
+const green = adjustHue('#FF0000', 120);
+```
+
+---
+
+### `rotateHue`
+
+旋转颜色的色相
+
+**签名：**
+```typescript
+function rotateHue(color, degrees)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+- `degrees`: `number` - 旋转角度（可正可负）
+
+**返回值：**
+
+- `string` - 旋转后的颜色 (RGB)
+
+**示例：**
+
+```javascript
+import { rotateHue } from '@aviala-design/color';
+
+// 色相顺时针旋转 30 度
+const rotated = rotateHue('#FF0000', 30);
+
+// 色相逆时针旋转 45 度
+const rotatedBack = rotateHue('#FF0000', -45);
+```
+
+---
+
+### `getComplementary`
+
+获取颜色的互补色
+
+**签名：**
+```typescript
+function getComplementary(color)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+
+**返回值：**
+
+- `string` - 互补色 (RGB)
+
+**示例：**
+
+```javascript
+import { getComplementary } from '@aviala-design/color';
+
+const complement = getComplementary('#FF0000'); // 青色
+```
+
+---
+
+### `getTriadic`
+
+获取颜色的三角配色
+
+**签名：**
+```typescript
+function getTriadic(color)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+
+**返回值：**
+
+- `[string, string, string]` - 三个颜色的数组
+
+**示例：**
+
+```javascript
+import { getTriadic } from '@aviala-design/color';
+
+const [c1, c2, c3] = getTriadic('#FF0000');
+```
+
+---
+
+### `getSplitComplementary`
+
+获取颜色的分裂互补色
+
+**签名：**
+```typescript
+function getSplitComplementary(color, angle = 30)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+- `angle` (可选): `number` - =30] - 分裂角度
+
+**返回值：**
+
+- `[string, string, string]` - 三个颜色的数组
+
+**示例：**
+
+```javascript
+import { getSplitComplementary } from '@aviala-design/color';
+
+const [c1, c2, c3] = getSplitComplementary('#FF0000');
+```
+
+---
+
+### `getAnalogous`
+
+获取颜色的类似色
+
+**签名：**
+```typescript
+function getAnalogous(color, count = 3, angle = 30)
+```
+
+**参数：**
+
+- `color`: `string` - 输入颜色 (RGB)
+- `count` (可选): `number` - =3] - 颜色数量
+- `angle` (可选): `number` - =30] - 每个颜色之间的角度
+
+**返回值：**
+
+- `string[]` - 类似色数组
+
+**示例：**
+
+```javascript
+import { getAnalogous } from '@aviala-design/color';
+
+const analogous = getAnalogous('#FF0000', 5, 15);
+```
 
 ---
 
 ### `harmonizeColor`
 
-颜色调和 - 让目标颜色向主题色的色相靠拢
+颜色调和 - 让目标颜色向主题色的色相靠拢 使用 Lab 空间计算，保持感知一致性
 
 **签名：**
 ```typescript

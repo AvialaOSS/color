@@ -1,19 +1,27 @@
 # 主题混合功能文档
 
-主题混合功能参考了 Material Design 3 的 HCT 色彩空间，提供了强大的颜色调和与混合能力，特别适用于品牌色系统和主题定制。
+主题混合功能基于 CIE Lab 颜色空间实现的 HCT (Hue, Chroma, Tone) 色彩空间，提供了强大的颜色调和与混合能力，特别适用于品牌色系统和主题定制。
 
-> **💡 提示**：主题混合功能基于感知均匀的 HCT 色彩空间，能够生成更自然、协调的颜色组合，特别适合构建一致性强的设计系统。
+> **💡 提示**：主题混合功能基于感知均匀的 Lab 色彩空间，能够生成更自然、协调的颜色组合，特别适合构建一致性强的设计系统。
 
 ## 功能概述
 
 ### 核心特性
 
-- **HCT 色彩空间**：基于人眼感知的色彩空间，提供更自然的颜色过渡
-- **智能色彩调和**：自动生成协调的颜色搭配，保持品牌一致性
+- **CIE Lab 色彩空间**：基于人眼感知的色彩空间，提供准确的颜色转换
+- **多种混合模式**：支持 Lab 空间混合、HCT 线性混合、仅色相混合
 - **完整色彩系统**：一键生成包含控件色、语义色、主题色的完整界面色彩系统
 - **暗色模式支持**：自动适配亮色和暗色两种模式
-- **无障碍友好**：确保生成的颜色符合对比度要求
-- **高度可定制**：支持自定义语义色、混合比例等参数
+- **颜色和谐工具**：提供互补色、三角配色、类似色等配色方案
+- **高度可定制**：支持自定义语义色、混合比例、亮度范围等参数
+
+### 新增功能 (v0.3.0)
+
+- **颜色差异计算**：`colorDifference` - 计算两色的感知差异 (Delta E)
+- **颜色调整**：`adjustTone`、`adjustChroma`、`adjustHue`、`rotateHue`
+- **配色方案**：`getComplementary`、`getTriadic`、`getSplitComplementary`、`getAnalogous`
+- **混合模式**：`blendInHct` 支持 `lab`、`hct`、`hue-only` 三种模式
+- **精确控制**：支持自定义色阶数量、亮度范围（minLightness/maxLightness）
 
 ### 适用场景
 
@@ -21,6 +29,7 @@
 - **品牌色彩定制**：基于品牌主色生成完整的色彩体系
 - **主题切换**：支持多主题和暗色模式的应用
 - **界面色彩优化**：提升界面色彩的协调性和视觉层次
+- **配色方案生成**：快速生成互补色、类似色等配色方案
 
 ## 快速开始
 
@@ -46,54 +55,93 @@ console.log(colorSystem);
 ### 自定义配置
 
 ```javascript
-// 自定义语义色和混合比例
+// 完整自定义配置
 const customSystem = generateInterfaceColorSystem('#165DFF', {
+  isDark: false,
+  baseGray: '#666666',
+  // 控件色配置
+  controlBlendRatio: 0.08,
+  controlSteps: 12,
+  controlMinLightness: 10,
+  controlMaxLightness: 98,
+  // 语义色配置
+  semanticBlendRatio: 0.12,
+  semanticSteps: 10,
   semanticColors: {
-    success: '#00b96b',
-    error: '#ff7875'
+    success: '#52c41a',
+    warning: '#faad14',
+    error: '#ff4d4f',
+    info: '#1890ff'
   },
-  semanticBlendRatio: 0.15
+  // 主题色配置
+  themeSteps: 10,
+  themeMinLightness: 15,
+  themeMaxLightness: 95
 });
+```
+
+### 配色方案生成
+
+```javascript
+import { getComplementary, getTriadic, getAnalogous } from '@aviala-design/color';
+
+// 获取互补色
+const complement = getComplementary('#FF0000'); // 青色
+
+// 获取三角配色
+const [c1, c2, c3] = getTriadic('#FF0000');
+
+// 获取类似色
+const analogous = getAnalogous('#FF0000', 5, 15); // 5 个颜色，间隔 15°
 ```
 
 ## API 说明
 
 ### 1. rgbToHct - RGB转HCT
 
-将RGB颜色转换为HCT色彩空间。
+将RGB颜色转换为HCT色彩空间（基于 CIE Lab 实现）。
 
 ```javascript
 import { rgbToHct } from '@aviala-design/color';
 
-const hct = rgbToHct('#165DFF');
-console.log(hct); // { h: 225, c: 87, t: 64 }
+const hct = rgbToHct('#3491FA');
+console.log(hct); // { h: 278.7, c: 60.7, t: 59.8 }
+// h: 色相 (0-360)，从 Lab 的 a*/b* 计算
+// c: 色度，sqrt(a² + b²)
+// t: 明度，即 L* 值 (0-100)
 ```
 
 ### 2. hctToRgb - HCT转RGB
 
-将HCT色彩空间转换为RGB颜色。
+将HCT色彩空间转换为RGB颜色，支持色域映射。
 
 ```javascript
 import { hctToRgb } from '@aviala-design/color';
 
-const rgb = hctToRgb({ h: 225, c: 87, t: 64 });
-console.log(rgb); // '#165DFF'
+const rgb = hctToRgb({ h: 278.7, c: 60.7, t: 59.8 });
+console.log(rgb); // '#3491fa'
+
+// 使用色域映射选项
+const rgb2 = hctToRgb({ h: 120, c: 150, t: 50 }, { 
+  gamutMapping: 'reduce-chroma' // 默认，逐步减少色度直到在色域内
+});
 ```
 
-### 3. blendInHct - HCT空间混合
+### 3. blendInHct - 颜色混合（支持多种模式）
 
-在HCT色彩空间中混合两种颜色。
+在色彩空间中混合两种颜色，支持三种混合模式。
 
 ```javascript
 import { blendInHct } from '@aviala-design/color';
 
-// 混合主题色和目标色
-const blended = blendInHct('#165DFF', '#F53F3F', 0.5);
-console.log(blended); // 混合后的颜色
+// Lab 空间混合（默认，最感知一致）
+const labBlend = blendInHct('#FF0000', '#0000FF', 0.5);
 
-// 不同混合比例
-const light = blendInHct('#165DFF', '#F53F3F', 0.2); // 更偏向主题色
-const heavy = blendInHct('#165DFF', '#F53F3F', 0.8); // 更偏向目标色
+// HCT 线性混合（保持色相连续性）
+const hctBlend = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hct' });
+
+// 仅混合色相（保持第一个颜色的色度和明度）
+const hueBlend = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hue-only' });
 ```
 
 ### 4. harmonizeColor - 颜色调和
@@ -959,3 +1007,36 @@ function checkContrast(backgroundColor, textColor) {
 - **5-8%**：轻微的品牌化，保持原色特性
 - **10-15%**：中等程度的品牌化，平衡效果
 - **15-20%**：强烈的品牌化，明显的主题色影响
+
+### Q: 三种混合模式有什么区别？
+
+**A:** 
+- **lab (默认)**：在 CIE Lab 色彩空间中进行线性混合，这是最平衡的选择，能保持感知上的平滑过渡
+- **hct**：HCT 线性混合，分别对色相、彩度、明度进行线性插值，适合需要精确控制各属性的场景
+- **hue-only**：仅混合色相，保持原始色彩的彩度和明度，适合保持语义色辨识度的场景
+
+### Q: 如何选择混合模式？
+
+**A:** 
+- 大多数情况下使用默认的 `lab` 模式即可
+- 如果希望语义色保持更高的辨识度，使用 `hue-only` 模式
+- 如果需要更细致地控制色彩变化，使用 `hct` 模式
+
+## 更新日志
+
+### v2.0.0 (最新)
+
+- **新增** CIE Lab 色彩空间支持，提供更精准的感知均匀混合
+- **新增** 三种混合模式：`lab`、`hct`、`hue-only`
+- **新增** 颜色工具函数：
+  - `colorDifference()` - 计算两个颜色之间的 Delta E 感知差异
+  - `adjustTone()` - 调整颜色明度
+  - `adjustChroma()` - 调整颜色彩度
+  - `adjustHue()` / `rotateHue()` - 调整/旋转色相
+- **新增** 色彩和谐函数：
+  - `getComplementary()` - 获取互补色
+  - `getTriadic()` - 获取三角配色
+  - `getSplitComplementary()` - 获取分裂互补色
+  - `getAnalogous()` - 获取类似色
+- **改进** HCT 转换精度，Delta E 误差趋近于 0
+- **改进** 主题色生成的感知均匀性

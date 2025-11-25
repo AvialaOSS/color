@@ -2,7 +2,7 @@ import { default as generate } from './generate.js';
 import { getRgbStr } from './utils.js';
 import { extractColorFromImage, extractColorFromFile } from './image-color.js';
 import { generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL } from './linear.js';
-import { rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem } from './theme-blend.js';
+import { rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem, colorDifference, adjustTone, adjustChroma, adjustHue, rotateHue, getComplementary, getTriadic, getSplitComplementary, getAnalogous } from './theme-blend.js';
 /**
  * 获取所有预设颜色的色板
  *
@@ -80,5 +80,5 @@ export const colorList: {
     pinkpurple: string;
     magenta: string;
 };
-export { generate, getRgbStr, extractColorFromImage, extractColorFromFile, generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL, rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem };
+export { generate, getRgbStr, extractColorFromImage, extractColorFromFile, generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL, rgbToHct, hctToRgb, blendInHct, harmonizeColor, generateThemeVariants, blendUIColors, generateThemePalette, generateControlColors, generateSemanticColors, generateThemeColors, generateInterfaceColorSystem, colorDifference, adjustTone, adjustChroma, adjustHue, rotateHue, getComplementary, getTriadic, getSplitComplementary, getAnalogous };
 //# sourceMappingURL=index.d.ts.map

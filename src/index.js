@@ -13,7 +13,17 @@ import {
   generateControlColors,
   generateSemanticColors,
   generateThemeColors,
-  generateInterfaceColorSystem
+  generateInterfaceColorSystem,
+  // 新增的颜色工具函数
+  colorDifference,
+  adjustTone,
+  adjustChroma,
+  adjustHue,
+  rotateHue,
+  getComplementary,
+  getTriadic,
+  getSplitComplementary,
+  getAnalogous
 } from './theme-blend.js';
 
 /**
@@ -179,5 +189,15 @@ export {
   generateControlColors,
   generateSemanticColors,
   generateThemeColors,
-  generateInterfaceColorSystem
+  generateInterfaceColorSystem,
+  // 新增的颜色工具函数
+  colorDifference,
+  adjustTone,
+  adjustChroma,
+  adjustHue,
+  rotateHue,
+  getComplementary,
+  getTriadic,
+  getSplitComplementary,
+  getAnalogous
 };

@@ -1,12 +1,19 @@
 /**
  * @typedef {Object} HCT
  * @property {number} h - 色相 (0-360)
- * @property {number} c - 色度 (0-200+)
- * @property {number} t - 色调/亮度 (0-100)
+ * @property {number} c - 色度 (0-150+)
+ * @property {number} t - 色调/亮度 (0-100)，对应 CIE L*
+ */
+/**
+ * @typedef {Object} LabColor
+ * @property {number} l - L* 亮度 (0-100)
+ * @property {number} a - a* 红绿轴 (-128 to 128)
+ * @property {number} b - b* 黄蓝轴 (-128 to 128)
  */
 /**
  * 将 RGB 颜色转换为 HCT 颜色空间
- * 这是一个简化的实现，实际的 HCT 转换需要复杂的 CAM16 计算
+ * 使用 CIE Lab 颜色空间实现准确的感知一致性
+ *
  * @param {string} rgb - RGB 颜色值，格式如 "#ff0000"
  * @returns {HCT} HCT 颜色对象 {h, c, t}
  *
@@ -15,7 +22,7 @@
  *
  * // 转换品牌色到 HCT 空间
  * const hct = rgbToHct('#3491FA');
- * console.log(hct); // { h: 210, c: 45, t: 60 }
+ * console.log(hct); // { h: 278.7, c: 60.7, t: 59.8 }
  *
  * @example
  * // 用于颜色分析和处理
@@ -27,16 +34,18 @@
 export function rgbToHct(rgb: string): HCT;
 /**
  * 将 HCT 颜色转换为 RGB
+ * 使用 CIE Lab 颜色空间作为中间转换
+ *
  * @param {HCT} hct - HCT 颜色对象 {h, c, t}
- * @param {{maxChroma?: number}} [options] - 配置选项
+ * @param {{gamutMapping?: 'clamp' | 'reduce-chroma'}} [options] - 配置选项
  * @returns {string} RGB 颜色值，格式如 "#ff0000"
  *
  * @example
  * import { hctToRgb } from '@aviala-design/color';
  *
  * // 从 HCT 颜色空间转回 RGB
- * const rgb = hctToRgb({ h: 210, c: 45, t: 60 });
- * console.log(rgb); // '#3491FA'
+ * const rgb = hctToRgb({ h: 278.7, c: 60.7, t: 59.8 });
+ * console.log(rgb); // '#3491fa'
  *
  * @example
  * // 在 HCT 空间调整颜色后转换
@@ -45,31 +54,164 @@ export function rgbToHct(rgb: string): HCT;
  * document.body.style.backgroundColor = rgb;
  */
 export function hctToRgb(hct: HCT, options?: {
-    maxChroma?: number;
+    gamutMapping?: "clamp" | "reduce-chroma";
 }): string;
 /**
  * 在 HCT 颜色空间中混合两种颜色
+ * 支持多种混合模式：Lab 空间混合（默认）、HCT 线性混合、色相混合
+ *
  * @param {string} color1 - 第一种颜色 (RGB)
  * @param {string} color2 - 第二种颜色 (RGB)
  * @param {number} ratio - 混合比例，0-1，0表示完全是color1，1表示完全是color2
+ * @param {{mode?: 'lab' | 'hct' | 'hue-only'}} [options] - 混合选项
  * @returns {string} 混合后的颜色 (RGB)
  *
  * @example
  * import { blendInHct } from '@aviala-design/color';
  *
- * // 混合品牌色和背景色
+ * // 混合品牌色和背景色（默认 Lab 空间混合）
  * const blended = blendInHct('#3491FA', '#FFFFFF', 0.3);
- * // 30% 白色，70% 品牌色
  *
  * @example
- * // 创建悬停效果颜色
- * const primaryColor = '#FF5722';
- * const hoverColor = blendInHct(primaryColor, '#000000', 0.1);
- * // 混入 10% 黑色使颜色变深
+ * // 使用 HCT 线性混合
+ * const blended = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hct' });
+ *
+ * @example
+ * // 只混合色相，保持第一个颜色的色度和明度
+ * const blended = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hue-only' });
  */
-export function blendInHct(color1: string, color2: string, ratio?: number): string;
+export function blendInHct(color1: string, color2: string, ratio?: number, options?: {
+    mode?: "lab" | "hct" | "hue-only";
+}): string;
+/**
+ * 计算两个颜色在 Lab 空间中的感知色差 (Delta E)
+ * 值越小表示颜色越接近，一般认为 < 2 为几乎不可察觉的差异
+ *
+ * @param {string} color1 - 第一种颜色 (RGB)
+ * @param {string} color2 - 第二种颜色 (RGB)
+ * @returns {number} Delta E 值
+ *
+ * @example
+ * import { colorDifference } from '@aviala-design/color';
+ *
+ * const diff = colorDifference('#FF0000', '#FF0001');
+ * console.log(diff); // 很小的值，几乎相同
+ */
+export function colorDifference(color1: string, color2: string): number;
+/**
+ * 调整颜色的明度（Tone）
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @param {number} tone - 目标明度 (0-100)
+ * @returns {string} 调整后的颜色 (RGB)
+ *
+ * @example
+ * import { adjustTone } from '@aviala-design/color';
+ *
+ * // 将颜色调整到 80% 明度
+ * const lighter = adjustTone('#3491FA', 80);
+ */
+export function adjustTone(color: string, tone: number): string;
+/**
+ * 调整颜色的色度（Chroma）
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @param {number} chroma - 目标色度
+ * @returns {string} 调整后的颜色 (RGB)
+ *
+ * @example
+ * import { adjustChroma } from '@aviala-design/color';
+ *
+ * // 降低颜色鲜艳度
+ * const muted = adjustChroma('#FF0000', 30);
+ */
+export function adjustChroma(color: string, chroma: number): string;
+/**
+ * 调整颜色的色相（Hue）
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @param {number} hue - 目标色相 (0-360)
+ * @returns {string} 调整后的颜色 (RGB)
+ *
+ * @example
+ * import { adjustHue } from '@aviala-design/color';
+ *
+ * // 将色相旋转到 120 度（绿色区域）
+ * const green = adjustHue('#FF0000', 120);
+ */
+export function adjustHue(color: string, hue: number): string;
+/**
+ * 旋转颜色的色相
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @param {number} degrees - 旋转角度（可正可负）
+ * @returns {string} 旋转后的颜色 (RGB)
+ *
+ * @example
+ * import { rotateHue } from '@aviala-design/color';
+ *
+ * // 色相顺时针旋转 30 度
+ * const rotated = rotateHue('#FF0000', 30);
+ *
+ * // 色相逆时针旋转 45 度
+ * const rotatedBack = rotateHue('#FF0000', -45);
+ */
+export function rotateHue(color: string, degrees: number): string;
+/**
+ * 获取颜色的互补色
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @returns {string} 互补色 (RGB)
+ *
+ * @example
+ * import { getComplementary } from '@aviala-design/color';
+ *
+ * const complement = getComplementary('#FF0000'); // 青色
+ */
+export function getComplementary(color: string): string;
+/**
+ * 获取颜色的三角配色
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @returns {[string, string, string]} 三个颜色的数组
+ *
+ * @example
+ * import { getTriadic } from '@aviala-design/color';
+ *
+ * const [c1, c2, c3] = getTriadic('#FF0000');
+ */
+export function getTriadic(color: string): [string, string, string];
+/**
+ * 获取颜色的分裂互补色
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @param {number} [angle=30] - 分裂角度
+ * @returns {[string, string, string]} 三个颜色的数组
+ *
+ * @example
+ * import { getSplitComplementary } from '@aviala-design/color';
+ *
+ * const [c1, c2, c3] = getSplitComplementary('#FF0000');
+ */
+export function getSplitComplementary(color: string, angle?: number): [string, string, string];
+/**
+ * 获取颜色的类似色
+ *
+ * @param {string} color - 输入颜色 (RGB)
+ * @param {number} [count=3] - 颜色数量
+ * @param {number} [angle=30] - 每个颜色之间的角度
+ * @returns {string[]} 类似色数组
+ *
+ * @example
+ * import { getAnalogous } from '@aviala-design/color';
+ *
+ * const analogous = getAnalogous('#FF0000', 5, 15);
+ */
+export function getAnalogous(color: string, count?: number, angle?: number): string[];
 /**
  * 颜色调和 - 让目标颜色向主题色的色相靠拢
+ * 使用 Lab 空间计算，保持感知一致性
+ *
  * @param {string} themeColor - 主题色 (RGB)
  * @param {string} targetColor - 目标颜色 (RGB)
  * @param {number} harmonizeRatio - 调和强度，0-1，0表示不调和，1表示完全采用主题色的色相
@@ -208,7 +350,7 @@ export function generateControlColors(themeColor: string, options?: {
 /**
  * 生成表意色（1-10）
  * @param {string} themeColor - 主题颜色
- * @param {{semanticColors?: {[key: string]: string}, blendRatio?: number, isDark?: boolean}} [options] - 配置选项
+ * @param {{semanticColors?: {[key: string]: string}, blendRatio?: number, isDark?: boolean, steps?: number, lightnessRange?: number, minLightness?: number, maxLightness?: number}} [options] - 配置选项
  * @returns {{[key: string]: string}} 表意色对象
  *
  * @example
@@ -230,6 +372,14 @@ export function generateControlColors(themeColor: string, options?: {
  *   },
  *   blendRatio: 0.1
  * });
+ *
+ * @example
+ * // 使用固定端点模式获得更广的亮度范围
+ * const wideRange = generateSemanticColors('#3491FA', {
+ *   minLightness: 10,
+ *   maxLightness: 95,
+ *   steps: 10
+ * });
  */
 export function generateSemanticColors(themeColor: string, options?: {
     semanticColors?: {
@@ -237,13 +387,17 @@ export function generateSemanticColors(themeColor: string, options?: {
     };
     blendRatio?: number;
     isDark?: boolean;
+    steps?: number;
+    lightnessRange?: number;
+    minLightness?: number;
+    maxLightness?: number;
 }): {
     [key: string]: string;
 };
 /**
  * 生成主题色（1-10）
  * @param {string} themeColor - 主题颜色
- * @param {{isDark?: boolean}} [options] - 配置选项
+ * @param {{isDark?: boolean, steps?: number, lightnessRange?: number, minLightness?: number, maxLightness?: number}} [options] - 配置选项
  * @returns {{[key: string]: string}} 主题色对象
  *
  * @example
@@ -258,9 +412,21 @@ export function generateSemanticColors(themeColor: string, options?: {
  * @example
  * // 深色模式主题色
  * const darkTheme = generateThemeColors('#FF5722', { isDark: true });
+ *
+ * @example
+ * // 使用固定端点模式
+ * const wideRange = generateThemeColors('#3491FA', {
+ *   minLightness: 15,
+ *   maxLightness: 95,
+ *   steps: 10
+ * });
  */
 export function generateThemeColors(themeColor: string, options?: {
     isDark?: boolean;
+    steps?: number;
+    lightnessRange?: number;
+    minLightness?: number;
+    maxLightness?: number;
 }): {
     [key: string]: string;
 };
@@ -300,7 +466,11 @@ export function generateThemeColors(themeColor: string, options?: {
  * const preciseSystem = generateInterfaceColorSystem('#3491FA', {
  *   controlSteps: 12,
  *   controlMinLightness: 10,   // 最深色接近纯黑
- *   controlMaxLightness: 98    // 最浅色接近纯白
+ *   controlMaxLightness: 98,   // 最浅色接近纯白
+ *   semanticMinLightness: 15,  // 语义色最深
+ *   semanticMaxLightness: 95,  // 语义色最浅
+ *   themeMinLightness: 15,     // 主题色最深
+ *   themeMaxLightness: 95      // 主题色最浅
  * });
  * // 生成接近纯白到纯黑的灰度系统
  */
@@ -348,12 +518,26 @@ export type HCT = {
      */
     h: number;
     /**
-     * - 色度 (0-200+)
+     * - 色度 (0-150+)
      */
     c: number;
     /**
-     * - 色调/亮度 (0-100)
+     * - 色调/亮度 (0-100)，对应 CIE L*
      */
     t: number;
+};
+export type LabColor = {
+    /**
+     * - L* 亮度 (0-100)
+     */
+    l: number;
+    /**
+     * - a* 红绿轴 (-128 to 128)
+     */
+    a: number;
+    /**
+     * - b* 黄蓝轴 (-128 to 128)
+     */
+    b: number;
 };
 //# sourceMappingURL=theme-blend.d.ts.map
