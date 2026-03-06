@@ -1218,7 +1218,8 @@
         html += `<strong>📊 生成配置</strong><br>`;
         html += `• 控件色: ${controlSteps} 级 (亮度 ${minLightness}%-${maxLightness}%) | 混合 ${(controlBlend * 100).toFixed(0)}%<br>`;
         html += `• 语义色: ${semanticSteps} 级 (亮度 ${semanticMinLightness}%-${semanticMaxLightness}%) | 混合 ${(semanticBlend * 100).toFixed(0)}%<br>`;
-        html += `• 主题色: ${themeSteps} 级 (亮度 ${themeMinLightness}%-${themeMaxLightness}%)`;
+        html += `• 主题色: ${themeSteps} 级 (亮度 ${themeMinLightness}%-${themeMaxLightness}%)<br>`;
+        html += `• 浅灰度: ${Object.keys(system.neutrals).length} 级 (背景/卡片用)`;
         html += '</div></div>';
         html += '<div class="theme-system-grid">';
         
@@ -1226,7 +1227,7 @@
         const themeCount = Object.keys(system.theme).length;
         html += `
           <div class="theme-section">
-            <div class="theme-section-title">主题色 (${themeCount})</div>
+            <div class="theme-section-title">🎨 主题色 (${themeCount})</div>
             <div class="theme-colors">
               ${Object.values(system.theme).map((c, i) => `
                 <div class="theme-color" style="background: ${c}" onclick="copyColor('${c}')" title="theme-${i+1}: ${c}"></div>
@@ -1235,10 +1236,25 @@
           </div>
         `;
         
+        // 浅灰度颜色（Neutrals）- 新增
+        html += `
+          <div class="theme-section">
+            <div class="theme-section-title">🌫️ 浅灰度 (${Object.keys(system.neutrals).length}) - 背景/卡片</div>
+            <div class="theme-colors">
+              ${Object.entries(system.neutrals).map(([key, c]) => `
+                <div class="theme-color" style="background: ${c}; border: 1px solid #e5e6eb;" onclick="copyColor('${c}')" title="${key}: ${c}"></div>
+              `).join('')}
+            </div>
+            <div style="margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-secondary);">
+              用于: 页面背景 → 卡片背景 → hover → 分割线 → 边框 → 禁用态
+            </div>
+          </div>
+        `;
+        
         // 控件色
         html += `
           <div class="theme-section">
-            <div class="theme-section-title">控件色 (${Object.keys(system.controls).length}) - 混合 ${(controlBlend * 100).toFixed(0)}%</div>
+            <div class="theme-section-title">⚙️ 控件色 (${Object.keys(system.controls).length}) - 混合 ${(controlBlend * 100).toFixed(0)}%</div>
             <div class="theme-colors">
               ${Object.values(system.controls).map((c, i) => `
                 <div class="theme-color" style="background: ${c}" onclick="copyColor('${c}')" title="gray-${i+1}: ${c}"></div>
@@ -1262,7 +1278,7 @@
         
         html += `
           <div class="theme-section">
-            <div class="theme-section-title">语义色 - 混合 ${(semanticBlend * 100).toFixed(0)}%</div>
+            <div class="theme-section-title">💡 语义色 - 混合 ${(semanticBlend * 100).toFixed(0)}%</div>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
               ${Object.entries(semanticGroups).map(([name, colors]) => `
                 <div>
@@ -1278,7 +1294,24 @@
           </div>
         `;
         
-        html += '</div></div>';
+        html += '</div>';
+        
+        // 添加使用示例
+        html += `
+          <div style="margin-top: 1.5rem; padding: 1rem; background: #f0f9ff; border-left: 4px solid #3491FA; border-radius: 4px;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: #1e40af;">💡 浅灰度使用建议</div>
+            <div style="font-size: 0.8rem; color: #1e40af; line-height: 1.8;">
+              <code style="background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">neutral-1</code> 页面背景 (最浅，接近白色)<br>
+              <code style="background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">neutral-2</code> 卡片背景、输入框背景<br>
+              <code style="background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">neutral-3</code> hover 状态背景<br>
+              <code style="background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">neutral-4</code> 分割线、表格斑马纹<br>
+              <code style="background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">neutral-5</code> 边框颜色<br>
+              <code style="background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px;">neutral-6</code> 禁用状态背景 (最深的浅灰)
+            </div>
+          </div>
+        `;
+        
+        html += '</div>';
         
         // 存储系统供导出
         lastGeneratedSystem = system;

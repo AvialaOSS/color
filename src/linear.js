@@ -113,7 +113,7 @@ export function generateGrayLinear(options = {}) {
  * 基于一个基础颜色，生成从浅到深的渐变
  * 
  * @param {string} baseColor - 基础颜色
- * @param {{steps?: number, format?: string, lightnessRange?: number, minLightness?: number, maxLightness?: number}} options - 配置选项
+ * @param {{steps?: number, format?: string, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} options - 配置选项
  * @returns {string[]} 单色调颜色数组
  * 
  * @example
@@ -140,6 +140,13 @@ export function generateGrayLinear(options = {}) {
  * // 推荐用于需要接近纯白/纯黑的场景
  * 
  * @example
+ * // 保持感知色度（推荐用于鲜艳的颜色）
+ * const vibrantShades = generateMonochromeLinear('#FF0000', {
+ *   steps: 10,
+ *   preserveChroma: true  // 在 Lab 空间保持色度，避免灰蒙蒙
+ * });
+ * 
+ * @example
  * // 生成HSL格式
  * const hslShades = generateMonochromeLinear('#00b894', {
  *   format: 'hsl',
@@ -152,7 +159,8 @@ export function generateMonochromeLinear(baseColor, options = {}) {
     format = 'hex', 
     lightnessRange = 80,
     minLightness = null,
-    maxLightness = null
+    maxLightness = null,
+    preserveChroma = false
   } = options;
   
   const base = Color(baseColor);
@@ -173,6 +181,11 @@ export function generateMonochromeLinear(baseColor, options = {}) {
     finalMinLightness = Math.max(5, baseLightness - lightnessRange / 2);
   }
   
+  // 如果需要保持感知色度，使用 Lab 空间
+  if (preserveChroma) {
+    return generateMonochromeInLab(base, finalMaxLightness, finalMinLightness, steps, format);
+  }
+  
   // 创建起始和结束颜色（保持色相和饱和度，只改变亮度）
   const startColor = Color({
     h: base.hue(),
@@ -187,6 +200,72 @@ export function generateMonochromeLinear(baseColor, options = {}) {
   });
   
   return generateLinear(startColor.hex(), endColor.hex(), { steps, format, includeEnds: true });
+}
+
+/**
+ * 在 Lab 空间生成单色调渐变，保持感知色度
+ * 
+ * @param {import('color')} baseColor - Color 对象
+ * @param {number} maxLightness - 最大亮度
+ * @param {number} minLightness - 最小亮度
+ * @param {number} steps - 步数
+ * @param {string} format - 输出格式
+ * @returns {string[]} 颜色数组
+ */
+function generateMonochromeInLab(baseColor, maxLightness, minLightness, steps, format) {
+  // 获取基础色的 Lab 值
+  const baseA = baseColor.a();
+  const baseB = baseColor.b();
+  
+  // 计算色度 (chroma) 和色相角
+  const baseChroma = Math.sqrt(baseA * baseA + baseB * baseB);
+  const hueAngle = Math.atan2(baseB, baseA);
+  
+  const colors = [];
+  const stepSize = (maxLightness - minLightness) / (steps - 1);
+  
+  for (let i = 0; i < steps; i++) {
+    // 从最亮到最暗
+    const targetL = maxLightness - stepSize * i;
+    
+    // 根据亮度计算可用的最大色度
+    // 在极端亮度时需要减少色度以保持在色域内
+    let targetChroma = baseChroma;
+    
+    // 亮度接近 0 或 100 时，逐渐减少色度
+    if (targetL > 85) {
+      // 高亮度时，色度需要降低以保持在色域内
+      const factor = Math.max(0, (100 - targetL) / 15);
+      targetChroma = baseChroma * factor;
+    } else if (targetL < 15) {
+      // 低亮度时，色度也需要降低
+      const factor = Math.max(0, targetL / 15);
+      targetChroma = baseChroma * factor;
+    }
+    
+    // 计算新的 a, b 值
+    const newA = targetChroma * Math.cos(hueAngle);
+    const newB = targetChroma * Math.sin(hueAngle);
+    
+    // 创建颜色并进行色域映射
+    let color = Color.lab(targetL, newA, newB);
+    
+    // 确保颜色在 sRGB 色域内
+    let rgb = color.rgb().array();
+    let currentChroma = targetChroma;
+    
+    while ((rgb[0] < 0 || rgb[0] > 255 || rgb[1] < 0 || rgb[1] > 255 || rgb[2] < 0 || rgb[2] > 255) && currentChroma > 0) {
+      currentChroma -= 1;
+      const adjA = currentChroma * Math.cos(hueAngle);
+      const adjB = currentChroma * Math.sin(hueAngle);
+      color = Color.lab(targetL, adjA, adjB);
+      rgb = color.rgb().array();
+    }
+    
+    colors.push(getColorString(color, format));
+  }
+  
+  return colors;
 }
 
 /**

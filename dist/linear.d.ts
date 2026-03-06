@@ -73,7 +73,7 @@ export function generateGrayLinear(options?: {
  * 基于一个基础颜色，生成从浅到深的渐变
  *
  * @param {string} baseColor - 基础颜色
- * @param {{steps?: number, format?: string, lightnessRange?: number, minLightness?: number, maxLightness?: number}} options - 配置选项
+ * @param {{steps?: number, format?: string, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} options - 配置选项
  * @returns {string[]} 单色调颜色数组
  *
  * @example
@@ -100,6 +100,13 @@ export function generateGrayLinear(options?: {
  * // 推荐用于需要接近纯白/纯黑的场景
  *
  * @example
+ * // 保持感知色度（推荐用于鲜艳的颜色）
+ * const vibrantShades = generateMonochromeLinear('#FF0000', {
+ *   steps: 10,
+ *   preserveChroma: true  // 在 Lab 空间保持色度，避免灰蒙蒙
+ * });
+ *
+ * @example
  * // 生成HSL格式
  * const hslShades = generateMonochromeLinear('#00b894', {
  *   format: 'hsl',
@@ -112,6 +119,7 @@ export function generateMonochromeLinear(baseColor: string, options?: {
     lightnessRange?: number;
     minLightness?: number;
     maxLightness?: number;
+    preserveChroma?: boolean;
 }): string[];
 /**
  * 在HSL空间进行线性插值

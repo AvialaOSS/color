@@ -763,9 +763,114 @@ export function generateControlColors(themeColor, options = {}) {
 }
 
 /**
+ * 生成浅灰度颜色系列（neutral colors）
+ * 专门用于生成浅色背景、卡片、分割线等 UI 元素的灰度色系
+ * 与 generateControlColors 的区别：
+ * - 亮度范围更窄，集中在浅色区域（默认 92-100）
+ * - 更适合作为背景色、hover 状态、边框等
+ * - 产生更细腻的浅色梯度变化
+ * 
+ * @param {string} themeColor - 主题颜色
+ * @param {{baseGray?: string, blendRatio?: number, steps?: number, minLightness?: number, maxLightness?: number, prefix?: string}} [options] - 配置选项
+ * @returns {{[key: string]: string}} 浅灰度颜色对象
+ * 
+ * @example
+ * import { generateNeutralColors } from '@aviala-design/color';
+ * 
+ * // 生成默认的浅灰度色系（6个等级）
+ * const neutrals = generateNeutralColors('#3491FA');
+ * console.log(neutrals);
+ * // {
+ * //   'neutral-1': '#fafbfc',  // 最浅，接近白色
+ * //   'neutral-2': '#f5f7f9',
+ * //   'neutral-3': '#f0f2f5',
+ * //   'neutral-4': '#ebeef2',
+ * //   'neutral-5': '#e6e9ee',
+ * //   'neutral-6': '#e1e5eb'   // 最深的浅灰
+ * // }
+ * 
+ * @example
+ * // 用于不同 UI 场景
+ * const neutrals = generateNeutralColors('#3491FA');
+ * // neutrals['neutral-1'] -> 页面背景
+ * // neutrals['neutral-2'] -> 卡片背景
+ * // neutrals['neutral-3'] -> hover 状态背景
+ * // neutrals['neutral-4'] -> 分割线
+ * // neutrals['neutral-5'] -> 边框
+ * // neutrals['neutral-6'] -> 禁用状态背景
+ * 
+ * @example
+ * // 自定义亮度范围，生成更多等级
+ * const fineNeutrals = generateNeutralColors('#3491FA', {
+ *   steps: 10,
+ *   minLightness: 88,
+ *   maxLightness: 100
+ * });
+ * 
+ * @example
+ * // 增加主题色混合比例，让浅灰更有品牌感
+ * const brandedNeutrals = generateNeutralColors('#6200EE', {
+ *   blendRatio: 0.06,  // 增加主题色影响
+ *   steps: 8
+ * });
+ * 
+ * @example
+ * // 自定义前缀
+ * const bgColors = generateNeutralColors('#3491FA', {
+ *   prefix: 'bg',
+ *   steps: 4
+ * });
+ * // { 'bg-1': '...', 'bg-2': '...', 'bg-3': '...', 'bg-4': '...' }
+ */
+export function generateNeutralColors(themeColor, options = {}) {
+  // 验证输入
+  if (!themeColor) {
+    throw new Error('Theme color is required');
+  }
+  
+  const { 
+    baseGray = '#f5f5f5',  // 使用浅灰作为基础，比控件色更浅
+    blendRatio = 0.03,     // 较低的混合比例，保持中性但带有品牌色调
+    steps = 6,             // 默认 6 个等级
+    minLightness = 92,     // 最深的浅灰亮度
+    maxLightness = 100,    // 最浅接近白色
+    prefix = 'neutral'     // 颜色名称前缀
+  } = options;
+  
+  // 验证混合比例
+  const clampedBlendRatio = Math.max(0, Math.min(1, blendRatio));
+  
+  // 验证步数
+  const validSteps = Math.max(2, Math.min(20, Math.round(steps)));
+  
+  // 验证亮度范围
+  const validMinLightness = Math.max(80, Math.min(99, minLightness));
+  const validMaxLightness = Math.max(validMinLightness + 1, Math.min(100, maxLightness));
+  
+  // 步骤1: 混合基础灰色和主题色，得到一个带有主题色倾向的基准浅灰
+  const blendedBase = blendInHct(baseGray, themeColor, clampedBlendRatio);
+  
+  // 步骤2: 使用单色调渐变算法生成浅灰度梯度
+  const colors = generateMonochromeLinear(blendedBase, {
+    steps: validSteps,
+    format: 'hex',
+    minLightness: validMinLightness,
+    maxLightness: validMaxLightness
+  });
+  
+  /** @type {{[key: string]: string}} */
+  const neutralColors = {};
+  colors.forEach((color, index) => {
+    neutralColors[`${prefix}-${index + 1}`] = color;
+  });
+  
+  return neutralColors;
+}
+
+/**
  * 生成表意色（1-10）
  * @param {string} themeColor - 主题颜色
- * @param {{semanticColors?: {[key: string]: string}, blendRatio?: number, isDark?: boolean, steps?: number, lightnessRange?: number, minLightness?: number, maxLightness?: number}} [options] - 配置选项
+ * @param {{semanticColors?: {[key: string]: string}, blendRatio?: number, isDark?: boolean, steps?: number, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} [options] - 配置选项
  * @returns {{[key: string]: string}} 表意色对象
  * 
  * @example
@@ -786,6 +891,14 @@ export function generateControlColors(themeColor, options = {}) {
  *     info: '#2979FF'
  *   },
  *   blendRatio: 0.1
+ * });
+ * 
+ * @example
+ * // 保持鲜艳的色度（推荐：避免灰蒙蒙）
+ * const vibrant = generateSemanticColors('#3491FA', {
+ *   preserveChroma: true,  // 在 Lab 空间保持色度
+ *   minLightness: 25,
+ *   maxLightness: 95
  * });
  * 
  * @example
@@ -813,8 +926,9 @@ export function generateSemanticColors(themeColor, options = {}) {
     isDark = false,
     steps = 10,  // 默认生成 10 个色阶
     lightnessRange = 80,  // 亮度变化范围（中心扩展模式）
-    minLightness = null,  // 最小亮度（固定端点模式）
-    maxLightness = null   // 最大亮度（固定端点模式）
+    minLightness = 8,  // 最小亮度（固定端点模式）- 默认接近黑色
+    maxLightness = 97,  // 最大亮度（固定端点模式）- 默认接近白色
+    preserveChroma = true  // 默认保持色度，避免灰蒙蒙
   } = options;
   
   // 验证语义色对象
@@ -842,10 +956,11 @@ export function generateSemanticColors(themeColor, options = {}) {
       const blendedBase = blendInHct(color, themeColor, clampedBlendRatio);
       
       // 步骤2: 使用单色调渐变算法生成完整色盘
-      /** @type {{steps: number, format: string, lightnessRange?: number, minLightness?: number, maxLightness?: number}} */
+      /** @type {{steps: number, format: string, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} */
       const monochromeOptions = { 
         steps: validSteps, 
-        format: 'hex'
+        format: 'hex',
+        preserveChroma: preserveChroma  // 保持色度，避免灰蒙蒙
       };
       
       // 优先使用固定端点模式
@@ -879,7 +994,7 @@ export function generateSemanticColors(themeColor, options = {}) {
 /**
  * 生成主题色（1-10）
  * @param {string} themeColor - 主题颜色
- * @param {{isDark?: boolean, steps?: number, lightnessRange?: number, minLightness?: number, maxLightness?: number}} [options] - 配置选项
+ * @param {{isDark?: boolean, steps?: number, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} [options] - 配置选项
  * @returns {{[key: string]: string}} 主题色对象
  * 
  * @example
@@ -894,6 +1009,14 @@ export function generateSemanticColors(themeColor, options = {}) {
  * @example
  * // 深色模式主题色
  * const darkTheme = generateThemeColors('#FF5722', { isDark: true });
+ * 
+ * @example
+ * // 保持鲜艳色度
+ * const vibrant = generateThemeColors('#3491FA', {
+ *   preserveChroma: true,
+ *   minLightness: 20,
+ *   maxLightness: 95
+ * });
  * 
  * @example
  * // 使用固定端点模式
@@ -913,18 +1036,20 @@ export function generateThemeColors(themeColor, options = {}) {
     isDark = false,
     steps = 10,  // 默认生成 10 个色阶
     lightnessRange = 80,  // 亮度变化范围（中心扩展模式）
-    minLightness = null,  // 最小亮度（固定端点模式）
-    maxLightness = null   // 最大亮度（固定端点模式）
+    minLightness = 8,  // 最小亮度（固定端点模式）- 默认接近黑色
+    maxLightness = 97,  // 最大亮度（固定端点模式）- 默认接近白色
+    preserveChroma = true  // 默认保持色度
   } = options;
   
   // 验证步数
   const validSteps = Math.max(2, Math.min(100, Math.round(steps)));
   
   // 使用单色调渐变算法生成主题色色阶
-  /** @type {{steps: number, format: string, lightnessRange?: number, minLightness?: number, maxLightness?: number}} */
+  /** @type {{steps: number, format: string, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} */
   const monochromeOptions = { 
     steps: validSteps, 
-    format: 'hex'
+    format: 'hex',
+    preserveChroma: preserveChroma
   };
   
   // 优先使用固定端点模式
@@ -955,14 +1080,16 @@ export function generateThemeColors(themeColor, options = {}) {
  * 生成完整的界面色彩系统
  * @param {string} themeColor - 主题颜色
  * @param {*} [options] - 配置选项
- * @returns {{controls: object, semantic: object, theme: object}} 包含三个部分的完整色彩系统
+ * @returns {{controls: object, neutrals: object, semantic: object, theme: object}} 包含四个部分的完整色彩系统
  * 
+/**
  * @example
  * import { generateInterfaceColorSystem } from '@aviala-design/color';
  * 
  * // 生成完整色彩系统
  * const colorSystem = generateInterfaceColorSystem('#3491FA');
  * console.log(colorSystem.controls);  // 灰色系 1-12
+ * console.log(colorSystem.neutrals);  // 浅灰度色系（背景、卡片用）
  * console.log(colorSystem.semantic);  // 语义色系
  * console.log(colorSystem.theme);     // 主题色系
  * 
@@ -975,11 +1102,10 @@ export function generateThemeColors(themeColor, options = {}) {
  * });
  * 
  * @example
- * // 使用 lightnessRange（中心扩展模式）
- * const customSystem = generateInterfaceColorSystem('#3491FA', {
- *   controlSteps: 24,           // 24 级灰度
- *   controlLightnessRange: 90,  // 更接近纯白/纯黑
- *   controlBlendRatio: 0.1
+ * // 保持鲜艳色度（推荐：避免灰蒙蒙）
+ * const vibrantSystem = generateInterfaceColorSystem('#3491FA', {
+ *   semanticPreserveChroma: true,  // 语义色保持色度
+ *   themePreserveChroma: true      // 主题色保持色度
  * });
  * 
  * @example
@@ -1015,10 +1141,17 @@ export function generateInterfaceColorSystem(themeColor, options = {}) {
     semanticLightnessRange = 80,  // 语义色亮度变化范围
     semanticMinLightness = null,  // 语义色最小亮度
     semanticMaxLightness = null,  // 语义色最大亮度
+    semanticPreserveChroma = true,  // 语义色保持色度（默认开启）
     themeSteps = 10,  // 主题色等级数
     themeLightnessRange = 80,  // 主题色亮度变化范围
     themeMinLightness = null,  // 主题色最小亮度
-    themeMaxLightness = null   // 主题色最大亮度
+    themeMaxLightness = null,  // 主题色最大亮度
+    themePreserveChroma = true,   // 主题色保持色度（默认开启）
+    // 浅灰度颜色配置
+    neutralSteps = 6,  // 浅灰度等级数
+    neutralMinLightness = 92,  // 浅灰度最小亮度
+    neutralMaxLightness = 100,  // 浅灰度最大亮度
+    neutralBlendRatio = 0.03  // 浅灰度主题色混合比例
   } = options;
   
   // 验证混合比例
@@ -1041,12 +1174,13 @@ export function generateInterfaceColorSystem(themeColor, options = {}) {
     controlOptions.lightnessRange = controlLightnessRange;
   }
   
-  /** @type {{semanticColors?: any, blendRatio: number, isDark: boolean, steps: number, lightnessRange?: number, minLightness?: number, maxLightness?: number}} */
+  /** @type {{semanticColors?: any, blendRatio: number, isDark: boolean, steps: number, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} */
   const semanticOptions = {
     semanticColors,
     blendRatio: clampedSemanticBlendRatio,
     isDark,
-    steps: semanticSteps
+    steps: semanticSteps,
+    preserveChroma: semanticPreserveChroma
   };
   
   if (semanticMinLightness !== null && semanticMaxLightness !== null) {
@@ -1056,10 +1190,11 @@ export function generateInterfaceColorSystem(themeColor, options = {}) {
     semanticOptions.lightnessRange = semanticLightnessRange;
   }
   
-  /** @type {{isDark: boolean, steps: number, lightnessRange?: number, minLightness?: number, maxLightness?: number}} */
+  /** @type {{isDark: boolean, steps: number, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} */
   const themeOptions = {
     isDark,
-    steps: themeSteps
+    steps: themeSteps,
+    preserveChroma: themePreserveChroma
   };
   
   if (themeMinLightness !== null && themeMaxLightness !== null) {
@@ -1073,10 +1208,18 @@ export function generateInterfaceColorSystem(themeColor, options = {}) {
     // 1. 基础控件颜色（灰色系1-12或更多）
     controls: generateControlColors(themeColor, controlOptions),
     
-    // 2. 表意色（1-10或更多）
+    // 2. 浅灰度颜色（用于背景、卡片等）
+    neutrals: generateNeutralColors(themeColor, {
+      blendRatio: neutralBlendRatio,
+      steps: neutralSteps,
+      minLightness: neutralMinLightness,
+      maxLightness: neutralMaxLightness
+    }),
+    
+    // 3. 表意色（1-10或更多）
     semantic: generateSemanticColors(themeColor, semanticOptions),
     
-    // 3. 主题色（1-10或更多）
+    // 4. 主题色（1-10或更多）
     theme: generateThemeColors(themeColor, themeOptions)
   };
 }
