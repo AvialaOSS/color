@@ -2,7 +2,7 @@
 
 > 🤖 此文档由 `npm run docs:generate` 自动生成，请勿手动编辑
 
-> 最后更新时间: 2025/11/25 21:21:09
+> 最后更新时间: 2026/3/6 13:02:19
 
 ## 目录
 
@@ -36,6 +36,7 @@
   - [`generateThemeVariants`](#generatethemevariants)
   - [`blendUIColors`](#blenduicolors)
   - [`generateControlColors`](#generatecontrolcolors)
+  - [`generateNeutralColors`](#generateneutralcolors)
   - [`generateSemanticColors`](#generatesemanticcolors)
   - [`generateThemeColors`](#generatethemecolors)
   - [`generateInterfaceColorSystem`](#generateinterfacecolorsystem)
@@ -215,6 +216,12 @@ const fixedRange = generateMonochromeLinear('#3491FA', {
 });
 // 推荐用于需要接近纯白/纯黑的场景
 
+// 保持感知色度（推荐用于鲜艳的颜色）
+const vibrantShades = generateMonochromeLinear('#FF0000', {
+  steps: 10,
+  preserveChroma: true  // 在 Lab 空间保持色度，避免灰蒙蒙
+});
+
 // 生成HSL格式
 const hslShades = generateMonochromeLinear('#00b894', {
   format: 'hsl',
@@ -226,7 +233,7 @@ const hslShades = generateMonochromeLinear('#00b894', {
 
 ### `generateLinearHSL`
 
-在HSL空间进行线性插值 适用于需要更自然色彩过渡的场景
+在 Lab 空间生成单色调渐变，保持感知色度
 
 **签名：**
 ```typescript
@@ -235,35 +242,15 @@ function generateLinearHSL(startColor, endColor, options = {})
 
 **参数：**
 
-- `startColor`: `string` - 起始颜色
-- `endColor`: `string` - 结束颜色
+- `baseColor`: `import('color')` - Color 对象
+- `maxLightness`: `number` - 最大亮度
+- `minLightness`: `number` - 最小亮度
+- `steps`: `number` - 步数
+- `format`: `string` - 输出格式
 
 **返回值：**
 
 - `string[]` - 颜色数组
-
-**示例：**
-
-```javascript
-import { generateLinearHSL } from '@aviala-design/color';
-
-// 在 HSL 空间生成从黄色到紫色的渐变
-const gradient = generateLinearHSL('#FFD700', '#9B59B6', { steps: 8 });
-// 通过色相环插值，产生更自然的彩虹效果
-
-// 包含端点值
-const withEnds = generateLinearHSL('#FF6B6B', '#4ECDC4', {
-  steps: 5,
-  includeEnds: true
-});
-// 结果的第一个是 #FF6B6B，最后一个是 #4ECDC4
-
-// 输出为 RGB 格式
-const rgbGradient = generateLinearHSL('hsl(0, 100%, 50%)', 'hsl(240, 100%, 50%)', {
-  steps: 6,
-  format: 'rgb'
-});
-```
 
 ---
 
@@ -785,6 +772,15 @@ const result = blendUIColors('#6200EE', {
 **签名：**
 ```typescript
 function generateControlColors(themeColor, options = {})
+```
+
+---
+
+### `generateNeutralColors`
+
+**签名：**
+```typescript
+function generateNeutralColors(themeColor, options = {})
 ```
 
 ---

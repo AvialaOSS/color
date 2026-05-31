@@ -1,4 +1,4 @@
-<!-- 当前版本: 0.4.0 | 最后同步: 2025/11/25 21:21:09 -->
+<!-- 当前版本: 0.4.0 | 最后同步: 2026/3/6 13:02:20 -->
 # Aviala Design Color
 
 ![npm version](https://img.shields.io/npm/v/@aviala-design/color) ![npm downloads](https://img.shields.io/npm/dm/@aviala-design/color) ![license](https://img.shields.io/npm/l/@aviala-design/color)
