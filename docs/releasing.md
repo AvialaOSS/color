@@ -4,8 +4,8 @@
 
 ## 前置条件
 
-1. 你需要在 GitHub 仓库设置一个 Secret：`NPM_TOKEN`
-2. `NPM_TOKEN` 需要具备发布权限（建议创建 Read and Publish Token）
+1. 在 npm 上为该包配置 Trusted Publishers（GitHub Actions）
+2. GitHub Actions 工作流需要具备 OIDC 权限（本仓库工作流已申请 `id-token: write`）
 
 ## 发布流程
 
@@ -43,7 +43,7 @@ Release 发布后会触发工作流，工作流会执行：
 - `npm ci`
 - `npm test`
 - 校验 tag 是否与 `package.json` 的 `version` 一致（`vX.Y.Z` ↔ `X.Y.Z`）
-- `npm publish --access public`
+- `npm publish --access public --provenance`
 
 ## 常见问题
 
@@ -57,4 +57,3 @@ Release 发布后会触发工作流，工作流会执行：
 ### 2) 发布失败：需要 public access
 
 `@scope/name` 形式的包在 npm 上默认会走 restricted，工作流已使用 `--access public`。如需发布私有包，需要将命令与 npm 权限策略改为 `restricted`。
-
