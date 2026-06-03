@@ -57,3 +57,9 @@ Release 发布后会触发工作流，工作流会执行：
 ### 2) 发布失败：需要 public access
 
 `@scope/name` 形式的包在 npm 上默认会走 restricted，工作流已使用 `--access public`。如需发布私有包，需要将命令与 npm 权限策略改为 `restricted`。
+
+### 3) CI 报错：Cannot find module @rollup/rollup-linux-x64-gnu
+
+这是 npm 在 optionalDependencies 场景下的已知问题，表现为 Linux 环境缺失 Rollup 的平台二进制包。
+
+本仓库工作流已内置修复逻辑：如果检测到缺失，会按当前 `rollup` 版本临时安装对应的 `@rollup/rollup-linux-x64-gnu`。

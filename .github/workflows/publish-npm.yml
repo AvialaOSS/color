@@ -16,7 +16,16 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
-      - run: npm ci
+      - run: npm ci --include=optional
+      - name: Ensure Rollup native binary (Linux)
+        run: |
+          node -e "require('@rollup/rollup-linux-x64-gnu')"
+        continue-on-error: true
+      - name: Repair Rollup native binary (if missing)
+        run: |
+          node -e "require('@rollup/rollup-linux-x64-gnu')" && exit 0
+          ROLLUP_VERSION=$(node -p "require('rollup/package.json').version")
+          npm i --no-save "@rollup/rollup-linux-x64-gnu@${ROLLUP_VERSION}"
       - run: npm test
       - name: Verify tag matches package version
         run: |
