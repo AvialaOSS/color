@@ -63,3 +63,13 @@ Release 发布后会触发工作流，工作流会执行：
 这是 npm 在 optionalDependencies 场景下的已知问题，表现为 Linux 环境缺失 Rollup 的平台二进制包。
 
 本仓库工作流已内置修复逻辑：如果检测到缺失，会按当前 `rollup` 版本临时安装对应的 `@rollup/rollup-linux-x64-gnu`。
+
+### 4) 发布失败：E404 Not Found - PUT https://registry.npmjs.org/@scope%2fname
+
+通常意味着 npm 侧无法识别该包或你没有对该 scope/package 的发布权限（npm 有时会用 404 隐藏权限问题）。
+
+排查顺序：
+
+1. 确认 `package.json.name` 对应的包确实存在于 npm（例如 `@aviala-design/color`）
+2. 确认该包已配置 Trusted Publishers，且指向当前仓库与 workflow
+3. 如果这是“第一次发布该包”，很多情况下需要先用传统方式手动发布一次以创建包，然后再启用 Trusted Publishers
