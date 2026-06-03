@@ -10,6 +10,7 @@
 - [灰阶色阶（neutral）](./neutral-generate.md)
 - [最佳实践](./best-practices.md)
 - [迁移指南（Breaking Changes）](./migration.md)
+- [发布到 npm](./releasing.md)
 
 ## 相关链接
 
