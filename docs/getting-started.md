@@ -14,29 +14,28 @@ npm install @aviala-design/color
 yarn add @aviala-design/color
 ```
 
-### CDN 引入
+### 浏览器直接使用（ESM）
 ```html
-<script src="https://unpkg.com/@aviala-design/color@latest/dist/index.js"></script>
+<script type="module">
+  import { palette, neutral } from "https://unpkg.com/@aviala-design/color@latest/dist/index.mjs";
+  console.log(palette.generate("#165DFF", { list: true }));
+  console.log(neutral.generate("#ffffff", "#000000", { steps: 12 }));
+</script>
 ```
 
 ## 基础使用
 
 ### ES6 模块导入
 ```javascript
-import { generate, getPresetColors } from '@aviala-design/color';
+import { palette, neutral } from '@aviala-design/color';
 ```
 
 ### CommonJS 导入
 ```javascript
-const { generate, getPresetColors } = require('@aviala-design/color');
+const { palette } = require('@aviala-design/color');
 ```
 
-### 浏览器直接使用
-```html
-<script>
-  const { generate, getPresetColors } = window.AvialadDesignColor;
-</script>
-```
+浏览器场景建议直接使用 ESM（见上方示例）。
 
 ## 5分钟快速体验
 
@@ -45,10 +44,10 @@ const { generate, getPresetColors } = require('@aviala-design/color');
 最简单的用法是基于一个颜色生成完整的色盘：
 
 ```javascript
-import { generate } from '@aviala-design/color';
+import { palette, neutral } from '@aviala-design/color';
 
-// 生成蓝色系色盘
-const bluePalette = generate('#165DFF', { list: true });
+// 生成蓝色系色盘（支持 steps / curveGamma）
+const bluePalette = palette.generate('#165DFF', { list: true, steps: 12, curveGamma: 1.1 });
 console.log(bluePalette);
 // 输出: [
 //   '#E8F3FF', '#BEDAFF', '#94BFFF', '#6AA1FF', '#4080FF',
@@ -56,109 +55,34 @@ console.log(bluePalette);
 // ]
 
 // 生成暗色模式色盘
-const darkBluePalette = generate('#165DFF', { list: true, dark: true });
+const darkBluePalette = palette.generate('#165DFF', { list: true, dark: true });
 console.log(darkBluePalette);
 ```
 
 ### 2. 使用预设颜色
 
-库提供了14种精心设计的预设颜色：
+预设色（Presets）已移除。建议在你的项目中维护自己的颜色常量，并按需生成色板：
 
-```javascript
-import { getPresetColors } from '@aviala-design/color';
+### 3. 灰阶色阶（Neutral）
 
-const presetColors = getPresetColors();
+本版本提供灰阶色阶能力（仅灰阶），用于背景/文本/边框等中性色体系：
 
-// 获取红色系色盘
-const redColors = presetColors.red;
-console.log('红色主色调:', redColors.primary);     // '#F53F3F'
-console.log('红色亮色系:', redColors.light);       // 10个亮色
-console.log('红色暗色系:', redColors.dark);        // 10个暗色
+```js
+import { neutral } from '@aviala-design/color';
 
-// 遍历所有预设颜色
-Object.keys(presetColors).forEach(colorName => {
-  console.log(`${colorName}: ${presetColors[colorName].primary}`);
-});
+const neutralLight = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2 });
+const neutralDark = neutral.generate('#000000', '#ffffff', { steps: 12, curveGamma: 1.2 });
 ```
 
-### 3. 线性颜色渐变
-
-创建两个颜色之间的平滑过渡：
-
-```javascript
-import { generateLinear, generateGrayLinear } from '@aviala-design/color';
-
-// 从红色到蓝色的渐变
-const gradient = generateLinear('#FF0000', '#0000FF', { steps: 8 });
-console.log(gradient);
-
-// 生成灰色系渐变
-const grayGradient = generateGrayLinear({ steps: 10 });
-console.log(grayGradient);
-```
+通用渐变/插值（Gradient）已移除。可参考 [迁移指南](./migration.md) 选择替代方案。
 
 ### 4. 从图片提取颜色
 
-从图片中自动提取主色调：
-
-```javascript
-import { extractColorFromFile, generate } from '@aviala-design/color';
-
-// HTML: <input type="file" id="imageInput" accept="image/*">
-const fileInput = document.getElementById('imageInput');
-
-fileInput.addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    try {
-      // 提取主色调
-      const dominantColor = await extractColorFromFile(file);
-      console.log('图片主色调:', dominantColor);
-      
-      // 基于主色调生成色盘
-      const palette = generate(dominantColor, { list: true });
-      console.log('生成的色盘:', palette);
-    } catch (error) {
-      console.error('处理失败:', error);
-    }
-  }
-});
-```
+图片取色（Image）已移除。可参考 [迁移指南](./migration.md) 选择替代方案。
 
 ### 5. 主题混合与品牌定制
 
-使用HCT色彩空间进行高级主题混合：
-
-```javascript
-import { generateThemePalette, generateInterfaceColorSystem } from '@aviala-design/color';
-
-// 生成完整的主题色盘
-const themePalette = generateThemePalette('#3491FA', {
-  semanticColors: {
-    success: '#00C853',
-    warning: '#FF9800',
-    error: '#F44336'
-  },
-  semanticBlendRatio: 0.1 // 10%的品牌色影响
-});
-
-console.log('控制色系:', themePalette.control);
-console.log('语义色系:', themePalette.semantic);
-console.log('主题色变体:', themePalette.theme);
-
-// 生成界面色彩系统
-const interfaceColors = generateInterfaceColorSystem('#3491FA', {
-  semanticColors: {
-    success: '#00C853',
-    warning: '#FF9800',
-    error: '#F44336'
-  },
-  semanticBlendRatio: 0.08,
-  controlBlendRatio: 0.05
-});
-
-console.log('完整界面色彩系统:', interfaceColors);
-```
+主题混合/界面色彩系统（Theme）已移除。可参考 [迁移指南](./migration.md) 选择替代方案。
 
 ## 常见使用场景
 
@@ -167,7 +91,7 @@ console.log('完整界面色彩系统:', interfaceColors);
 为设计系统创建一致的颜色规范：
 
 ```javascript
-import { generate, getPresetColors } from '@aviala-design/color';
+import { palette } from '@aviala-design/color';
 
 // 定义品牌主色
 const brandColor = '#165DFF';
@@ -176,28 +100,30 @@ const brandColor = '#165DFF';
 const designSystem = {
   // 品牌色系
   primary: {
-    light: generate(brandColor, { list: true }),
-    dark: generate(brandColor, { list: true, dark: true })
+    light: palette.generate(brandColor, { list: true }),
+    dark: palette.generate(brandColor, { list: true, dark: true })
   },
   
   // 功能色系
   success: {
-    light: generate('#00B42A', { list: true }),
-    dark: generate('#00B42A', { list: true, dark: true })
+    light: palette.generate('#00B42A', { list: true }),
+    dark: palette.generate('#00B42A', { list: true, dark: true })
   },
   
   error: {
-    light: generate('#F53F3F', { list: true }),
-    dark: generate('#F53F3F', { list: true, dark: true })
+    light: palette.generate('#F53F3F', { list: true }),
+    dark: palette.generate('#F53F3F', { list: true, dark: true })
   },
   
   warning: {
-    light: generate('#FF7D00', { list: true }),
-    dark: generate('#FF7D00', { list: true, dark: true })
+    light: palette.generate('#FF7D00', { list: true }),
+    dark: palette.generate('#FF7D00', { list: true, dark: true })
   },
   
-  // 使用预设灰色系
-  neutral: getPresetColors().gray
+  neutral: {
+    light: neutral.generate('#ffffff', '#000000', { steps: 10, curveGamma: 1.2 }),
+    dark: neutral.generate('#000000', '#ffffff', { steps: 10, curveGamma: 1.2 })
+  }
 };
 
 console.log('设计系统色盘:', designSystem);
@@ -208,41 +134,15 @@ console.log('设计系统色盘:', designSystem);
 为图表和数据可视化创建和谐的配色方案：
 
 ```javascript
-import { generateLinear, getPresetColors } from '@aviala-design/color';
+import { palette } from '@aviala-design/color';
 
-// 创建数据可视化配色方案
-function createVisualizationPalette() {
-  const presets = getPresetColors();
-  
-  // 分类数据配色（使用预设颜色的主色调）
-  const categoricalColors = [
-    presets.blue.primary,
-    presets.green.primary,
-    presets.orange.primary,
-    presets.purple.primary,
-    presets.cyan.primary,
-    presets.magenta.primary
-  ];
-  
-  // 连续数据配色（渐变色）
-  const sequentialColors = generateLinear('#E8F4FD', '#165DFF', { steps: 9 });
-  
-  // 发散数据配色（双向渐变）
-  const divergingColors = [
-    ...generateLinear('#F53F3F', '#FFFFFF', { steps: 5, includeEnds: false }),
-    '#FFFFFF',
-    ...generateLinear('#FFFFFF', '#165DFF', { steps: 5, includeEnds: false })
-  ];
-  
-  return {
-    categorical: categoricalColors,
-    sequential: sequentialColors,
-    diverging: divergingColors
-  };
-}
+const categoricalBase = ['#165DFF', '#00B42A', '#FF7D00', '#722ED1', '#14C9C9', '#F5319D'];
 
-const vizPalette = createVisualizationPalette();
-console.log('可视化配色方案:', vizPalette);
+const categorical = categoricalBase;
+const categoricalLight = categoricalBase.map((c) => palette.generate(c, { index: 3 }));
+const categoricalDark = categoricalBase.map((c) => palette.generate(c, { index: 8, dark: true }));
+
+console.log({ categorical, categoricalLight, categoricalDark });
 ```
 
 ### 场景3：主题切换
@@ -250,12 +150,21 @@ console.log('可视化配色方案:', vizPalette);
 实现亮色/暗色主题的动态切换：
 
 ```javascript
-import { generate, getPresetColors } from '@aviala-design/color';
+import { palette } from '@aviala-design/color';
 
 class ThemeManager {
   constructor() {
     this.currentTheme = 'light';
-    this.colors = getPresetColors();
+    this.base = {
+      primary: '#165DFF',
+      success: '#00B42A',
+      error: '#F53F3F',
+      warning: '#FF7D00',
+      neutral: {
+        light: neutral.generate('#ffffff', '#000000', { steps: 10, curveGamma: 1.2 }),
+        dark: neutral.generate('#000000', '#ffffff', { steps: 10, curveGamma: 1.2 })
+      }
+    };
   }
   
   // 获取当前主题的颜色
@@ -263,11 +172,11 @@ class ThemeManager {
     const isDark = this.currentTheme === 'dark';
     
     return {
-      primary: isDark ? this.colors.arcoblue.dark : this.colors.arcoblue.light,
-      success: isDark ? this.colors.green.dark : this.colors.green.light,
-      error: isDark ? this.colors.red.dark : this.colors.red.light,
-      warning: isDark ? this.colors.orange.dark : this.colors.orange.light,
-      neutral: isDark ? this.colors.gray.dark : this.colors.gray.light
+      primary: palette.generate(this.base.primary, { list: true, dark: isDark }),
+      success: palette.generate(this.base.success, { list: true, dark: isDark }),
+      error: palette.generate(this.base.error, { list: true, dark: isDark }),
+      warning: palette.generate(this.base.warning, { list: true, dark: isDark }),
+      neutral: isDark ? this.base.neutral.dark : this.base.neutral.light
     };
   }
   
@@ -308,37 +217,31 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 根据用户输入动态生成品牌色系：
 
 ```javascript
-import { generate, generateLinear } from '@aviala-design/color';
+import { palette } from '@aviala-design/color';
 
 function generateBrandPalette(brandColor) {
   try {
     // 验证颜色格式
-    const basePalette = generate(brandColor, { list: true });
+    const basePalette = palette.generate(brandColor, { list: true });
     
     // 生成扩展色盘
     const extendedPalette = {
       // 主色系
       primary: {
         light: basePalette,
-        dark: generate(brandColor, { list: true, dark: true })
+        dark: palette.generate(brandColor, { list: true, dark: true })
       },
       
       // 辅助色系（基于主色的色相偏移）
       secondary: {
-        light: generate(shiftHue(brandColor, 30), { list: true }),
-        dark: generate(shiftHue(brandColor, 30), { list: true, dark: true })
+        light: palette.generate(shiftHue(brandColor, 30), { list: true }),
+        dark: palette.generate(shiftHue(brandColor, 30), { list: true, dark: true })
       },
       
       // 强调色系
       accent: {
-        light: generate(shiftHue(brandColor, -60), { list: true }),
-        dark: generate(shiftHue(brandColor, -60), { list: true, dark: true })
-      },
-      
-      // 渐变色组合
-      gradients: {
-        primary: generateLinear(basePalette[3], basePalette[7], { steps: 10 }),
-        secondary: generateLinear(brandColor, shiftHue(brandColor, 60), { steps: 10 })
+        light: palette.generate(shiftHue(brandColor, -60), { list: true }),
+        dark: palette.generate(shiftHue(brandColor, -60), { list: true, dark: true })
       }
     };
     
@@ -369,18 +272,20 @@ try {
 ### 1. 颜色命名规范
 
 ```javascript
+import { palette } from '@aviala-design/color';
+
 // 推荐：语义化命名
 const colors = {
-  primary: generate('#165DFF', { list: true }),
-  success: generate('#00B42A', { list: true }),
-  warning: generate('#FF7D00', { list: true }),
-  error: generate('#F53F3F', { list: true })
+  primary: palette.generate('#165DFF', { list: true }),
+  success: palette.generate('#00B42A', { list: true }),
+  warning: palette.generate('#FF7D00', { list: true }),
+  error: palette.generate('#F53F3F', { list: true })
 };
 
 // 不推荐：颜色值命名
 const colors = {
-  blue: generate('#165DFF', { list: true }),
-  green: generate('#00B42A', { list: true })
+  blue: palette.generate('#165DFF', { list: true }),
+  green: palette.generate('#00B42A', { list: true })
 };
 ```
 
@@ -418,7 +323,7 @@ function getCachedPalette(color, options = {}) {
   const key = `${color}-${JSON.stringify(options)}`;
   
   if (!colorCache.has(key)) {
-    colorCache.set(key, generate(color, options));
+    colorCache.set(key, palette.generate(color, options));
   }
   
   return colorCache.get(key);
@@ -428,7 +333,7 @@ function getCachedPalette(color, options = {}) {
 function generateMultiplePalettes(colors) {
   return Promise.all(
     colors.map(color => 
-      Promise.resolve(generate(color, { list: true }))
+      Promise.resolve(palette.generate(color, { list: true }))
     )
   );
 }
@@ -440,7 +345,7 @@ function generateMultiplePalettes(colors) {
 // 颜色验证函数
 function isValidColor(color) {
   try {
-    generate(color);
+    palette.generate(color);
     return true;
   } catch {
     return false;
@@ -450,22 +355,20 @@ function isValidColor(color) {
 // 安全的颜色生成
 function safeGenerate(color, options = {}, fallback = '#165DFF') {
   try {
-    return generate(color, options);
+    return palette.generate(color, options);
   } catch (error) {
     console.warn(`颜色生成失败，使用备用颜色: ${error.message}`);
-    return generate(fallback, options);
+    return palette.generate(fallback, options);
   }
 }
 ```
 
 ## 下一步
 
-- 查看 [API 参考文档](./api-reference.md) 了解完整的API
+- 查看 [API 参考文档](./api-reference.md) 了解 `palette.generate`
 - 阅读 [色盘生成文档](./palette-generate.md) 深入了解色盘算法
-- 查看 [线性颜色生成文档](./linear-generate.md) 学习渐变色生成
-- 阅读 [图片取色文档](./image-color.md) 了解图片颜色提取
-- 学习 [主题混合文档](./theme-blend.md) 掌握高级颜色混合技术
-- 访问 [在线演示](../index.html) 体验所有功能
+- 阅读 [迁移指南](./migration.md) 了解破坏性变更与替代方案
+- 访问 [在线演示](../index.html) 体验色盘生成
 
 ## 获取帮助
 
@@ -477,4 +380,4 @@ function safeGenerate(color, options = {}, fallback = '#165DFF') {
 4. 查看 [GitHub Issues](https://github.com/aviala-design/color/issues)
 5. 提交新的 Issue 或 Pull Request
 
-祝您使用愉快！🎨
+祝您使用愉快！

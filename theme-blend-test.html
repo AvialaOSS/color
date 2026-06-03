@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主题混合测试工具</title>
+    <style>
+        :root {
+            /* shadcn/ui inspired color system */
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+            --primary: 221.2 83.2% 53.3%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222.2 84% 4.9%;
+            --muted: 210 40% 96%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222.2 84% 4.9%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 221.2 83.2% 53.3%;
+            --radius: 0.5rem;
+            
+            /* Semantic colors */
+            --success: 142.1 76.2% 36.3%;
+            --success-foreground: 355.7 100% 97.3%;
+            --warning: 32.6 94.6% 43.7%;
+            --warning-foreground: 355.7 100% 97.3%;
+            --info: 199.89 89.09% 48.04%;
+            --info-foreground: 355.7 100% 97.3%;
+            
+            /* Spacing scale */
+            --spacing-0: 0px;
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            --spacing-16: 4rem;
+            
+            /* Typography scale */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            
+            /* Shadow system */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            /* Border radius */
+            --radius-sm: calc(var(--radius) - 2px);
+            --radius-md: var(--radius);
+            --radius-lg: calc(var(--radius) + 2px);
+            --radius-xl: calc(var(--radius) + 4px);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: hsl(var(--background));
+            min-height: 100vh;
+            padding: var(--spacing-6);
+            color: hsl(var(--foreground));
+            line-height: 1.6;
+            font-size: var(--text-base);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: hsl(var(--card));
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-8);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-8);
+            padding-bottom: var(--spacing-6);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .header h1 {
+            font-size: var(--text-4xl);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--spacing-2);
+            letter-spacing: -0.025em;
+        }
+        
+        .header p {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--text-lg);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: var(--spacing-8);
+            align-items: start;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-6);
+            }
+        }
+        
+        .controls-panel {
+            position: sticky;
+            top: var(--spacing-6);
+        }
+        
+        .control-card {
+            background: hsl(var(--card));
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            margin-bottom: var(--spacing-4);
+            border: 1px solid hsl(var(--border));
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .control-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: hsl(var(--ring));
+        }
+        
+        .control-card h3 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: hsl(var(--card-foreground));
+            margin-bottom: var(--spacing-4);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            letter-spacing: -0.025em;
+        }
+        
+        .input-group {
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: var(--spacing-2);
+            font-weight: 500;
+            color: hsl(var(--foreground));
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+        
+        .color-input-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+        
+        input[type="color"] {
+            width: 44px;
+            height: 44px;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+        }
+        
+        input[type="color"]:hover {
+            border-color: hsl(var(--ring));
+        }
+        
+        input[type="color"]:focus-visible {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 2px;
+        }
+        
+        .range-input-group {
+            position: relative;
+        }
+        
+        .range-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .range-value {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            min-width: 48px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: hsl(var(--muted));
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        input[type="range"]:hover {
+            background: hsl(var(--muted) / 0.8);
+        }
+        
+        input[type="range"]::-webkit-slider-track {
+            width: 100%;
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: hsl(var(--muted));
+            border: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: hsl(var(--primary));
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px hsl(var(--border));
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid hsl(var(--background));
+            margin-top: -8px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 0 4px hsl(var(--primary) / 0.2);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 6px hsl(var(--primary) / 0.3);
+        }
+        
+        /* Firefox 样式 */
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: hsl(var(--muted));
+            border: none;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: hsl(var(--primary));
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            border: 2px solid hsl(var(--background));
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            height: 44px;
+            padding: 0 var(--spacing-3);
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-md);
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: var(--text-sm);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+        
+        input[type="text"]:focus {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 2px;
+            border-color: hsl(var(--ring));
+        }
+        
+        .update-button {
+            width: 100%;
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border: none;
+            height: 44px;
+            padding: 0 var(--spacing-4);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .update-button:hover {
+            background: hsl(var(--primary) / 0.9);
+        }
+        
+        .update-button:focus-visible {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 2px;
+        }
+        
+        .update-button:active {
+            scale: 0.98;
+        }
+        
+        .results-grid {
+            display: grid;
+            gap: var(--spacing-6);
+        }
+        
+        .result-card {
+            background: hsl(var(--card));
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            border: 1px solid hsl(var(--border));
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .result-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: hsl(var(--ring));
+        }
+        
+        .result-card h3 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: hsl(var(--card-foreground));
+            margin-bottom: var(--spacing-4);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            letter-spacing: -0.025em;
+        }
+        
+        .result-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .blend-demo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+            margin: var(--spacing-4) 0;
+            padding: var(--spacing-4);
+            background: hsl(var(--muted));
+            border-radius: var(--radius-md);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .color-swatch {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid hsl(var(--border));
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .color-swatch:hover {
+            scale: 1.05;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .color-swatch::after {
+            content: attr(data-color);
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: hsl(var(--muted-foreground));
+            font-family: monospace;
+            white-space: nowrap;
+        }
+        
+        .blend-arrow {
+            font-size: 24px;
+            color: hsl(var(--muted-foreground));
+            font-weight: bold;
+        }
+        
+        .palette-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-8);
+        }
+        
+        .color-section {
+            background: hsl(var(--card));
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            border: 1px solid hsl(var(--border));
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .color-section:hover {
+            box-shadow: var(--shadow-md);
+            border-color: hsl(var(--ring) / 0.3);
+        }
+        
+        .section-header {
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-4);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .section-header h3 {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--spacing-2);
+            letter-spacing: -0.025em;
+        }
+        
+        .section-desc {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+        
+        .color-group {
+            margin-bottom: var(--spacing-6);
+        }
+        
+        .color-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .color-group h4 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: hsl(var(--card-foreground));
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        
+        .group-desc {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--text-xs);
+            margin-bottom: var(--spacing-3);
+            line-height: 1.4;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-3);
+        }
+        
+        .color-item {
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid hsl(var(--border));
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+        
+        .color-item:hover {
+            scale: 1.1;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+        
+        .color-info {
+            margin-top: var(--spacing-4);
+            padding: var(--spacing-4);
+            background: hsl(var(--muted));
+            border-radius: var(--radius-md);
+            border: 1px solid hsl(var(--border));
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: var(--text-xs);
+            line-height: 1.5;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-1);
+        }
+        
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: hsl(var(--muted-foreground));
+        }
+        
+        .info-value {
+            color: hsl(var(--foreground));
+            font-weight: 500;
+        }
+        
+        .error {
+            color: hsl(var(--destructive-foreground));
+            background: hsl(var(--destructive) / 0.1);
+            padding: var(--spacing-4);
+            border-radius: var(--radius-md);
+            border: 1px solid hsl(var(--destructive) / 0.2);
+            margin: var(--spacing-4) 0;
+            font-size: var(--text-sm);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid hsl(var(--border));
+            border-radius: 50%;
+            border-top-color: hsl(var(--primary));
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: hsl(var(--foreground));
+            color: hsl(var(--background));
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+        
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        
+        .mode-checkbox {
+            width: 44px;
+            height: 24px;
+            appearance: none;
+            background: hsl(var(--muted));
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .mode-checkbox:checked {
+            background: hsl(var(--primary));
+            border-color: hsl(var(--primary));
+        }
+        
+        .mode-checkbox::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mode-checkbox:checked::before {
+            transform: translateX(20px);
+        }
+        
+        .mode-label {
+            cursor: pointer;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mode-text {
+            font-size: var(--text-sm);
+            color: hsl(var(--foreground));
+            font-weight: 500;
+        }
+        
+        /* 自定义功能色系样式 */
+        .custom-semantic-colors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-3);
+            margin-top: var(--spacing-2);
+        }
+        
+        .semantic-color-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-1);
+        }
+        
+        .semantic-color-item label {
+            font-size: var(--text-xs);
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .semantic-color-item .color-input-group {
+            margin: 0;
+        }
+        
+        .semantic-color-item input[type="color"] {
+            width: 28px;
+            height: 28px;
+        }
+        
+        .semantic-color-item input[type="text"] {
+            font-size: var(--text-xs);
+            padding: var(--spacing-1) var(--spacing-2);
+        }
+        
+        @media (max-width: 768px) {
+            .custom-semantic-colors {
+                grid-template-columns: 1fr;
+            }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-4);
+            }
+            
+            .container {
+                padding: var(--spacing-6);
+            }
+            
+            .color-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            }
+            
+            .blend-demo {
+                flex-direction: column;
+                gap: var(--spacing-2);
+            }
+            
+            .color-swatch {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>主题混合测试工具</h1>
+            <p>基于HCT色彩空间的高级颜色混合与主题生成系统，提供专业级的色彩设计工具</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="controls-panel">
+                <div class="control-card">
+                    <h3>🎨 颜色混合测试</h3>
+                    <div class="input-group">
+                        <label>基础颜色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="baseColor" value="#3498db" class="tooltip" data-tooltip="选择基础颜色">
+                            <input type="text" id="baseColorText" value="#3498db" placeholder="#3498db">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>混合颜色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="blendColor" value="#e74c3c" class="tooltip" data-tooltip="选择混合颜色">
+                            <input type="text" id="blendColorText" value="#e74c3c" placeholder="#e74c3c">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="range-input-group">
+                            <div class="range-label">
+                                <label>混合比例</label>
+                                <span class="range-value" id="blendRatioValue">0.5</span>
+                            </div>
+                            <input type="range" id="blendRatio" min="0" max="1" step="0.1" value="0.5">
+                        </div>
+                    </div>
+                    <button class="update-button" onclick="updateBlendDemo()">更新混合</button>
+                </div>
+                
+                <div class="control-card">
+                    <h3>🎯 颜色协调测试</h3>
+                    <div class="input-group">
+                        <label>主题颜色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="themeColor" value="#9b59b6" class="tooltip" data-tooltip="选择主题颜色">
+                            <input type="text" id="themeColorText" value="#9b59b6" placeholder="#9b59b6">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>目标颜色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="targetColor" value="#f39c12" class="tooltip" data-tooltip="选择目标颜色">
+                            <input type="text" id="targetColorText" value="#f39c12" placeholder="#f39c12">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="range-input-group">
+                            <div class="range-label">
+                                <label>协调强度</label>
+                                <span class="range-value" id="harmonizeStrengthValue">0.5</span>
+                            </div>
+                            <input type="range" id="harmonizeStrength" min="0" max="1" step="0.1" value="0.5">
+                        </div>
+                    </div>
+                    <button class="update-button" onclick="updateHarmonizeDemo()">更新协调</button>
+                </div>
+                
+                <div class="control-card">
+                    <h3>🌈 主题变体生成</h3>
+                    <div class="input-group">
+                        <label>主色调</label>
+                        <div class="color-input-group">
+                            <input type="color" id="variantBaseColor" value="#2ecc71" class="tooltip" data-tooltip="选择基础主色调">
+                            <input type="text" id="variantBaseColorText" value="#2ecc71" placeholder="#2ecc71">
+                        </div>
+                    </div>
+                    <button class="update-button" onclick="updateVariantsDemo()">生成变体</button>
+                </div>
+                
+                <div class="control-card">
+                    <h3>🎪 完整主题调色板</h3>
+                    <div class="input-group">
+                        <label>主题色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="paletteThemeColor" value="#e67e22" class="tooltip" data-tooltip="选择主题色">
+                            <input type="text" id="paletteThemeColorText" value="#e67e22" placeholder="#e67e22">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="range-input-group">
+                            <div class="range-label">
+                                <label>混合比例</label>
+                                <span class="range-value" id="paletteBlendRatioValue">0.12</span>
+                            </div>
+                            <input type="range" id="paletteBlendRatio" min="0" max="0.3" step="0.01" value="0.12">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="range-input-group">
+                            <div class="range-label">
+                                <label>协调比例</label>
+                                <span class="range-value" id="paletteHarmonizeRatioValue">0.15</span>
+                            </div>
+                            <input type="range" id="paletteHarmonizeRatio" min="0" max="0.5" step="0.01" value="0.15">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                         <label>色彩模式</label>
+                         <div class="mode-toggle">
+                             <input type="checkbox" id="paletteIsDark" class="mode-checkbox">
+                             <label for="paletteIsDark" class="mode-label">
+                                 <span class="mode-text">暗色模式</span>
+                             </label>
+                         </div>
+                     </div>
+                     
+                     <div class="input-group">
+                         <label>自定义功能色系</label>
+                         <div class="custom-semantic-colors">
+                             <div class="semantic-color-item">
+                                 <label>成功色</label>
+                                 <div class="color-input-group">
+                                     <input type="color" id="customSuccess" value="#52c41a" class="tooltip" data-tooltip="自定义成功色">
+                                     <input type="text" id="customSuccessText" value="#52c41a" placeholder="#52c41a">
+                                 </div>
+                             </div>
+                             <div class="semantic-color-item">
+                                 <label>警告色</label>
+                                 <div class="color-input-group">
+                                     <input type="color" id="customWarning" value="#faad14" class="tooltip" data-tooltip="自定义警告色">
+                                     <input type="text" id="customWarningText" value="#faad14" placeholder="#faad14">
+                                 </div>
+                             </div>
+                             <div class="semantic-color-item">
+                                 <label>错误色</label>
+                                 <div class="color-input-group">
+                                     <input type="color" id="customError" value="#ff4d4f" class="tooltip" data-tooltip="自定义错误色">
+                                     <input type="text" id="customErrorText" value="#ff4d4f" placeholder="#ff4d4f">
+                                 </div>
+                             </div>
+                             <div class="semantic-color-item">
+                                 <label>信息色</label>
+                                 <div class="color-input-group">
+                                     <input type="color" id="customInfo" value="#1890ff" class="tooltip" data-tooltip="自定义信息色">
+                                     <input type="text" id="customInfoText" value="#1890ff" placeholder="#1890ff">
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                    <button class="update-button" onclick="updatePaletteDemo()">生成调色板</button>
+                </div>
+            </div>
+            
+            <div class="results-grid">
+                <div class="result-card">
+                    <h3><span class="result-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">🎨</span>颜色混合测试</h3>
+                    <div id="blendDemo"></div>
+                    <div class="color-info" id="blendInfo"></div>
+                </div>
+                
+                <div class="result-card">
+                    <h3><span class="result-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">🎯</span>颜色调和测试</h3>
+                    <div id="harmonizeDemo"></div>
+                    <div class="color-info" id="harmonizeInfo"></div>
+                </div>
+                
+                <div class="result-card">
+                    <h3><span class="result-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">🌈</span>主题变体</h3>
+                    <div class="color-grid" id="themeVariants"></div>
+                </div>
+                
+                <div class="result-card">
+                    <h3><span class="result-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">🎪</span>完整主题调色板</h3>
+                    <div id="themePalette"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="errorLog"></div>
+    </div>
+    
+    <script type="module">
+        // 导入主题混合模块
+        import { 
+            blendInHct, 
+            harmonizeColor, 
+            generateThemeVariants, 
+            generateThemePalette,
+            rgbToHct,
+            hctToRgb
+        } from './src/theme-blend.js';
+        
+        // 全局变量
+        window.blendInHct = blendInHct;
+        window.harmonizeColor = harmonizeColor;
+        window.generateThemeVariants = generateThemeVariants;
+        window.generateThemePalette = generateThemePalette;
+        window.rgbToHct = rgbToHct;
+        window.hctToRgb = hctToRgb;
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            
+            // 初始化所有演示
+            updateBlendDemo();
+            updateHarmonizeDemo();
+            updateVariantsDemo();
+            updatePaletteDemo();
+        });
+        
+        function setupEventListeners() {
+            // 更新滑块值显示
+            document.getElementById('blendRatio').addEventListener('input', function() {
+                document.getElementById('blendRatioValue').textContent = this.value;
+            });
+            
+            document.getElementById('harmonizeStrength').addEventListener('input', function() {
+                document.getElementById('harmonizeStrengthValue').textContent = this.value;
+            });
+            
+            document.getElementById('paletteBlendRatio').addEventListener('input', function() {
+                document.getElementById('paletteBlendRatioValue').textContent = this.value;
+            });
+            
+            document.getElementById('paletteHarmonizeRatio').addEventListener('input', function() {
+                document.getElementById('paletteHarmonizeRatioValue').textContent = this.value;
+            });
+            
+            // 颜色输入同步函数
+            function setupColorSync(colorId, textId) {
+                const colorInput = document.getElementById(colorId);
+                const textInput = document.getElementById(textId);
+                
+                colorInput.addEventListener('input', function() {
+                    textInput.value = this.value;
+                });
+                
+                textInput.addEventListener('input', function() {
+                    if (this.value.match(/^#[0-9A-F]{6}$/i)) {
+                        colorInput.value = this.value;
+                    }
+                });
+            }
+            
+            // 设置所有颜色输入同步
+            setupColorSync('baseColor', 'baseColorText');
+            setupColorSync('blendColor', 'blendColorText');
+            setupColorSync('themeColor', 'themeColorText');
+            setupColorSync('targetColor', 'targetColorText');
+            setupColorSync('variantBaseColor', 'variantBaseColorText');
+            setupColorSync('paletteThemeColor', 'paletteThemeColorText');
+            
+            // 设置自定义功能色系颜色输入同步
+            setupColorSync('customSuccess', 'customSuccessText');
+            setupColorSync('customWarning', 'customWarningText');
+            setupColorSync('customError', 'customErrorText');
+            setupColorSync('customInfo', 'customInfoText');
+        }
+        
+        window.updateBlendDemo = function() {
+            try {
+                const baseColor = document.getElementById('baseColorText').value;
+                const blendColor = document.getElementById('blendColorText').value;
+                const blendRatio = parseFloat(document.getElementById('blendRatio').value);
+                
+                const blended = blendInHct(baseColor, blendColor, blendRatio);
+                
+                document.getElementById('blendDemo').innerHTML = `
+                    <div class="blend-demo">
+                        <div class="color-swatch" style="background: ${baseColor}" data-color="${baseColor}">基础</div>
+                        <div class="blend-arrow">+</div>
+                        <div class="color-swatch" style="background: ${blendColor}" data-color="${blendColor}">混合</div>
+                        <div class="blend-arrow">=</div>
+                        <div class="color-swatch" style="background: ${blended}" data-color="${blended}">结果</div>
+                    </div>
+                `;
+                
+                document.getElementById('blendInfo').innerHTML = `
+                    <div class="info-row"><span class="info-label">混合结果:</span><span class="info-value">${blended}</span></div>
+                    <div class="info-row"><span class="info-label">混合比例:</span><span class="info-value">${(blendRatio * 100).toFixed(0)}%</span></div>
+                    <div class="info-row"><span class="info-label">算法:</span><span class="info-value">HCT色彩空间插值</span></div>
+                `;
+                
+            } catch (error) {
+                console.error('颜色混合出错:', error);
+                document.getElementById('blendDemo').innerHTML = `<div class="error">错误: ${error.message}</div>`;
+            }
+        }
+        
+        window.updateHarmonizeDemo = function() {
+            try {
+                const themeColor = document.getElementById('themeColorText').value;
+                const targetColor = document.getElementById('targetColorText').value;
+                const harmonizeStrength = parseFloat(document.getElementById('harmonizeStrength').value);
+                
+                const harmonized = harmonizeColor(targetColor, themeColor, harmonizeStrength);
+                
+                document.getElementById('harmonizeDemo').innerHTML = `
+                    <div class="blend-demo">
+                        <div class="color-swatch" style="background: ${targetColor}" data-color="${targetColor}">原色</div>
+                        <div class="blend-arrow">→</div>
+                        <div class="color-swatch" style="background: ${harmonized}" data-color="${harmonized}">协调</div>
+                        <div class="blend-arrow">←</div>
+                        <div class="color-swatch" style="background: ${themeColor}" data-color="${themeColor}">主题</div>
+                    </div>
+                `;
+                
+                document.getElementById('harmonizeInfo').innerHTML = `
+                    <div class="info-row"><span class="info-label">协调结果:</span><span class="info-value">${harmonized}</span></div>
+                    <div class="info-row"><span class="info-label">协调强度:</span><span class="info-value">${(harmonizeStrength * 100).toFixed(0)}%</span></div>
+                    <div class="info-row"><span class="info-label">算法:</span><span class="info-value">色相向主题色靠拢</span></div>
+                `;
+                
+            } catch (error) {
+                console.error('颜色协调出错:', error);
+                document.getElementById('harmonizeDemo').innerHTML = `<div class="error">错误: ${error.message}</div>`;
+            }
+        }
+        
+        window.updateVariantsDemo = function() {
+            try {
+                const variantBaseColor = document.getElementById('variantBaseColorText').value;
+                const variants = generateThemeVariants(variantBaseColor);
+                
+                let variantsHtml = '';
+                Object.entries(variants).forEach(([name, color]) => {
+                    const displayName = {
+                        'lighter': '更亮',
+                        'light': '亮色',
+                        'base': '基础',
+                        'dark': '暗色',
+                        'darker': '更暗'
+                    }[name] || name;
+                    variantsHtml += `<div class="color-item tooltip" style="background: ${color}" data-tooltip="${displayName}: ${color}">${displayName}</div>`;
+                });
+                document.getElementById('themeVariants').innerHTML = variantsHtml;
+                
+            } catch (error) {
+                console.error('主题变体生成出错:', error);
+                document.getElementById('themeVariants').innerHTML = `<div class="error">错误: ${error.message}</div>`;
+            }
+        }
+        
+        window.updatePaletteDemo = function() {
+            try {
+                const paletteThemeColor = document.getElementById('paletteThemeColorText').value;
+                const blendRatio = parseFloat(document.getElementById('paletteBlendRatio').value);
+                const harmonizeRatio = parseFloat(document.getElementById('paletteHarmonizeRatio').value);
+                const isDark = document.getElementById('paletteIsDark').checked;
+                
+                // 获取自定义功能色系
+                const customSemanticColors = {
+                    success: document.getElementById('customSuccessText').value,
+                    warning: document.getElementById('customWarningText').value,
+                    error: document.getElementById('customErrorText').value,
+                    info: document.getElementById('customInfoText').value
+                };
+                
+                const palette = generateThemePalette(paletteThemeColor, {
+                    blendRatio,
+                    harmonizeRatio,
+                    isDark,
+                    semanticColors: customSemanticColors
+                });
+                
+                let paletteHtml = '<div class="palette-container">';
+                
+                // 基础色系分组
+                paletteHtml += '<div class="color-section"><div class="section-header"><h3>🎨 基础色系</h3><p class="section-desc">品牌主色调中和性色调</p></div>';
+                
+                // 主题色阶
+                paletteHtml += '<div class="color-group"><h4>主题色阶</h4><div class="color-grid">';
+                if (palette.theme && typeof palette.theme === 'object') {
+                    Object.entries(palette.theme).forEach(([key, color]) => {
+                        const index = key.replace('theme-', '');
+                        paletteHtml += `<div class="color-item tooltip" style="background: ${color}" data-tooltip="主题色 ${index}: ${color}">${index}</div>`;
+                    });
+                }
+                paletteHtml += '</div></div>';
+                
+                // 中性色阶
+                paletteHtml += '<div class="color-group"><h4>中性色阶</h4><div class="color-grid">';
+                if (palette.controls && typeof palette.controls === 'object') {
+                    Object.entries(palette.controls).forEach(([key, color]) => {
+                        const index = key.replace('gray-', '');
+                        paletteHtml += `<div class="color-item tooltip" style="background: ${color}" data-tooltip="中性色 ${index}: ${color}">${index}</div>`;
+                    });
+                }
+                paletteHtml += '</div></div></div>';
+                
+                // 功能色系分组
+                paletteHtml += '<div class="color-section"><div class="section-header"><h3>🚦 功能色系</h3><p class="section-desc">状态反馈和信息传达</p></div>';
+                
+                const semanticLabels = {
+                    success: { name: '成功', icon: '✅', desc: '操作成功、正确状态' },
+                    warning: { name: '警告', icon: '⚠️', desc: '注意事项、提醒信息' },
+                    error: { name: '错误', icon: '❌', desc: '错误状态、危险操作' },
+                    info: { name: '信息', icon: 'ℹ️', desc: '一般信息、提示内容' }
+                };
+                
+                if (palette.semantic) {
+                    Object.entries(palette.semantic).forEach(([type, colorObj]) => {
+                        if (colorObj && typeof colorObj === 'object') {
+                            const labelInfo = semanticLabels[type] || { name: type, icon: '🔵', desc: '' };
+                            paletteHtml += `<div class="color-group"><h4>${labelInfo.icon} ${labelInfo.name}</h4>`;
+                            if (labelInfo.desc) {
+                                paletteHtml += `<p class="group-desc">${labelInfo.desc}</p>`;
+                            }
+                            paletteHtml += '<div class="color-grid">';
+                            Object.entries(colorObj).forEach(([index, color]) => {
+                                paletteHtml += `<div class="color-item tooltip" style="background: ${color}" data-tooltip="${labelInfo.name} ${index}: ${color}">${index}</div>`;
+                            });
+                            paletteHtml += '</div></div>';
+                        }
+                    });
+                }
+                paletteHtml += '</div></div>';
+                
+                document.getElementById('themePalette').innerHTML = paletteHtml;
+                
+            } catch (error) {
+                console.error('主题调色板生成出错:', error);
+                document.getElementById('themePalette').innerHTML = `<div class="error">错误: ${error.message}</div>`;
+            }
+        }
+        
+        window.updateResults = function() {
+            updateBlendDemo();
+            updateHarmonizeDemo();
+            updateVariantsDemo();
+            updatePaletteDemo();
+        }
+        
+        function testBlending(color1, color2, ratio) {
+            try {
+                const blendedColor = blendInHct(color1, color2, ratio);
+                
+                const demoHtml = `
+                    <div class="blend-demo">
+                        <div class="blend-color" style="background: ${color1}">${color1}</div>
+                        <div class="blend-arrow">→</div>
+                        <div class="blend-color" style="background: ${blendedColor}">${blendedColor}</div>
+                        <div class="blend-arrow">←</div>
+                        <div class="blend-color" style="background: ${color2}">${color2}</div>
+                    </div>
+                `;
+                
+                const hct1 = rgbToHct(color1);
+                const hct2 = rgbToHct(color2);
+                const hctBlended = rgbToHct(blendedColor);
+                
+                const infoHtml = `
+                    <strong>混合结果:</strong> ${blendedColor}<br>
+                    <strong>比例:</strong> ${ratio}<br>
+                    <strong>HCT1:</strong> H:${hct1.h}° C:${hct1.c} T:${hct1.t}<br>
+                    <strong>HCT2:</strong> H:${hct2.h}° C:${hct2.c} T:${hct2.t}<br>
+                    <strong>混合HCT:</strong> H:${hctBlended.h}° C:${hctBlended.c} T:${hctBlended.t}
+                `;
+                
+                document.getElementById('blendDemo').innerHTML = demoHtml;
+                document.getElementById('blendInfo').innerHTML = infoHtml;
+                
+            } catch (error) {
+                showError('颜色混合测试失败: ' + error.message);
+            }
+        }
+        
+        function testHarmonize(themeColor, targetColor, ratio) {
+            try {
+                const harmonizedColor = harmonizeColor(themeColor, targetColor, ratio);
+                
+                const demoHtml = `
+                    <div class="blend-demo">
+                        <div class="blend-color" style="background: ${targetColor}">原始</div>
+                        <div class="blend-arrow">→</div>
+                        <div class="blend-color" style="background: ${harmonizedColor}">调和</div>
+                        <div class="blend-arrow">←</div>
+                        <div class="blend-color" style="background: ${themeColor}">主题</div>
+                    </div>
+                `;
+                
+                const hctTheme = rgbToHct(themeColor);
+                const hctTarget = rgbToHct(targetColor);
+                const hctHarmonized = rgbToHct(harmonizedColor);
+                
+                const infoHtml = `
+                    <strong>调和结果:</strong> ${harmonizedColor}<br>
+                    <strong>调和强度:</strong> ${ratio}<br>
+                    <strong>主题HCT:</strong> H:${hctTheme.h}° C:${hctTheme.c} T:${hctTheme.t}<br>
+                    <strong>目标HCT:</strong> H:${hctTarget.h}° C:${hctTarget.c} T:${hctTarget.t}<br>
+                    <strong>调和HCT:</strong> H:${hctHarmonized.h}° C:${hctHarmonized.c} T:${hctHarmonized.t}
+                `;
+                
+                document.getElementById('harmonizeDemo').innerHTML = demoHtml;
+                document.getElementById('harmonizeInfo').innerHTML = infoHtml;
+                
+            } catch (error) {
+                showError('颜色调和测试失败: ' + error.message);
+            }
+        }
+        
+        function testThemeVariants(themeColor) {
+            try {
+                const variants = generateThemeVariants(themeColor);
+                
+                let html = '';
+                variants.forEach((color, index) => {
+                    const tone = [10, 20, 30, 40, 50, 60, 70, 80, 90][index];
+                    html += `<div class="color-item" style="background: ${color}" title="${color}">${tone}</div>`;
+                });
+                
+                document.getElementById('themeVariants').innerHTML = html;
+                
+            } catch (error) {
+                showError('主题变体测试失败: ' + error.message);
+            }
+        }
+        
+        function testThemePalette(themeColor) {
+            try {
+                const palette = generateThemePalette(themeColor);
+                
+                let html = '<h4>语义色</h4>';
+                Object.entries(palette.semantic).forEach(([name, colors]) => {
+                    html += `<div style="margin: 10px 0;"><strong>${name}:</strong></div>`;
+                    html += '<div class="color-grid">';
+                    Object.entries(colors).forEach(([level, color]) => {
+                        html += `<div class="color-item" style="background: ${color}" title="${color}">${level}</div>`;
+                    });
+                    html += '</div>';
+                });
+                
+                html += '<h4 style="margin-top: 20px;">UI 颜色</h4>';
+                html += '<div class="color-grid">';
+                Object.entries(palette.ui).forEach(([name, color]) => {
+                    html += `<div class="color-item" style="background: ${color}; color: #333;" title="${color}">${name}</div>`;
+                });
+                html += '</div>';
+                
+                if (palette.variants) {
+                    html += '<h4 style="margin-top: 20px;">主题变体</h4>';
+                    html += '<div class="color-grid">';
+                    palette.variants.forEach((color, index) => {
+                        html += `<div class="color-item" style="background: ${color}" title="${color}">${index + 1}</div>`;
+                    });
+                    html += '</div>';
+                }
+                
+                document.getElementById('themePalette').innerHTML = html;
+                
+            } catch (error) {
+                showError('主题调色板测试失败: ' + error.message);
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.getElementById('errorLog').appendChild(errorDiv);
+        }
+    </script>
+</body>
+</html>

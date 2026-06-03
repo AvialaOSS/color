@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主题调色板生成器</title>
+    <style>
+        :root {
+            --primary: 220 14% 96%;
+            --primary-foreground: 220 9% 46%;
+            --secondary: 220 14% 96%;
+            --secondary-foreground: 220 9% 46%;
+            --muted: 220 14% 96%;
+            --muted-foreground: 220 9% 46%;
+            --accent: 220 14% 96%;
+            --accent-foreground: 220 9% 46%;
+            --destructive: 0 84% 60%;
+            --destructive-foreground: 210 20% 98%;
+            --border: 220 13% 91%;
+            --input: 220 13% 91%;
+            --ring: 262 83% 58%;
+            --background: 0 0% 100%;
+            --foreground: 224 71% 4%;
+            --card: 0 0% 100%;
+            --card-foreground: 224 71% 4%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 224 71% 4%;
+            
+            --radius-sm: 0.125rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            line-height: 1.5;
+            padding: var(--spacing-8);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: hsl(var(--card));
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-8);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-8);
+            padding-bottom: var(--spacing-6);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .header h1 {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--spacing-2);
+            letter-spacing: -0.025em;
+        }
+        
+        .header p {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--text-base);
+        }
+        
+        .control-panel {
+            background: hsl(var(--muted));
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            margin-bottom: var(--spacing-8);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-6);
+        }
+        
+        .input-group {
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--spacing-2);
+        }
+        
+        .color-input-group {
+            display: flex;
+            gap: var(--spacing-2);
+            align-items: center;
+        }
+        
+        input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: 2px solid hsl(var(--border));
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        input[type="color"]:hover {
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: var(--spacing-2) var(--spacing-3);
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-md);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-size: var(--text-sm);
+            font-family: monospace;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+        
+        .range-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+        }
+        
+        .range-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .range-value {
+            font-family: monospace;
+            font-size: var(--text-sm);
+            color: hsl(var(--primary-foreground));
+            background: hsl(var(--primary));
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-sm);
+            min-width: 50px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: hsl(var(--muted));
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: hsl(var(--primary-foreground));
+            cursor: pointer;
+            border: 2px solid hsl(var(--background));
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: hsl(var(--ring));
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: hsl(var(--primary-foreground));
+            cursor: pointer;
+            border: 2px solid hsl(var(--background));
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        input[type="range"]::-moz-range-thumb:hover {
+            background: hsl(var(--ring));
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        
+        .mode-checkbox {
+            width: 44px;
+            height: 24px;
+            appearance: none;
+            background: hsl(var(--muted));
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .mode-checkbox:checked {
+            background: hsl(var(--primary-foreground));
+            border-color: hsl(var(--primary-foreground));
+        }
+        
+        .mode-checkbox::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mode-checkbox:checked::before {
+            transform: translateX(20px);
+        }
+        
+        .mode-label {
+            cursor: pointer;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mode-text {
+            font-size: var(--text-sm);
+            color: hsl(var(--foreground));
+            font-weight: 500;
+        }
+        
+        .custom-semantic-colors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-3);
+            margin-top: var(--spacing-2);
+        }
+        
+        .semantic-color-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-1);
+        }
+        
+        .semantic-color-item label {
+            font-size: var(--text-xs);
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .semantic-color-item .color-input-group {
+            margin: 0;
+        }
+        
+        .semantic-color-item input[type="color"] {
+            width: 28px;
+            height: 28px;
+        }
+        
+        .semantic-color-item input[type="text"] {
+            font-size: var(--text-xs);
+            padding: var(--spacing-1) var(--spacing-2);
+        }
+        
+        .update-button {
+            width: 100%;
+            padding: var(--spacing-3) var(--spacing-6);
+            background: linear-gradient(135deg, hsl(var(--primary-foreground)), hsl(var(--ring)));
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: var(--spacing-4);
+        }
+        
+        .update-button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .update-button:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: hsl(var(--card));
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .result-header {
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-4);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .result-header h2 {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--spacing-2);
+            letter-spacing: -0.025em;
+        }
+        
+        .result-desc {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+        
+        .palette-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-8);
+        }
+        
+        .color-section {
+            background: hsl(var(--card));
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            border: 1px solid hsl(var(--border));
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .color-section:hover {
+            box-shadow: var(--shadow-md);
+            border-color: hsl(var(--ring) / 0.3);
+        }
+        
+        .section-header {
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-4);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .section-header h3 {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--spacing-2);
+            letter-spacing: -0.025em;
+        }
+        
+        .section-desc {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+        
+        .color-group {
+            margin-bottom: var(--spacing-6);
+        }
+        
+        .color-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .color-group h4 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: hsl(var(--card-foreground));
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        
+        .group-desc {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--text-xs);
+            margin-bottom: var(--spacing-3);
+            line-height: 1.4;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: var(--spacing-3);
+        }
+        
+        .color-item {
+            aspect-ratio: 1;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid hsl(var(--border));
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .color-item:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+        
+        .color-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: hsl(var(--muted-foreground));
+            font-family: monospace;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        
+        .color-item:hover::after {
+            opacity: 1;
+        }
+        
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: hsl(var(--foreground));
+            color: hsl(var(--background));
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+        
+        .error {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+            padding: var(--spacing-4);
+            border-radius: var(--radius-md);
+            margin: var(--spacing-4) 0;
+            font-size: var(--text-sm);
+        }
+        
+        @media (max-width: 768px) {
+            .custom-semantic-colors {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: var(--spacing-4);
+            }
+            
+            .container {
+                padding: var(--spacing-6);
+            }
+            
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎪 主题调色板生成器</h1>
+            <p>基于主题色生成完整的设计系统调色板，支持自定义功能色系和暗色模式</p>
+        </div>
+        
+        <div class="control-panel">
+            <div class="control-grid">
+                <div class="input-group">
+                    <label>主题色</label>
+                    <div class="color-input-group">
+                        <input type="color" id="themeColor" value="#e67e22" class="tooltip" data-tooltip="选择主题色">
+                        <input type="text" id="themeColorText" value="#e67e22" placeholder="#e67e22">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <div class="range-input-group">
+                        <div class="range-label">
+                            <label>混合比例</label>
+                            <span class="range-value" id="blendRatioValue">0.12</span>
+                        </div>
+                        <input type="range" id="blendRatio" min="0" max="0.3" step="0.01" value="0.12">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <div class="range-input-group">
+                        <div class="range-label">
+                            <label>协调比例</label>
+                            <span class="range-value" id="harmonizeRatioValue">0.15</span>
+                        </div>
+                        <input type="range" id="harmonizeRatio" min="0" max="0.5" step="0.01" value="0.15">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>色彩模式</label>
+                    <div class="mode-toggle">
+                        <input type="checkbox" id="isDark" class="mode-checkbox">
+                        <label for="isDark" class="mode-label">
+                            <span class="mode-text">暗色模式</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>自定义功能色系</label>
+                <div class="custom-semantic-colors">
+                    <div class="semantic-color-item">
+                        <label>成功色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="customSuccess" value="#52c41a" class="tooltip" data-tooltip="自定义成功色">
+                            <input type="text" id="customSuccessText" value="#52c41a" placeholder="#52c41a">
+                        </div>
+                    </div>
+                    <div class="semantic-color-item">
+                        <label>警告色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="customWarning" value="#faad14" class="tooltip" data-tooltip="自定义警告色">
+                            <input type="text" id="customWarningText" value="#faad14" placeholder="#faad14">
+                        </div>
+                    </div>
+                    <div class="semantic-color-item">
+                        <label>错误色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="customError" value="#ff4d4f" class="tooltip" data-tooltip="自定义错误色">
+                            <input type="text" id="customErrorText" value="#ff4d4f" placeholder="#ff4d4f">
+                        </div>
+                    </div>
+                    <div class="semantic-color-item">
+                        <label>信息色</label>
+                        <div class="color-input-group">
+                            <input type="color" id="customInfo" value="#1890ff" class="tooltip" data-tooltip="自定义信息色">
+                            <input type="text" id="customInfoText" value="#1890ff" placeholder="#1890ff">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="update-button" onclick="generatePalette()">生成调色板</button>
+        </div>
+        
+        <div class="result-container">
+            <div class="result-header">
+                <h2>🎨 生成的调色板</h2>
+                <p class="result-desc">完整的主题调色板，包含主题色阶、功能色系和中性色阶</p>
+            </div>
+            <div id="paletteResult"></div>
+        </div>
+        
+        <div id="errorLog"></div>
+    </div>
+    
+    <script type="module">
+        // 导入主题混合模块
+        import { generateThemePalette } from './src/theme-blend.js';
+        
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 更新滑块值显示
+            document.getElementById('blendRatio').addEventListener('input', function() {
+                document.getElementById('blendRatioValue').textContent = this.value;
+            });
+            
+            document.getElementById('harmonizeRatio').addEventListener('input', function() {
+                document.getElementById('harmonizeRatioValue').textContent = this.value;
+            });
+            
+            // 颜色输入同步函数
+            function setupColorSync(colorId, textId) {
+                const colorInput = document.getElementById(colorId);
+                const textInput = document.getElementById(textId);
+                
+                colorInput.addEventListener('input', function() {
+                    textInput.value = this.value;
+                });
+                
+                textInput.addEventListener('input', function() {
+                    if (this.value.match(/^#[0-9A-F]{6}$/i)) {
+                        colorInput.value = this.value;
+                    }
+                });
+            }
+            
+            // 设置所有颜色输入同步
+            setupColorSync('themeColor', 'themeColorText');
+            setupColorSync('customSuccess', 'customSuccessText');
+            setupColorSync('customWarning', 'customWarningText');
+            setupColorSync('customError', 'customErrorText');
+            setupColorSync('customInfo', 'customInfoText');
+        }
+        
+        window.generatePalette = function() {
+            try {
+                const themeColor = document.getElementById('themeColorText').value;
+                const blendRatio = parseFloat(document.getElementById('blendRatio').value);
+                const harmonizeRatio = parseFloat(document.getElementById('harmonizeRatio').value);
+                const isDark = document.getElementById('isDark').checked;
+                
+                // 获取自定义功能色系
+                const customSemanticColors = {
+                    success: document.getElementById('customSuccessText').value,
+                    warning: document.getElementById('customWarningText').value,
+                    error: document.getElementById('customErrorText').value,
+                    info: document.getElementById('customInfoText').value
+                };
+                
+                const palette = generateThemePalette(themeColor, {
+                    blendRatio,
+                    harmonizeRatio,
+                    isDark,
+                    semanticColors: customSemanticColors
+                });
+                
+                let paletteHtml = '<div class="palette-container">';
+                
+                // 基础色系分组
+                paletteHtml += '<div class="color-section"><div class="section-header"><h3>🎨 基础色系</h3><p class="section-desc">品牌主色调和中性色调</p></div>';
+                
+                // 主题色阶
+                paletteHtml += '<div class="color-group"><h4>主题色阶</h4><div class="color-grid">';
+                if (palette.theme && typeof palette.theme === 'object') {
+                    Object.entries(palette.theme).forEach(([key, color]) => {
+                        const index = key.replace('theme-', '');
+                        paletteHtml += `<div class="color-item tooltip" style="background: ${color}" data-tooltip="主题色 ${index}: ${color}">${index}</div>`;
+                    });
+                }
+                paletteHtml += '</div></div>';
+                
+                // 中性色阶
+                paletteHtml += '<div class="color-group"><h4>中性色阶</h4><div class="color-grid">';
+                if (palette.controls && typeof palette.controls === 'object') {
+                    Object.entries(palette.controls).forEach(([key, color]) => {
+                        const index = key.replace('gray-', '');
+                        paletteHtml += `<div class="color-item tooltip" style="background: ${color}" data-tooltip="中性色 ${index}: ${color}">${index}</div>`;
+                    });
+                }
+                paletteHtml += '</div></div></div>';
+                
+                // 功能色系分组
+                paletteHtml += '<div class="color-section"><div class="section-header"><h3>🚦 功能色系</h3><p class="section-desc">状态反馈和信息传达</p></div>';
+                
+                const semanticLabels = {
+                    success: { name: '成功', icon: '✅', desc: '操作成功、正确状态' },
+                    warning: { name: '警告', icon: '⚠️', desc: '注意事项、提醒信息' },
+                    error: { name: '错误', icon: '❌', desc: '错误状态、危险操作' },
+                    info: { name: '信息', icon: 'ℹ️', desc: '一般信息、提示内容' }
+                };
+                
+                if (palette.semantic) {
+                    Object.entries(palette.semantic).forEach(([type, colorObj]) => {
+                        if (colorObj && typeof colorObj === 'object') {
+                            const labelInfo = semanticLabels[type] || { name: type, icon: '🔵', desc: '' };
+                            paletteHtml += `<div class="color-group"><h4>${labelInfo.icon} ${labelInfo.name}</h4>`;
+                            if (labelInfo.desc) {
+                                paletteHtml += `<p class="group-desc">${labelInfo.desc}</p>`;
+                            }
+                            paletteHtml += '<div class="color-grid">';
+                            Object.entries(colorObj).forEach(([index, color]) => {
+                                paletteHtml += `<div class="color-item tooltip" style="background: ${color}" data-tooltip="${labelInfo.name} ${index}: ${color}">${index}</div>`;
+                            });
+                            paletteHtml += '</div></div>';
+                        }
+                    });
+                }
+                paletteHtml += '</div></div>';
+                
+                document.getElementById('paletteResult').innerHTML = paletteHtml;
+                
+            } catch (error) {
+                console.error('主题调色板生成出错:', error);
+                document.getElementById('paletteResult').innerHTML = `<div class="error">错误: ${error.message}</div>`;
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.getElementById('errorLog').appendChild(errorDiv);
+        }
+        
+        // 初始化
+        setupEventListeners();
+        generatePalette(); // 页面加载时生成默认调色板
+    </script>
+</body>
+</html>

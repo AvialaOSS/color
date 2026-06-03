@@ -368,11 +368,12 @@ export function generateThemePalette(themeColor, options = {}) {
     },
     harmonizeRatio = 0.15,
     blendRatio = 0.12,
+    isDark = false,
     generateVariants = true
   } = options;
   
   // 生成语义色变体
-  const semanticVariants = generateSemanticColors(themeColor, { semanticColors, blendRatio: harmonizeRatio });
+  const semanticVariants = generateSemanticColors(themeColor, { semanticColors, blendRatio: harmonizeRatio, isDark });
   
   // 将扁平的语义色变体重新组织为嵌套结构
   const semantic = {};
@@ -387,9 +388,10 @@ export function generateThemePalette(themeColor, options = {}) {
   });
   
   const palette = {
-    theme: themeColor,
+    theme: generateThemeColors(themeColor, { isDark }),
     semantic,
-    ui: blendUIColors(themeColor, uiColors, blendRatio)
+    ui: blendUIColors(themeColor, uiColors, blendRatio),
+    controls: generateControlColors(themeColor, { blendRatio, isDark })
   };
   
   if (generateVariants) {

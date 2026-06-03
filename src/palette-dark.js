@@ -1,52 +1,43 @@
 import Color from 'color';
-import colorPalette from './palette.js';
+import { Blend, Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities';
 import { getColorString } from './utils.js';
 
 // 暗色色板
 
-// 动态梯度算法
-function colorPaletteDark(originColor, i, format) {
-  const lightColor = Color(colorPalette(originColor, 10 - i + 1));
-  const originBaseColor = Color(originColor);
+function colorPaletteDark(originColor, i, format, steps = 10, curveGamma = 1, mixColor = '', mixRatio = 0) {
+  const baseColor = Color(originColor);
+  const safeSteps = Math.max(1, Math.min(24, Number(steps) || 10));
+  const centerIndex = Math.floor(safeSteps / 2) + 1;
+  const gamma = Math.max(0.1, Math.min(5, Number(curveGamma) || 1));
+  const ratio = Math.max(0, Math.min(1, Number(mixRatio) || 0));
 
-  const originBaseHue = originBaseColor.hue();
-  const originBaseSaturation = originBaseColor.saturationv();
-  const baseColor = Color({
-    h: originBaseColor.hue(),
-    s: getNewSaturation(6),
-    v: originBaseColor.value(),
-  });
-
-  const baseSaturation = baseColor.saturationv();
-  const step = Math.ceil((baseSaturation - 9) / 4);
-  const step1to5 = Math.ceil((100 - baseSaturation) / 5);
-
-  function getNewSaturation(_index) {
-    if (_index < 6) {
-      return baseSaturation + (6 - _index) * step1to5;
-    }
-    if (_index === 6) {
-      if (originBaseHue >= 0 && originBaseHue < 50) {
-        return originBaseSaturation - 15;
-      }
-      if (originBaseHue >= 50 && originBaseHue < 191) {
-        return originBaseSaturation - 20;
-      }
-      if (originBaseHue >= 191 && originBaseHue <= 360) {
-        return originBaseSaturation - 15;
-      }
-    }
-
-    return baseSaturation - step * (_index - 6);
+  let seedColor = baseColor;
+  if (mixColor && ratio > 0) {
+    const from = argbFromHex(baseColor.hex().toLowerCase());
+    const to = argbFromHex(Color(mixColor).hex().toLowerCase());
+    seedColor = Color(hexFromArgb(Blend.cam16Ucs(from, to, ratio)));
   }
 
-  const retColor = Color({
-    h: lightColor.hue(),
-    s: getNewSaturation(i),
-    v: lightColor.value(),
-  });
+  if (i === centerIndex) {
+    return getColorString(seedColor, format);
+  }
 
-  return getColorString(retColor, format);
+  const argb = argbFromHex(seedColor.hex().toLowerCase());
+  const baseHct = Hct.fromInt(argb);
+
+  const baseTone = baseHct.tone;
+  const lightCount = centerIndex - 1;
+  const darkCount = safeSteps - centerIndex;
+
+  const ease = (t) => Math.pow(Math.max(0, Math.min(1, t)), gamma);
+  const targetTone = i < centerIndex
+    ? baseTone - baseTone * ease((centerIndex - i) / Math.max(1, lightCount))
+    : baseTone + (100 - baseTone) * ease((i - centerIndex) / Math.max(1, darkCount));
+
+  const hct = Hct.from(baseHct.hue, baseHct.chroma, Math.max(0, Math.min(100, targetTone)));
+  const hex = hexFromArgb(hct.toInt());
+
+  return getColorString(Color(hex), format);
 }
 
 export default colorPaletteDark;

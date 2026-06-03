@@ -21,7 +21,14 @@ export default defineConfig({
   },
   plugins: [
     dts({
-      include: ['src/**/*.js'],
+      include: [
+        'src/index.js',
+        'src/generate.js',
+        'src/palette.js',
+        'src/palette-dark.js',
+        'src/neutral.js',
+        'src/utils.js',
+      ],
       beforeWriteFile: (filePath, content) => {
         return {
           filePath,

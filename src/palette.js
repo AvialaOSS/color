@@ -1,84 +1,43 @@
 import Color from 'color';
+import { Blend, Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities';
 import { getColorString } from './utils.js';
 
 // 色板
 
-// 动态梯度算法
-function colorPalette(originColor, i, format) {
-  const color = Color(originColor);
-  const h = color.hue();
-  const s = color.saturationv();
-  const v = color.value();
+function colorPalette(originColor, i, format, steps = 10, curveGamma = 1, mixColor = '', mixRatio = 0) {
+  const baseColor = Color(originColor);
+  const safeSteps = Math.max(1, Math.min(24, Number(steps) || 10));
+  const centerIndex = Math.floor(safeSteps / 2) + 1;
+  const gamma = Math.max(0.1, Math.min(5, Number(curveGamma) || 1));
+  const ratio = Math.max(0, Math.min(1, Number(mixRatio) || 0));
 
-  // 根据色相区域动态调整步长
-  const getHueStep = (hue) => {
-    if (hue >= 60 && hue <= 240) {
-      return 2.5; // 绿色-蓝色区域可以用更大的步长
-    } else if ((hue >= 0 && hue < 60) || (hue > 300 && hue <= 360)) {
-      return 1.5; // 红色区域使用较小的步长
-    } else {
-      return 2; // 其他区域使用默认步长
-    }
-  };
-  
-  const hueStep = getHueStep(h);
-  const maxSaturationStep = 100;
-  const minSaturationStep = 9;
-
-  const maxValue = 100;
-  const minValue = 30;
-
-  function getNewHue(isLight, i) {
-    let hue;
-    if (h >= 60 && h <= 240) {
-      hue = isLight ? h - hueStep * i : h + hueStep * i;
-    } else {
-      hue = isLight ? h + hueStep * i : h - hueStep * i;
-    }
-    if (hue < 0) {
-      hue += 360;
-    } else if (hue >= 360) {
-      hue -= 360;
-    }
-    return Math.round(hue);
+  let seedColor = baseColor;
+  if (mixColor && ratio > 0) {
+    const from = argbFromHex(baseColor.hex().toLowerCase());
+    const to = argbFromHex(Color(mixColor).hex().toLowerCase());
+    seedColor = Color(hexFromArgb(Blend.cam16Ucs(from, to, ratio)));
   }
 
-  function getNewSaturation(isLight, i) {
-    let newSaturation;
-
-    if (isLight) {
-      // 改进的亮色饱和度计算，使过渡更平滑
-      newSaturation = s <= minSaturationStep ? s : s - ((s - minSaturationStep) / 5.5) * Math.pow(i, 1.05);
-    } else {
-      // 改进的暗色饱和度计算，避免过饱和
-      const maxS = Math.min(maxSaturationStep, s + 30);
-      newSaturation = s + ((maxS - s) / 4.2) * Math.pow(i, 0.95);
-    }
-    return Math.max(0, Math.min(100, newSaturation)); // 确保在有效范围内
+  if (i === centerIndex) {
+    return getColorString(seedColor, format);
   }
 
-  function getNewValue(isLight, i) {
-    if (isLight) {
-      // 亮色明度调整，使过渡更自然
-      return Math.min(maxValue, v + ((maxValue - v) / 5.2) * Math.pow(i, 0.9));
-    } else {
-      // 暗色明度调整，避免过暗
-      return v <= minValue ? v : Math.max(minValue, v - ((v - minValue) / 4.2) * Math.pow(i, 1.05));
-    }
-  }
+  const argb = argbFromHex(seedColor.hex().toLowerCase());
+  const baseHct = Hct.fromInt(argb);
 
-  const isLight = i < 6;
-  const index = isLight ? 6 - i : i - 6;
+  const baseTone = baseHct.tone;
+  const lightCount = centerIndex - 1;
+  const darkCount = safeSteps - centerIndex;
 
-  const retColor = i === 6
-    ? color
-    : Color({
-        h: getNewHue(isLight, index),
-        s: getNewSaturation(isLight, index),
-        v: getNewValue(isLight, index),
-      });
-  
-  return getColorString(retColor, format);
+  const ease = (t) => Math.pow(Math.max(0, Math.min(1, t)), gamma);
+  const targetTone = i < centerIndex
+    ? baseTone + (100 - baseTone) * ease((centerIndex - i) / Math.max(1, lightCount))
+    : baseTone - baseTone * ease((i - centerIndex) / Math.max(1, darkCount));
+
+  const hct = Hct.from(baseHct.hue, baseHct.chroma, Math.max(0, Math.min(100, targetTone)));
+  const hex = hexFromArgb(hct.toInt());
+
+  return getColorString(Color(hex), format);
 }
 
 export default colorPalette;

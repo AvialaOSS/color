@@ -1,657 +1,766 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>颜色色卡系统</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
-</head>
-<body>
-  <div class="container">
-    <h1>Aviala Design 色卡系统</h1>
-    <div class="color-input-group">
-      <div class="color-input">
-        <input type="text" id="colorInput" placeholder="请输入颜色值 (例如: #FF0000)" />
-        <button id="generateBtn"><i class="ri-palette-line"></i> 生成色卡</button>
-      </div>
-      <div class="color-input">
-        <div class="file-input-wrapper">
-          <input type="file" id="imageInput" accept="image/*" />
-          <label for="imageInput">选择图片</label>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>颜色</title>
+    <link rel="stylesheet" href="playground.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title">颜色</div>
         </div>
-        <button id="extractBtn"><i class="ri-image-line"></i> 从图片提取颜色</button>
+        <div class="topbar-right">
+          <button class="icon-btn" id="exportBtn" type="button" aria-label="导出">
+            <i class="ri-upload-2-line"></i>
+          </button>
+          <button class="icon-btn" id="uiThemeToggle" type="button" aria-label="切换主题">
+            <i class="ri-moon-line" id="uiThemeIcon"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-controls">
+            <div class="segmented" role="tablist" aria-label="模式切换">
+              <button class="segmented-btn is-active" id="modeLight" type="button">亮色模式</button>
+              <button class="segmented-btn" id="modeDark" type="button">暗色模式</button>
+            </div>
+            <button class="btn btn-secondary" id="addColorBtn" type="button">
+              <i class="ri-add-line"></i>
+              添加颜色
+            </button>
+            <div class="select-wrap">
+              <span class="select-prefix mono">格式</span>
+              <select class="select" id="formatSelect">
+                <option value="hex" selected>HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="hsl">HSL</option>
+              </select>
+            </div>
+            <div class="range-wrap">
+              <div class="range-label">输出数量</div>
+              <div class="range-row">
+                <input class="range" id="stepsRange" type="range" min="1" max="24" step="1" value="10" />
+                <div class="range-value mono" id="stepsValue">10</div>
+              </div>
+            </div>
+            <div class="range-wrap">
+              <div class="range-label">曲线</div>
+              <div class="range-row">
+                <input class="range" id="curveRange" type="range" min="0.5" max="2.5" step="0.05" value="1" />
+                <div class="range-value mono" id="curveValue">1.00</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="palette-list" id="paletteList"></div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <dialog class="dialog" id="addDialog">
+      <div class="dialog-head">
+        <div class="dialog-title">添加颜色到色卡</div>
+        <button class="icon-btn" id="addDialogClose" type="button" aria-label="关闭">
+          <i class="ri-close-line"></i>
+        </button>
       </div>
-      <div class="color-input linear-input">
-        <input type="text" id="startColorInput" placeholder="起始颜色 (例如: #FF0000)" />
-        <input type="text" id="endColorInput" placeholder="结束颜色 (例如: #0000FF)" />
-        <select id="linearSteps">
-          <option value="5">5步</option>
-          <option value="8">8步</option>
-          <option value="10" selected>10步</option>
-          <option value="12">12步</option>
-        </select>
-        <button id="generateLinearBtn"><i class="ri-contrast-line"></i> 生成线性渐变</button>
-      </div>
-      <div class="color-input preset-linear">
-        <select id="linearPreset">
-          <option value="gray">灰色系渐变</option>
-          <option value="monochrome">单色调渐变</option>
-          <option value="hsl">HSL空间渐变</option>
-        </select>
-        <input type="text" id="presetColorInput" placeholder="基础颜色 (单色调/HSL用)" />
-        <button id="generatePresetBtn"><i class="ri-palette-fill"></i> 生成预设渐变</button>
-      </div>
-      <div class="color-input theme-blend">
-        <input type="text" id="themeColorInput" placeholder="主题色 (例如: #165DFF)" />
-        <input type="text" id="targetColorInput" placeholder="目标色 (例如: #F53F3F)" />
-        <select id="blendMode">
-          <option value="harmonize">调和模式</option>
-          <option value="blend">混合模式</option>
-          <option value="variants">主题变体</option>
-          <option value="palette">完整色板</option>
-          <option value="interface-system">界面色彩系统</option>
-        </select>
-        <input type="range" id="blendRatio" min="0" max="1" step="0.05" value="0.15" />
-        <span id="blendRatioValue">15%</span>
-        
-        <!-- 界面色彩系统专用配置 -->
-        <div id="interfaceSystemConfig" style="display: none; margin-top: 10px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: #f9f9f9;">
-          <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #666;">语义色基准色配置</h4>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-            <input type="text" id="successColor" placeholder="成功色 (默认: #52c41a)" />
-            <input type="text" id="warningColor" placeholder="警告色 (默认: #faad14)" />
-            <input type="text" id="errorColor" placeholder="错误色 (默认: #ff4d4f)" />
-            <input type="text" id="infoColor" placeholder="信息色 (默认: #1890ff)" />
+      <div class="dialog-body">
+        <div class="form">
+          <div class="field">
+            <label>模式</label>
+            <div class="segmented" role="tablist" aria-label="添加模式">
+              <button class="segmented-btn is-active" id="addModePalette" type="button">颜色</button>
+              <button class="segmented-btn" id="addModeNeutral" type="button">中性色</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>颜色</label>
+            <div class="field-row" id="addPaletteFields">
+              <input class="color" type="color" id="addColorPicker" value="#f2502c" />
+              <input class="input mono" type="text" id="addColorText" value="#F2502C" />
+            </div>
+            <div class="is-hidden" id="addMixWrap">
+              <div class="field-row">
+                <input class="color" type="color" id="addMixPicker" value="#165dff" />
+                <input class="input mono" type="text" id="addMixText" value="#165DFF" />
+              </div>
+              <div class="range-row">
+                <input class="range" id="addMixRange" type="range" min="0" max="1" step="0.01" value="0.15" />
+                <div class="range-value mono" id="addMixValue">0.15</div>
+              </div>
+            </div>
+            <div class="is-hidden" id="addNeutralFields">
+              <div class="neutral-row">
+                <input class="color" type="color" id="addNeutralStartPicker" value="#ffffff" />
+                <input class="input mono" type="text" id="addNeutralStartText" value="#FFFFFF" />
+              </div>
+              <div class="neutral-row">
+                <input class="color" type="color" id="addNeutralEndPicker" value="#000000" />
+                <input class="input mono" type="text" id="addNeutralEndText" value="#000000" />
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label>色卡名称</label>
+            <input class="input" type="text" id="addName" placeholder="例如 theme-color" />
+          </div>
+          <div class="field" id="addMixField">
+            <label>混入颜色</label>
+            <div class="range-label range-label-row">
+              <span class="mono"></span>
+              <label class="check">
+                <input type="checkbox" id="addMixEnabled" />
+                <span>启用</span>
+              </label>
+            </div>
           </div>
         </div>
-        
-        <button id="generateThemeBtn"><i class="ri-brush-line"></i> 生成主题混合</button>
+
+        <div class="dialog-section">
+          <div class="dialog-section-title">预览效果</div>
+          <div id="addPreview"></div>
+        </div>
       </div>
-    </div>
-    <div id="notification" class="notification"></div>
-    <div id="customColorCard" class="color-card" style="display: none;">
-      <h3>自定义颜色</h3>
-      <div class="variants" id="customColorVariants"></div>
-    </div>
-    <div id="linearColorCard" class="color-card" style="display: none;">
-      <h3>线性渐变颜色</h3>
-      <div class="variants" id="linearColorVariants"></div>
-    </div>
-    <div id="colorPalette"></div>
-  </div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="addCancelBtn" type="button">取消</button>
+        <button class="btn" id="addConfirmBtn" type="button">添加</button>
+      </div>
+    </dialog>
 
-  <script type="module">
-    // 修改导入路径，使用相对路径
-    import { getPresetColors, generateLinear, generateGrayLinear, generateMonochromeLinear, generateLinearHSL, harmonizeColor, blendInHct, generateThemeVariants, generateThemePalette, generateInterfaceColorSystem } from './src/index.js';
-    import generate from './src/generate.js';
-    import { extractColorFromFile } from './src/image-color.js';
-    
-    // 通知功能
-    function showNotification(message, type = 'info') {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.className = `notification ${type}`;
-      notification.style.display = 'block';
-      
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => {
-          notification.style.display = 'none';
-          notification.style.opacity = '1';
-        }, 300);
-      }, 2000);
-    }
+    <dialog class="dialog" id="exportDialog">
+      <div class="dialog-head">
+        <div class="dialog-title" id="exportDialogTitle"></div>
+        <button class="icon-btn" id="exportDialogClose" type="button" aria-label="关闭">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <pre class="code mono" id="exportDialogContent"></pre>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="exportDialogCopy" type="button">
+          <i class="ri-file-copy-line"></i>
+          复制
+        </button>
+        <button class="btn" id="exportDialogOk" type="button">关闭</button>
+      </div>
+    </dialog>
 
-    // 自定义颜色生成功能
-    const colorInput = document.getElementById('colorInput');
-    const generateBtn = document.getElementById('generateBtn');
-    const customColorCard = document.getElementById('customColorCard');
-    const customColorVariants = document.getElementById('customColorVariants');
+    <script type="module">
+      import { palette, neutral } from './src/index.js';
 
-    // 生成色卡函数
-    function generateColorPalette(color) {
-      if (!color) return;
+      const toastEl = document.getElementById('toast');
+      const uiThemeToggle = document.getElementById('uiThemeToggle');
+      const uiThemeIcon = document.getElementById('uiThemeIcon');
+      const formatSelect = document.getElementById('formatSelect');
+      const stepsRange = document.getElementById('stepsRange');
+      const stepsValue = document.getElementById('stepsValue');
+      const curveRange = document.getElementById('curveRange');
+      const curveValue = document.getElementById('curveValue');
+      const modeLight = document.getElementById('modeLight');
+      const modeDark = document.getElementById('modeDark');
+      const paletteListEl = document.getElementById('paletteList');
 
-      try {
-        const variants = [];
-        // 生成亮色系列
-        const lightColors = generate(color, { list: true });
-        variants.push({
-          type: '亮色',
-          colors: lightColors
-        });
-        // 生成暗色系列
-        const darkColors = generate(color, { list: true, dark: true });
-        variants.push({
-          type: '暗色',
-          colors: darkColors
-        });
+      const addDialog = document.getElementById('addDialog');
+      const addDialogClose = document.getElementById('addDialogClose');
+      const addModePalette = document.getElementById('addModePalette');
+      const addModeNeutral = document.getElementById('addModeNeutral');
+      const addPaletteFields = document.getElementById('addPaletteFields');
+      const addNeutralFields = document.getElementById('addNeutralFields');
+      const addColorPicker = document.getElementById('addColorPicker');
+      const addColorText = document.getElementById('addColorText');
+      const addMixField = document.getElementById('addMixField');
+      const addMixEnabled = document.getElementById('addMixEnabled');
+      const addMixWrap = document.getElementById('addMixWrap');
+      const addMixPicker = document.getElementById('addMixPicker');
+      const addMixText = document.getElementById('addMixText');
+      const addMixRange = document.getElementById('addMixRange');
+      const addMixValue = document.getElementById('addMixValue');
+      const addNeutralStartPicker = document.getElementById('addNeutralStartPicker');
+      const addNeutralStartText = document.getElementById('addNeutralStartText');
+      const addNeutralEndPicker = document.getElementById('addNeutralEndPicker');
+      const addNeutralEndText = document.getElementById('addNeutralEndText');
+      const addName = document.getElementById('addName');
+      const addPreview = document.getElementById('addPreview');
+      const addCancelBtn = document.getElementById('addCancelBtn');
+      const addConfirmBtn = document.getElementById('addConfirmBtn');
 
-        // 渲染结果
-        customColorVariants.innerHTML = variants.map(({ type, colors }) => 
-          `<div class="variant">
-            <h4>${type}</h4>
-            ${colors.map(color => 
-              `<div class="color-block" style="background:${color}" data-color="${color}">
-                <span>${color}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>`
-            ).join('')}
-          </div>`
-        ).join('');
+      const exportBtn = document.getElementById('exportBtn');
+      const exportDialog = document.getElementById('exportDialog');
+      const exportDialogTitle = document.getElementById('exportDialogTitle');
+      const exportDialogContent = document.getElementById('exportDialogContent');
+      const exportDialogClose = document.getElementById('exportDialogClose');
+      const exportDialogOk = document.getElementById('exportDialogOk');
+      const exportDialogCopy = document.getElementById('exportDialogCopy');
 
-        customColorCard.style.display = 'block';
-        window.scrollTo({ top: customColorCard.offsetTop - 20, behavior: 'smooth' });
-        showNotification('色卡生成成功！', 'success');
-        
-        // 添加颜色复制功能
-        addCopyFunctionality(customColorCard);
-      } catch (error) {
-        showNotification('生成色卡失败: ' + error.message, 'error');
+      let toastTimer = null;
+
+      function toast(message, type = 'info') {
+        toastEl.textContent = message;
+        toastEl.dataset.type = type;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1600);
       }
-    }
 
-    // 从输入框生成色卡
-    generateBtn.addEventListener('click', () => {
-      const color = colorInput.value.trim();
-      if (!color) {
-        showNotification('请输入有效的颜色值', 'error');
-        return;
-      }
-      generateColorPalette(color);
-    });
-    
-    // 支持回车键生成色卡
-    colorInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const color = colorInput.value.trim();
-        if (color) {
-          generateColorPalette(color);
-        } else {
-          showNotification('请输入有效的颜色值', 'error');
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          toast('已复制', 'success');
+        } catch {
+          toast('复制失败，请手动复制', 'error');
         }
       }
-    });
-    
-    // 从图片提取颜色并生成色卡
-    const imageInput = document.getElementById('imageInput');
-    const extractBtn = document.getElementById('extractBtn');
-    
-    // 显示选择的文件名
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files[0];
-      if (file) {
-        const label = document.querySelector('label[for="imageInput"]');
-        label.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
-        label.classList.add('file-selected');
-      }
-    });
-    
-    extractBtn.addEventListener('click', async () => {
-      const file = imageInput.files[0];
-      if (!file) {
-        showNotification('请选择图片文件', 'error');
-        return;
-      }
-      
-      try {
-        extractBtn.disabled = true;
-        extractBtn.innerHTML = '<i class="ri-loader-line ri-spin"></i> 提取中...';
-        showNotification('正在从图片提取颜色...', 'info');
-        
-        // 提取颜色
-        const color = await extractColorFromFile(file);
-        
-        // 更新输入框的值
-        colorInput.value = color;
-        
-        // 生成色卡
-        generateColorPalette(color);
-      } catch (error) {
-        showNotification('提取颜色失败: ' + error.message, 'error');
-      } finally {
-        extractBtn.disabled = false;
-        extractBtn.innerHTML = '<i class="ri-image-line"></i> 从图片提取颜色';
-      }
-    });
 
-    // 线性颜色生成功能
-    const startColorInput = document.getElementById('startColorInput');
-    const endColorInput = document.getElementById('endColorInput');
-    const linearSteps = document.getElementById('linearSteps');
-    const generateLinearBtn = document.getElementById('generateLinearBtn');
-    const linearPreset = document.getElementById('linearPreset');
-    const presetColorInput = document.getElementById('presetColorInput');
-    const generatePresetBtn = document.getElementById('generatePresetBtn');
-    const linearColorCard = document.getElementById('linearColorCard');
-    const linearColorVariants = document.getElementById('linearColorVariants');
+      function normalizeColor(input) {
+        return String(input || '').trim();
+      }
 
-    // 生成线性渐变色卡函数
-    function generateLinearColorPalette(colors, title) {
-      if (!colors || colors.length === 0) return;
+      function getSteps() {
+        return Math.max(1, Math.min(24, Number(stepsRange.value) || 10));
+      }
 
-      try {
-        // 渲染结果
-        linearColorVariants.innerHTML = `
-          <div class="variant">
-            <h4>${title}</h4>
-            ${colors.map(color => 
-              `<div class="color-block" style="background:${color}" data-color="${color}">
-                <span>${color}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>`
-            ).join('')}
+      function getFormat() {
+        return formatSelect.value;
+      }
+
+      function getCurveGamma() {
+        return Math.max(0.1, Math.min(5, Number(curveRange.value) || 1));
+      }
+
+      function getMode() {
+        return modeDark.classList.contains('is-active') ? 'dark' : 'light';
+      }
+
+      function safeGenerate(color, opts) {
+        try {
+          return palette.generate(color, opts);
+        } catch (e) {
+          toast(e?.message || '生成失败', 'error');
+          return null;
+        }
+      }
+
+      function safeNeutral(startGray, endGray, opts) {
+        try {
+          return neutral.generate(startGray, endGray, opts);
+        } catch (e) {
+          toast(e?.message || '生成失败', 'error');
+          return null;
+        }
+      }
+
+      function stripHtml(title, colors) {
+        const swatches = colors
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="strip-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="strip-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="strip">
+            <div class="strip-head">
+              <div class="strip-title">${title}</div>
+              <div class="strip-meta mono">${colors.length} steps</div>
+            </div>
+            <div class="strip-scroll">
+              <div class="strip-row" style="grid-template-columns: repeat(${colors.length}, minmax(24px, 1fr));">
+                ${swatches}
+              </div>
+            </div>
           </div>
         `;
-
-        linearColorCard.style.display = 'block';
-        window.scrollTo({ top: linearColorCard.offsetTop - 20, behavior: 'smooth' });
-        showNotification('线性渐变色卡生成成功！', 'success');
-        
-        // 添加颜色复制功能
-        addCopyFunctionality(linearColorCard);
-      } catch (error) {
-        showNotification('生成线性渐变色卡失败: ' + error.message, 'error');
       }
-    }
 
-    // 基础线性渐变生成
-    generateLinearBtn.addEventListener('click', () => {
-      const startColor = startColorInput.value.trim();
-      const endColor = endColorInput.value.trim();
-      const steps = parseInt(linearSteps.value);
-      
-      if (!startColor || !endColor) {
-        showNotification('请输入起始颜色和结束颜色', 'error');
-        return;
-      }
-      
-      try {
-        const colors = generateLinear(startColor, endColor, { steps });
-        generateLinearColorPalette(colors, `线性渐变 (${startColor} → ${endColor})`);
-      } catch (error) {
-        showNotification('生成线性渐变失败: ' + error.message, 'error');
-      }
-    });
+      function paletteItemHtml(item, colors) {
+        const seed = item.color.toUpperCase();
+        const len = colors.light.length;
+        const swatches = colors.light
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+        const swatchesDark = colors.dark
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
 
-    // 预设渐变生成
-    generatePresetBtn.addEventListener('click', () => {
-      const preset = linearPreset.value;
-      const baseColor = presetColorInput.value.trim();
-      const steps = parseInt(linearSteps.value);
-      
-      try {
-        let colors, title;
-        
-        switch (preset) {
-          case 'gray':
-            colors = generateGrayLinear({ steps });
-            title = '灰色系渐变';
-            break;
-          case 'monochrome':
-            if (!baseColor) {
-              showNotification('请输入基础颜色', 'error');
-              return;
-            }
-            colors = generateMonochromeLinear(baseColor, { steps });
-            title = `单色调渐变 (${baseColor})`;
-            break;
-          case 'hsl':
-            if (!baseColor) {
-              showNotification('请输入基础颜色', 'error');
-              return;
-            }
-            // 为HSL演示，生成一个色相环渐变
-            const hslEndColor = baseColor; // 可以改为不同的颜色
-            colors = generateLinearHSL(baseColor, hslEndColor, { steps });
-            title = `HSL空间渐变 (${baseColor})`;
-            break;
-          default:
-            showNotification('未知的预设类型', 'error');
+        return `
+          <div class="palette-item" data-id="${item.id}">
+            <div class="palette-item-head">
+              <div class="palette-seed" style="background:${seed}"></div>
+              <div class="palette-meta">
+                <div class="palette-name">${item.name}</div>
+                <div class="palette-hex mono">${seed}</div>
+              </div>
+              <button class="icon-btn icon-btn-ghost palette-more" type="button" data-action="remove" aria-label="移除">
+                <i class="ri-delete-bin-6-line"></i>
+              </button>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatches}
+              </div>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatchesDark}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function neutralItemHtml(config, colors) {
+        const len = colors.light.length;
+        const swatches = colors.light
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+        const swatchesDark = colors.dark
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="palette-item palette-item-neutral" data-id="${config.id}">
+            <div class="palette-item-head">
+              <div class="palette-seed" style="background:${config.start}"></div>
+              <div class="palette-seed" style="background:${config.end}"></div>
+              <div class="palette-meta">
+                <div class="palette-name">${config.name}</div>
+                <div class="palette-hex mono">${config.start.toUpperCase()} → ${config.end.toUpperCase()}</div>
+              </div>
+              <button class="icon-btn icon-btn-ghost palette-more" type="button" data-action="remove" aria-label="移除">
+                <i class="ri-delete-bin-6-line"></i>
+              </button>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatches}
+              </div>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatchesDark}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function exportPayload() {
+        const steps = getSteps();
+        const format = getFormat();
+        const curveGamma = getCurveGamma();
+        const payload = {};
+
+        getItems().forEach((item) => {
+          if (item.type === 'neutral') {
+            const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma });
+            const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma });
+            if (!light || !dark) return;
+            payload[item.name] = { type: 'neutral', start: item.start, end: item.end, steps, format, curveGamma, light, dark };
             return;
-        }
-        
-        generateLinearColorPalette(colors, title);
-      } catch (error) {
-        showNotification('生成预设渐变失败: ' + error.message, 'error');
-      }
-    });
-
-    // 支持回车键生成线性渐变
-    [startColorInput, endColorInput].forEach(input => {
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          generateLinearBtn.click();
-        }
-      });
-    });
-
-    presetColorInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        generatePresetBtn.click();
-      }
-    });
-
-    // 主题混合功能
-    const themeColorInput = document.getElementById('themeColorInput');
-    const targetColorInput = document.getElementById('targetColorInput');
-    const blendMode = document.getElementById('blendMode');
-    const blendRatio = document.getElementById('blendRatio');
-    const interfaceSystemConfig = document.getElementById('interfaceSystemConfig');
-    const successColor = document.getElementById('successColor');
-    const warningColor = document.getElementById('warningColor');
-    const errorColor = document.getElementById('errorColor');
-    const infoColor = document.getElementById('infoColor');
-    
-    // 监听混合模式变化，显示/隐藏界面色彩系统配置
-    blendMode.addEventListener('change', () => {
-      if (blendMode.value === 'interface-system') {
-        interfaceSystemConfig.style.display = 'block';
-      } else {
-        interfaceSystemConfig.style.display = 'none';
-      }
-    });
-    const blendRatioValue = document.getElementById('blendRatioValue');
-    const generateThemeBtn = document.getElementById('generateThemeBtn');
-
-    // 更新混合比例显示
-    blendRatio.addEventListener('input', () => {
-      const value = Math.round(parseFloat(blendRatio.value) * 100);
-      blendRatioValue.textContent = value + '%';
-    });
-
-    // 生成主题混合色板
-    function generateThemeBlendPalette(result, title) {
-      const customColorCard = document.getElementById('customColorCard');
-      const customColorVariants = document.getElementById('customColorVariants');
-      
-      if (Array.isArray(result)) {
-        // 处理数组结果（变体或混合结果）
-        customColorVariants.innerHTML = `
-          <div class="variant">
-            <h4>${title}</h4>
-            ${result.map(color => 
-              `<div class="color-block" style="background:${color}" data-color="${color}">
-                <span>${color}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>`
-            ).join('')}
-          </div>
-        `;
-      } else if (typeof result === 'object') {
-        // 处理对象结果（完整色板）
-        let html = '';
-        
-        // 检查是否是单个主题色（字符串）而不是界面色彩系统的主题色对象
-        if (result.theme && typeof result.theme === 'string') {
-          html += `
-            <div class="variant">
-              <h4>主题色</h4>
-              <div class="color-grid">
-                <div class="color-block" style="background:${result.theme}" data-color="${result.theme}">
-                  <span>${result.theme}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-        
-        if (result.variants && result.variants.length > 0) {
-          html += `
-            <div class="variant">
-              <h4>主题变体</h4>
-              <div class="color-grid">
-                ${result.variants.map(color => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        if (result.semantic) {
-          html += `
-            <div class="variant">
-              <h4>语义色彩</h4>
-              <div class="color-grid">
-                ${Object.entries(result.semantic).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        // result.ui 已经不再使用，界面色彩系统使用 controls, semantic, theme 三个部分
-        
-        // 处理界面色彩系统的结果
-        if (result.controls) {
-          html += `
-            <div class="variant">
-              <h4>基础控件颜色 (灰色系1-12)</h4>
-              <div class="color-grid">
-                ${Object.entries(result.controls).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        // 检查是否是界面色彩系统的语义色（包含多个颜色变体）
-        if (result.semantic && typeof result.semantic === 'object' && Object.keys(result.semantic).length > 4) {
-          html += `
-            <div class="variant">
-              <h4>表意色 (success/warning/error/info 各1-10)</h4>
-              <div class="color-grid">
-                ${Object.entries(result.semantic).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        // 检查是否是界面色彩系统的主题色（包含多个颜色变体）
-        if (result.theme && typeof result.theme === 'object' && Object.keys(result.theme).length > 1) {
-          html += `
-            <div class="variant">
-              <h4>主题色 (theme-1 到 theme-10)</h4>
-              <div class="color-grid">
-                ${Object.entries(result.theme).map(([name, color]) => 
-                  `<div class="color-block" style="background:${color}" data-color="${color}">
-                    <span>${name}: ${color}</span>
-                    <div class="color-tooltip">点击复制</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        customColorVariants.innerHTML = html;
-      } else {
-        // 处理单个颜色结果
-        customColorVariants.innerHTML = `
-          <div class="variant">
-            <h4>${title}</h4>
-            <div class="color-grid">
-              <div class="color-block" style="background:${result}" data-color="${result}">
-                <span>${result}</span>
-                <div class="color-tooltip">点击复制</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      customColorCard.querySelector('h3').textContent = title;
-      customColorCard.style.display = 'block';
-      window.scrollTo({ top: customColorCard.offsetTop - 20, behavior: 'smooth' });
-      
-      // 添加颜色复制功能
-      addCopyFunctionality(customColorCard);
-    }
-
-    generateThemeBtn.addEventListener('click', () => {
-      const themeColor = themeColorInput.value.trim();
-      const targetColor = targetColorInput.value.trim();
-      const mode = blendMode.value;
-      const ratio = parseFloat(blendRatio.value);
-      
-      if (!themeColor) {
-        showNotification('请输入主题色', 'error');
-        return;
-      }
-      
-      try {
-        let result, title;
-        
-        switch (mode) {
-          case 'harmonize':
-            if (!targetColor) {
-              showNotification('调和模式需要输入目标色', 'error');
-              return;
-            }
-            result = harmonizeColor(themeColor, targetColor, ratio);
-            title = `调和色彩 (${Math.round(ratio * 100)}%)`;
-            break;
-            
-          case 'blend':
-            if (!targetColor) {
-              showNotification('混合模式需要输入目标色', 'error');
-              return;
-            }
-            result = blendInHct(themeColor, targetColor, ratio);
-            title = `混合色彩 (${Math.round(ratio * 100)}%)`;
-            break;
-            
-          case 'variants':
-            result = generateThemeVariants(themeColor);
-            title = '主题变体';
-            break;
-            
-          case 'palette':
-            result = generateThemePalette(themeColor, {
-              harmonizeRatio: ratio,
-              blendRatio: ratio
-            });
-            title = '完整主题色板';
-            break;
-            
-          case 'interface-system':
-            const baseGray = '#666666'; // 默认基准灰色
-            const isDark = false; // 默认亮色模式
-            
-            // 获取用户自定义的语义色基准色
-            const customSemanticColors = {};
-            if (successColor.value.trim()) customSemanticColors.success = successColor.value.trim();
-            if (warningColor.value.trim()) customSemanticColors.warning = warningColor.value.trim();
-            if (errorColor.value.trim()) customSemanticColors.error = errorColor.value.trim();
-            if (infoColor.value.trim()) customSemanticColors.info = infoColor.value.trim();
-            
-            // 如果用户没有输入任何自定义颜色，使用默认值
-            const semanticColors = Object.keys(customSemanticColors).length > 0 ? {
-              success: '#52c41a',
-              warning: '#faad14', 
-              error: '#ff4d4f',
-              info: '#1890ff',
-              ...customSemanticColors
-            } : undefined;
-            
-            result = generateInterfaceColorSystem(themeColor, {
-              baseGray,
-              isDark,
-              semanticColors
-            });
-            title = '界面色彩系统';
-            break;
-            
-          default:
-            showNotification('未知的混合模式', 'error');
-            return;
-        }
-        
-        generateThemeBlendPalette(result, title);
-        showNotification('主题混合生成成功！', 'success');
-      } catch (error) {
-        showNotification('生成主题混合失败: ' + error.message, 'error');
-      }
-    });
-
-    // 支持回车键生成主题混合
-    [themeColorInput, targetColorInput, successColor, warningColor, errorColor, infoColor].forEach(input => {
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          generateThemeBtn.click();
-        }
-      });
-    });
-
-    // 添加颜色复制功能
-    function addCopyFunctionality(container) {
-      const colorBlocks = container.querySelectorAll('.color-block');
-      colorBlocks.forEach(block => {
-        block.addEventListener('click', async () => {
-          const color = block.dataset.color || block.querySelector('span').textContent;
-          try {
-            await navigator.clipboard.writeText(color);
-            showNotification(`已复制颜色: ${color}`, 'success');
-          } catch (err) {
-            showNotification('复制失败，请手动复制', 'error');
           }
-        });
-      });
-    }
-    
-    const palette = document.getElementById('colorPalette');
-    const colors = getPresetColors();
 
-    Object.entries(colors).forEach(([name, variants]) => {
-      const colorCard = document.createElement('div');
-      colorCard.className = 'color-card';
-      
-      colorCard.innerHTML = `
-        <h3>${name}</h3>
-        <div class="variants">
-          ${Object.entries(variants).filter(([type]) => type !== 'primary').map(([type, colorset]) => 
-            `<div class="variant">
-              <h4>${type}</h4>
-              ${colorset.map(color => 
-                `<div class="color-block" style="background:${color}" data-color="${color}">
-                  <span>${color}</span>
-                  <div class="color-tooltip">点击复制</div>
-                </div>`
-              ).join('')}
-            </div>`
-          ).join('')}
-        </div>
-      `;
-      
-      palette.appendChild(colorCard);
-    });
-    
-    // 为所有预设色卡添加复制功能
-    addCopyFunctionality(palette);
-    
-    // 页面加载完成后显示欢迎信息
-    window.addEventListener('load', () => {
-      showNotification('欢迎使用 Aviala Design 色卡系统', 'success');
-    });
-  </script>
-</body>
+          const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio });
+          const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio });
+          if (!light || !dark) return;
+          payload[item.name] = { type: 'palette', seed: item.color, steps, format, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio, light, dark };
+        });
+
+        return payload;
+      }
+
+      function exportCss(payload) {
+        const lines = [];
+        lines.push(':root {');
+        Object.entries(payload).forEach(([name, v]) => {
+          v.light.forEach((c, idx) => lines.push(`  --${name}-light-${idx + 1}: ${c};`));
+          if (v.dark) v.dark.forEach((c, idx) => lines.push(`  --${name}-dark-${idx + 1}: ${c};`));
+        });
+        lines.push('}');
+        return lines.join('\n');
+      }
+
+      function wireCopy(container) {
+        container.querySelectorAll('[data-color]').forEach((el) => {
+          el.addEventListener('click', () => copyText(el.dataset.color));
+        });
+      }
+
+      const storageKey = 'aviala-color-playground-items';
+
+      function getDefaultItems() {
+        return [
+          { id: 'theme-color', name: 'theme-color', type: 'palette', color: '#F2502C' },
+          { id: 'green-leaf-green', name: 'green-leaf-green', type: 'palette', color: '#0D9E64' },
+        ];
+      }
+
+      function getItems() {
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (!raw) return getDefaultItems();
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed) || parsed.length === 0) return getDefaultItems();
+          const normalized = parsed
+            .map((x) => {
+              const id = typeof x?.id === 'string' ? x.id : null;
+              const name = typeof x?.name === 'string' ? x.name : null;
+              if (!id || !name) return null;
+
+              if (x?.type === 'neutral' || (typeof x?.start === 'string' && typeof x?.end === 'string')) {
+                const start = typeof x?.start === 'string' ? x.start : '#ffffff';
+                const end = typeof x?.end === 'string' ? x.end : '#000000';
+                return { id, name, type: 'neutral', start, end };
+              }
+
+              if (typeof x?.color === 'string') {
+                const mixColor = typeof x?.mixColor === 'string' ? x.mixColor : '';
+                const mixRatio = typeof x?.mixRatio === 'number' ? x.mixRatio : Number(x?.mixRatio) || 0;
+                return { id, name, type: 'palette', color: x.color, mixColor, mixRatio };
+              }
+
+              return null;
+            })
+            .filter(Boolean);
+          if (normalized.length === 0) return getDefaultItems();
+          return normalized;
+        } catch {
+          return getDefaultItems();
+        }
+      }
+
+      function setItems(items) {
+        localStorage.setItem(storageKey, JSON.stringify(items));
+      }
+
+      function renderList() {
+        const steps = getSteps();
+        const format = getFormat();
+        const curveGamma = getCurveGamma();
+        const html = getItems()
+          .map((item) => {
+            if (item.type === 'neutral') {
+              const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma });
+              const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma });
+              if (!light || !dark) return '';
+              return neutralItemHtml(item, { light, dark });
+            }
+
+            const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio });
+            const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio });
+            if (!light || !dark) return '';
+            return paletteItemHtml(item, { light, dark });
+          })
+          .filter(Boolean)
+          .join('');
+
+        paletteListEl.innerHTML = html;
+        wireCopy(paletteListEl);
+
+        paletteListEl.querySelectorAll('[data-action="remove"]').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            const itemEl = e.currentTarget.closest('.palette-item');
+            const id = itemEl?.dataset?.id;
+            if (!id) return;
+            setItems(getItems().filter((x) => x.id !== id));
+            renderAll();
+          });
+        });
+
+        paletteListEl.querySelectorAll('.palette-item').forEach((el) => {
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('[data-action="remove"]')) return;
+            paletteListEl.querySelectorAll('.palette-item').forEach((n) => n.classList.remove('is-active'));
+            el.classList.add('is-active');
+          });
+        });
+      }
+
+      function openExportDialog(title, content) {
+        exportDialogTitle.textContent = title;
+        exportDialogContent.textContent = content;
+        exportDialog.showModal();
+      }
+
+      function closeExportDialog() {
+        exportDialog.close();
+      }
+
+      function applyUiTheme(theme) {
+        const t = theme === 'dark' ? 'dark' : 'light';
+        document.documentElement.classList.toggle('dark', t === 'dark');
+        localStorage.setItem('ui-theme', t);
+        uiThemeIcon.className = t === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+      }
+
+      function syncStepsUi() {
+        stepsValue.textContent = String(getSteps());
+      }
+
+      function syncCurveUi() {
+        curveValue.textContent = getCurveGamma().toFixed(2);
+      }
+
+      function renderAll() {
+        syncStepsUi();
+        syncCurveUi();
+        renderList();
+        const first = paletteListEl.querySelector('.palette-item');
+        if (first) first.classList.add('is-active');
+      }
+
+      function openAddDialog() {
+        addName.value = '';
+        addMixEnabled.checked = false;
+        syncMixUi();
+        setAddMode('palette');
+        addDialog.showModal();
+        renderAddPreview();
+      }
+
+      function closeAddDialog() {
+        addDialog.close();
+      }
+
+      function renderAddPreview() {
+        const steps = getSteps();
+        const format = getFormat();
+        const curveGamma = getCurveGamma();
+        const mode = getAddMode();
+        if (mode === 'neutral') {
+          const start = normalizeColor(addNeutralStartText.value || addNeutralStartPicker.value);
+          const end = normalizeColor(addNeutralEndText.value || addNeutralEndPicker.value);
+          const light = safeNeutral(start, end, { steps, format, includeEnds: true, curveGamma });
+          const dark = safeNeutral(end, start, { steps, format, includeEnds: true, curveGamma });
+          if (!light || !dark) {
+            addPreview.innerHTML = '';
+            return;
+          }
+          addPreview.innerHTML = [stripHtml('Light', light), stripHtml('Dark', dark)].join('');
+          wireCopy(addPreview);
+          return;
+        }
+
+        const mix = getAddMix();
+        const color = normalizeColor(addColorText.value || addColorPicker.value);
+        const light = safeGenerate(color, { list: true, steps, format, curveGamma, dark: false, ...mix });
+        const dark = safeGenerate(color, { list: true, steps, format, curveGamma, dark: true, ...mix });
+        if (!light || !dark) {
+          addPreview.innerHTML = '';
+          return;
+        }
+        addPreview.innerHTML = [stripHtml('Light', light), stripHtml('Dark', dark)].join('');
+        wireCopy(addPreview);
+      }
+
+      document.getElementById('addColorBtn').addEventListener('click', openAddDialog);
+      addDialogClose.addEventListener('click', closeAddDialog);
+      addCancelBtn.addEventListener('click', closeAddDialog);
+      addDialog.addEventListener('click', (e) => {
+        if (e.target === addDialog) closeAddDialog();
+      });
+
+      addColorPicker.addEventListener('input', (e) => {
+        addColorText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addColorText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addColorPicker.value = v;
+        renderAddPreview();
+      });
+
+      function getAddMode() {
+        return addModeNeutral.classList.contains('is-active') ? 'neutral' : 'palette';
+      }
+
+      function setAddMode(next) {
+        const mode = next === 'neutral' ? 'neutral' : 'palette';
+        addModePalette.classList.toggle('is-active', mode === 'palette');
+        addModeNeutral.classList.toggle('is-active', mode === 'neutral');
+        addPaletteFields.classList.toggle('is-hidden', mode !== 'palette');
+        addNeutralFields.classList.toggle('is-hidden', mode !== 'neutral');
+        addMixField.classList.toggle('is-hidden', mode !== 'palette');
+        addMixWrap.classList.toggle('is-hidden', mode !== 'palette' || !addMixEnabled.checked);
+        renderAddPreview();
+      }
+
+      function isGrayscaleHex(hex) {
+        if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return false;
+        const r = hex.slice(1, 3).toLowerCase();
+        const g = hex.slice(3, 5).toLowerCase();
+        const b = hex.slice(5, 7).toLowerCase();
+        return r === g && g === b;
+      }
+
+      addModePalette.addEventListener('click', () => setAddMode('palette'));
+      addModeNeutral.addEventListener('click', () => setAddMode('neutral'));
+
+      function syncMixUi() {
+        addMixValue.textContent = Number(addMixRange.value || 0).toFixed(2);
+        addMixWrap.classList.toggle('is-hidden', !addMixEnabled.checked);
+      }
+
+      function getAddMix() {
+        if (!addMixEnabled.checked) return {};
+        const mixColor = normalizeColor(addMixText.value || addMixPicker.value);
+        if (!/^#[0-9a-fA-F]{6}$/.test(mixColor)) return {};
+        const mixRatio = Math.max(0, Math.min(1, Number(addMixRange.value) || 0));
+        if (!mixRatio) return {};
+        return { mixColor, mixRatio };
+      }
+
+      addMixEnabled.addEventListener('change', () => {
+        syncMixUi();
+        renderAddPreview();
+      });
+      addMixPicker.addEventListener('input', (e) => {
+        addMixText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addMixText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addMixPicker.value = v;
+        renderAddPreview();
+      });
+      addMixRange.addEventListener('input', () => {
+        syncMixUi();
+        renderAddPreview();
+      });
+
+      addNeutralStartPicker.addEventListener('input', (e) => {
+        addNeutralStartText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addNeutralEndPicker.addEventListener('input', (e) => {
+        addNeutralEndText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addNeutralStartText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addNeutralStartPicker.value = v;
+        renderAddPreview();
+      });
+      addNeutralEndText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addNeutralEndPicker.value = v;
+        renderAddPreview();
+      });
+
+      addConfirmBtn.addEventListener('click', () => {
+        const name = String(addName.value || '').trim();
+        if (!name) {
+          toast('请输入色卡名称', 'error');
+          return;
+        }
+        const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-_]/g, '').slice(0, 48) || `color-${Date.now()}`;
+        const next = getItems().filter((x) => x.id !== id);
+        const mode = getAddMode();
+        if (mode === 'neutral') {
+          const start = normalizeColor(addNeutralStartText.value || addNeutralStartPicker.value);
+          const end = normalizeColor(addNeutralEndText.value || addNeutralEndPicker.value);
+          if (!/^#[0-9a-fA-F]{6}$/.test(start) || !/^#[0-9a-fA-F]{6}$/.test(end)) {
+            toast('请输入有效 HEX 颜色', 'error');
+            return;
+          }
+          if (!isGrayscaleHex(start) || !isGrayscaleHex(end)) {
+            toast('中性色仅支持灰阶（R=G=B）', 'error');
+            return;
+          }
+          next.unshift({ id, name, type: 'neutral', start: start.toUpperCase(), end: end.toUpperCase() });
+        } else {
+          const color = normalizeColor(addColorText.value || addColorPicker.value);
+          if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
+            toast('请输入有效 HEX 颜色', 'error');
+            return;
+          }
+          const mix = getAddMix();
+          next.unshift({ id, name, type: 'palette', color: color.toUpperCase(), mixColor: mix.mixColor, mixRatio: mix.mixRatio });
+        }
+        setItems(next);
+        closeAddDialog();
+        renderAll();
+        toast('已添加', 'success');
+      });
+
+      exportDialogClose.addEventListener('click', closeExportDialog);
+      exportDialogOk.addEventListener('click', closeExportDialog);
+      exportDialog.addEventListener('click', (e) => {
+        if (e.target === exportDialog) closeExportDialog();
+      });
+      exportDialogCopy.addEventListener('click', () => copyText(exportDialogContent.textContent || ''));
+
+      exportBtn.addEventListener('click', () => {
+        const payload = exportPayload();
+        openExportDialog('导出（JSON）', JSON.stringify(payload, null, 2));
+      });
+
+      formatSelect.addEventListener('change', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+      stepsRange.addEventListener('input', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+      curveRange.addEventListener('input', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+
+      modeLight.addEventListener('click', () => {
+        modeLight.classList.add('is-active');
+        modeDark.classList.remove('is-active');
+        renderAll();
+      });
+      modeDark.addEventListener('click', () => {
+        modeDark.classList.add('is-active');
+        modeLight.classList.remove('is-active');
+        renderAll();
+      });
+
+      uiThemeToggle.addEventListener('click', () => applyUiTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark'));
+
+      applyUiTheme(localStorage.getItem('ui-theme') || 'light');
+      renderAll();
+    </script>
+  </body>
 </html>
