@@ -24,8 +24,12 @@ jobs:
       - name: Repair Rollup native binary (if missing)
         run: |
           node -e "require('@rollup/rollup-linux-x64-gnu')" && exit 0
-          ROLLUP_VERSION=$(node -p "require('rollup/package.json').version")
+          ROLLUP_VERSION=$(node -p "require('./package-lock.json')?.packages?.['node_modules/rollup']?.version || require('./package-lock.json')?.dependencies?.rollup?.version || ''")
+          if [ -z \"$ROLLUP_VERSION\" ]; then
+            ROLLUP_VERSION=$(node -e "const fs=require('fs');const p='node_modules/rollup/package.json';console.log(fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')).version:'')")
+          fi
           npm i --no-save "@rollup/rollup-linux-x64-gnu@${ROLLUP_VERSION}"
+          node -e "require('@rollup/rollup-linux-x64-gnu')"
       - run: npm test
       - name: Verify tag matches package version
         run: |
