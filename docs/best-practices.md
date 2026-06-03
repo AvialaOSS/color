@@ -2,6 +2,8 @@
 
 本指南提供了使用 Aviala Design Color 库的最佳实践，帮助您构建更好的颜色系统和用户体验。
 
+本版本对外保留 `palette.generate`（色板）与 `neutral.generate`（灰阶色阶）。如需了解被移除能力与迁移建议，请参考 [迁移指南](./migration.md)。
+
 ## 目录
 
 - [颜色系统设计](#颜色系统设计)
@@ -19,7 +21,7 @@
 ### 1. 建立颜色层次结构
 
 ```javascript
-import { generate, getPresetColors } from '@aviala-design/color';
+import { palette } from '@aviala-design/color';
 
 // 推荐：建立清晰的颜色层次
 const colorSystem = {
@@ -37,8 +39,11 @@ const colorSystem = {
     info: '#165DFF'
   },
   
-  // 中性色 - 文本、背景、边框
-  neutral: getPresetColors().gray,
+  // 中性色 - 文本、背景、边框（建议在你的项目中维护）
+  neutral: {
+    light: ['#f7f8fa', '#f2f3f5', '#e5e6eb', '#c9cdd4', '#a9aeb8', '#86909c', '#6b7785', '#4e5969', '#272e3b', '#1d2129'],
+    dark: ['#17171a', '#2e2e30', '#484849', '#5f5f60', '#78787a', '#929293', '#ababac', '#c5c5c5', '#dfdfdf', '#f6f6f6']
+  },
   
   // 扩展色 - 装饰和强调
   extended: {
@@ -52,8 +57,8 @@ const colorSystem = {
 Object.keys(colorSystem.functional).forEach(key => {
   const baseColor = colorSystem.functional[key];
   colorSystem.functional[key] = {
-    light: generate(baseColor, { list: true }),
-    dark: generate(baseColor, { list: true, dark: true }),
+    light: palette.generate(baseColor, { list: true }),
+    dark: palette.generate(baseColor, { list: true, dark: true }),
     primary: baseColor
   };
 });
@@ -120,12 +125,12 @@ const colorAllocation = {
 ### 1. 对比度检查
 
 ```javascript
-import { getRgbStr } from '@aviala-design/color';
+import Color from 'color';
 
 // 对比度计算函数
 function calculateContrast(color1, color2) {
-  const rgb1 = getRgbStr(color1).split(',').map(Number);
-  const rgb2 = getRgbStr(color2).split(',').map(Number);
+  const rgb1 = Color(color1).rgb().array();
+  const rgb2 = Color(color2).rgb().array();
   
   const luminance1 = calculateLuminance(rgb1);
   const luminance2 = calculateLuminance(rgb2);
@@ -281,8 +286,7 @@ function cached(fn) {
 }
 
 // 使用缓存的颜色生成函数
-const cachedGenerate = cached(generate);
-const cachedGenerateLinear = cached(generateLinear);
+const cachedGenerate = cached(palette.generate);
 ```
 
 ### 2. 批量处理
@@ -292,7 +296,7 @@ const cachedGenerateLinear = cached(generateLinear);
 function generateBatchPalettes(colors, options = {}) {
   return colors.reduce((acc, color) => {
     try {
-      acc[color] = generate(color, options);
+      acc[color] = palette.generate(color, options);
     } catch (error) {
       console.warn(`颜色 ${color} 生成失败:`, error.message);
       acc[color] = null;
@@ -305,7 +309,7 @@ function generateBatchPalettes(colors, options = {}) {
 async function generateBatchPalettesAsync(colors, options = {}) {
   const results = await Promise.allSettled(
     colors.map(color => 
-      Promise.resolve().then(() => generate(color, options))
+      Promise.resolve().then(() => palette.generate(color, options))
     )
   );
   
@@ -329,14 +333,14 @@ class LazyColorPalette {
   
   get light() {
     if (!this._lightPalette) {
-      this._lightPalette = generate(this.baseColor, { list: true });
+      this._lightPalette = palette.generate(this.baseColor, { list: true });
     }
     return this._lightPalette;
   }
   
   get dark() {
     if (!this._darkPalette) {
-      this._darkPalette = generate(this.baseColor, { list: true, dark: true });
+      this._darkPalette = palette.generate(this.baseColor, { list: true, dark: true });
     }
     return this._darkPalette;
   }
@@ -380,7 +384,7 @@ class ThemeSystem {
       if (typeof value === 'string' && value.startsWith('#')) {
         // 为颜色值生成完整色盘
         processedTheme[key] = {
-          palette: generate(value, { list: true }),
+          palette: palette.generate(value, { list: true }),
           primary: value
         };
       } else {
@@ -516,7 +520,7 @@ const brandTheme = extendTheme(baseTheme, {
 使用主题混合功能创建一致性更强的颜色系统：
 
 ```javascript
-import { generateThemePalette, harmonizeColor } from '@aviala-design/color';
+import { generateThemePalette, harmonizeColor } from 'your-theme-solution';
 
 // 品牌色主题混合
 class BrandThemeSystem {
@@ -646,7 +650,7 @@ function setupResponsiveTheme(brandColor) {
 ### 1. 混合比例选择策略
 
 ```javascript
-import { generateThemePalette } from '@aviala-design/color';
+import { generateThemePalette } from 'your-theme-solution';
 
 // 不同场景的混合比例建议
 const blendingStrategies = {
@@ -928,7 +932,7 @@ class ThemeValidator {
 ### 1. 图表配色方案
 
 ```javascript
-import { generateLinear, getPresetColors } from '@aviala-design/color';
+import { generateLinear } from 'your-gradient-lib';
 
 // 数据可视化配色工具
 class VisualizationColors {
@@ -971,7 +975,7 @@ class VisualizationColors {
   
   // 连续数据配色
   getSequentialColors(baseColor, steps = 9) {
-    const lightColor = generate(baseColor, { index: 1 });
+    const lightColor = palette.generate(baseColor, { index: 1 });
     return generateLinear(lightColor, baseColor, { steps });
   }
   
@@ -1031,7 +1035,7 @@ function getAccessibleChartColors(count) {
   const accessibleColors = colors.slice(0, count).map((color, index) => {
     if (index % 2 === 1) {
       // 为奇数索引的颜色增加对比度
-      return generate(color, { index: 8 });
+        return palette.generate(color, { index: 8 });
     }
     return color;
   });
@@ -1306,13 +1310,13 @@ describe('颜色系统测试', () => {
   });
   
   test('色盘生成应该返回正确数量的颜色', () => {
-    const palette = generate('#165DFF', { list: true });
-    expect(palette).toHaveLength(10);
+    const list = palette.generate('#165DFF', { list: true });
+    expect(list).toHaveLength(10);
   });
   
   test('暗色模式色盘应该与亮色模式不同', () => {
-    const lightPalette = generate('#165DFF', { list: true });
-    const darkPalette = generate('#165DFF', { list: true, dark: true });
+    const lightPalette = palette.generate('#165DFF', { list: true });
+    const darkPalette = palette.generate('#165DFF', { list: true, dark: true });
     
     expect(lightPalette).not.toEqual(darkPalette);
   });
@@ -1350,13 +1354,13 @@ function getAllColors(tokens) {
 ```javascript
 // 品牌色评估工具
 function evaluateBrandColor(color) {
-  const palette = generate(color, { list: true });
+  const list = palette.generate(color, { list: true });
   
   return {
     color,
-    palette,
+    palette: list,
     accessibility: validateColorAccessibility(color, '#FFFFFF'),
-    versatility: palette.length === 10,
+    versatility: list.length === 10,
     recommendation: getColorRecommendation(color)
   };
 }

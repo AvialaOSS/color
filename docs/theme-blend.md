@@ -1,34 +1,21 @@
-# 主题混合功能文档
+# 主题混合（已移除）
 
-主题混合功能基于 CIE Lab 颜色空间实现的 HCT (Hue, Chroma, Tone) 色彩空间，提供了强大的颜色调和与混合能力，特别适用于品牌色系统和主题定制。
+主题混合/界面色彩系统（Theme）能力已从本库移除。
 
-> **💡 提示**：主题混合功能基于感知均匀的 Lab 色彩空间，能够生成更自然、协调的颜色组合，特别适合构建一致性强的设计系统。
+迁移建议与替代方案请参考 [迁移指南](./migration.md)。
+
+## 历史内容（已移除能力的旧文档）
 
 ## 功能概述
 
 ### 核心特性
 
-- **CIE Lab 色彩空间**：基于人眼感知的色彩空间，提供准确的颜色转换
-- **多种混合模式**：支持 Lab 空间混合、HCT 线性混合、仅色相混合
+- **HCT 色彩空间**：基于人眼感知的色彩空间，提供更自然的颜色过渡
+- **智能色彩调和**：自动生成协调的颜色搭配，保持品牌一致性
 - **完整色彩系统**：一键生成包含控件色、语义色、主题色的完整界面色彩系统
 - **暗色模式支持**：自动适配亮色和暗色两种模式
-- **颜色和谐工具**：提供互补色、三角配色、类似色等配色方案
-- **高度可定制**：支持自定义语义色、混合比例、亮度范围等参数
-
-### 新增功能 (v0.4.1)
-
-- **浅灰度颜色生成**：`generateNeutralColors` - 生成用于背景、卡片、边框的浅灰度色阶
-- **完整界面色彩系统**：`generateInterfaceColorSystem` 现在返回包含 `neutrals` 的完整结构
-- **固定端点亮度**：语义色和主题色默认使用固定端点（minLightness: 8, maxLightness: 97）
-
-### 新增功能 (v0.4.0)
-
-- **保持色度模式**：`preserveChroma` - 在 Lab 空间保持感知色度，避免生成灰蒙蒙的颜色
-- **颜色差异计算**：`colorDifference` - 计算两色的感知差异 (Delta E)
-- **颜色调整**：`adjustTone`、`adjustChroma`、`adjustHue`、`rotateHue`
-- **配色方案**：`getComplementary`、`getTriadic`、`getSplitComplementary`、`getAnalogous`
-- **混合模式**：`blendInHct` 支持 `lab`、`hct`、`hue-only` 三种模式
-- **精确控制**：支持自定义色阶数量、亮度范围（minLightness/maxLightness）
+- **无障碍友好**：确保生成的颜色符合对比度要求
+- **高度可定制**：支持自定义语义色、混合比例等参数
 
 ### 适用场景
 
@@ -36,7 +23,6 @@
 - **品牌色彩定制**：基于品牌主色生成完整的色彩体系
 - **主题切换**：支持多主题和暗色模式的应用
 - **界面色彩优化**：提升界面色彩的协调性和视觉层次
-- **配色方案生成**：快速生成互补色、类似色等配色方案
 
 ## 快速开始
 
@@ -53,7 +39,6 @@ console.log(colorSystem);
 输出:
 {
   controls: { 'gray-1': '#f8f9fa', 'gray-2': '#f1f3f4', ... },
-  neutrals: { 'neutral-1': '#ffffff', 'neutral-2': '#fafbfc', ... },  // 浅灰度色阶
   semantic: { 'success-1': '#f6ffed', 'error-1': '#fff2f0', ... },
   theme: { 'theme-1': '#f0f5ff', 'theme-6': '#165DFF', ... }
 }
@@ -63,95 +48,54 @@ console.log(colorSystem);
 ### 自定义配置
 
 ```javascript
-// 完整自定义配置
+// 自定义语义色和混合比例
 const customSystem = generateInterfaceColorSystem('#165DFF', {
-  isDark: false,
-  baseGray: '#666666',
-  // 控件色配置
-  controlBlendRatio: 0.08,
-  controlSteps: 12,
-  controlMinLightness: 10,
-  controlMaxLightness: 98,
-  // 语义色配置
-  semanticBlendRatio: 0.12,
-  semanticSteps: 10,
-  semanticPreserveChroma: true,  // 保持鲜艳色度（默认 true）
   semanticColors: {
-    success: '#52c41a',
-    warning: '#faad14',
-    error: '#ff4d4f',
-    info: '#1890ff'
+    success: '#00b96b',
+    error: '#ff7875'
   },
-  // 主题色配置
-  themeSteps: 10,
-  themeMinLightness: 15,
-  themeMaxLightness: 95,
-  themePreserveChroma: true      // 保持鲜艳色度（默认 true）
+  semanticBlendRatio: 0.15
 });
-```
-
-### 配色方案生成
-
-```javascript
-import { getComplementary, getTriadic, getAnalogous } from '@aviala-design/color';
-
-// 获取互补色
-const complement = getComplementary('#FF0000'); // 青色
-
-// 获取三角配色
-const [c1, c2, c3] = getTriadic('#FF0000');
-
-// 获取类似色
-const analogous = getAnalogous('#FF0000', 5, 15); // 5 个颜色，间隔 15°
 ```
 
 ## API 说明
 
 ### 1. rgbToHct - RGB转HCT
 
-将RGB颜色转换为HCT色彩空间（基于 CIE Lab 实现）。
+将RGB颜色转换为HCT色彩空间。
 
 ```javascript
 import { rgbToHct } from '@aviala-design/color';
 
-const hct = rgbToHct('#3491FA');
-console.log(hct); // { h: 278.7, c: 60.7, t: 59.8 }
-// h: 色相 (0-360)，从 Lab 的 a*/b* 计算
-// c: 色度，sqrt(a² + b²)
-// t: 明度，即 L* 值 (0-100)
+const hct = rgbToHct('#165DFF');
+console.log(hct); // { h: 225, c: 87, t: 64 }
 ```
 
 ### 2. hctToRgb - HCT转RGB
 
-将HCT色彩空间转换为RGB颜色，支持色域映射。
+将HCT色彩空间转换为RGB颜色。
 
 ```javascript
 import { hctToRgb } from '@aviala-design/color';
 
-const rgb = hctToRgb({ h: 278.7, c: 60.7, t: 59.8 });
-console.log(rgb); // '#3491fa'
-
-// 使用色域映射选项
-const rgb2 = hctToRgb({ h: 120, c: 150, t: 50 }, { 
-  gamutMapping: 'reduce-chroma' // 默认，逐步减少色度直到在色域内
-});
+const rgb = hctToRgb({ h: 225, c: 87, t: 64 });
+console.log(rgb); // '#165DFF'
 ```
 
-### 3. blendInHct - 颜色混合（支持多种模式）
+### 3. blendInHct - HCT空间混合
 
-在色彩空间中混合两种颜色，支持三种混合模式。
+在HCT色彩空间中混合两种颜色。
 
 ```javascript
 import { blendInHct } from '@aviala-design/color';
 
-// Lab 空间混合（默认，最感知一致）
-const labBlend = blendInHct('#FF0000', '#0000FF', 0.5);
+// 混合主题色和目标色
+const blended = blendInHct('#165DFF', '#F53F3F', 0.5);
+console.log(blended); // 混合后的颜色
 
-// HCT 线性混合（保持色相连续性）
-const hctBlend = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hct' });
-
-// 仅混合色相（保持第一个颜色的色度和明度）
-const hueBlend = blendInHct('#FF0000', '#0000FF', 0.5, { mode: 'hue-only' });
+// 不同混合比例
+const light = blendInHct('#165DFF', '#F53F3F', 0.2); // 更偏向主题色
+const heavy = blendInHct('#165DFF', '#F53F3F', 0.8); // 更偏向目标色
 ```
 
 ### 4. harmonizeColor - 颜色调和
@@ -272,64 +216,11 @@ const customSemantic = generateSemanticColors('#165DFF', {
     purple: '#722ed1'      // 自定义颜色
   },
   blendRatio: 0.12,
-  isDark: false,
-  preserveChroma: true     // 保持鲜艳色度（默认为 true）
-});
-
-// 如果需要传统的 HSL 渐变（可能显得灰蒙蒙）
-const mutedSemantic = generateSemanticColors('#165DFF', {
-  preserveChroma: false    // 关闭色度保持
+  isDark: false
 });
 ```
 
-### 8. generateNeutralColors - 浅灰度颜色生成 (新增)
-
-生成用于页面背景、卡片背景、边框等的浅灰度色阶（neutral-1 到 neutral-6）。
-
-```javascript
-import { generateNeutralColors } from '@aviala-design/color';
-
-// 基础用法 - 生成带主题色调的浅灰度
-const neutralColors = generateNeutralColors('#165DFF');
-console.log(neutralColors);
-/*
-输出:
-{
-  'neutral-1': '#ffffff',   // 页面背景（最浅，接近白色）
-  'neutral-2': '#fafbfc',   // 卡片背景、输入框背景
-  'neutral-3': '#f5f6f8',   // hover 状态背景
-  'neutral-4': '#f0f1f4',   // 分割线、表格斑马纹
-  'neutral-5': '#ebedf0',   // 边框颜色
-  'neutral-6': '#e6e8ec'    // 禁用状态背景（最深的浅灰）
-}
-*/
-
-// 自定义配置
-const customNeutrals = generateNeutralColors('#165DFF', {
-  steps: 8,                 // 生成 8 级灰度（默认 6）
-  minLightness: 88,         // 最深灰的亮度（默认 92）
-  maxLightness: 100,        // 最浅灰的亮度（默认 100）
-  blendRatio: 0.05          // 主题色混合比例（默认 0.03）
-});
-
-// 暗色模式
-const darkNeutrals = generateNeutralColors('#165DFF', {
-  isDark: true  // 暗色模式下生成深色背景色阶
-});
-```
-
-**使用场景：**
-
-| 级别 | 推荐用途 |
-|------|----------|
-| `neutral-1` | 页面背景（最浅，接近白色）|
-| `neutral-2` | 卡片背景、输入框背景 |
-| `neutral-3` | hover 状态背景 |
-| `neutral-4` | 分割线、表格斑马纹 |
-| `neutral-5` | 边框颜色 |
-| `neutral-6` | 禁用状态背景（最深的浅灰）|
-
-### 9. generateThemeColors - 主题色生成
+### 8. generateThemeColors - 主题色生成
 
 生成主题色（1-10），提供主题色的完整明度变化。
 
@@ -359,13 +250,6 @@ console.log(themeColors);
 const darkThemeColors = generateThemeColors('#165DFF', {
   isDark: true
 });
-
-// 保持鲜艳色度（默认开启）
-const vibrantTheme = generateThemeColors('#165DFF', {
-  preserveChroma: true,    // 默认为 true
-  minLightness: 20,
-  maxLightness: 95
-});
 ```
 
 ### 11. generateInterfaceColorSystem - 完整界面色彩系统
@@ -388,7 +272,6 @@ function generateInterfaceColorSystem(
 ```typescript
 interface InterfaceColorSystem {
   controls: Record<string, string>;  // 控件色：gray-1 到 gray-12
-  neutrals: Record<string, string>;  // 浅灰度：neutral-1 到 neutral-6（用于背景/卡片）
   semantic: Record<string, string>;  // 语义色：success-1 到 success-10, warning-1 到 warning-10, 等
   theme: Record<string, string>;     // 主题色：theme-1 到 theme-10
 }
@@ -409,14 +292,6 @@ console.log(colorSystem);
     'gray-2': '#f1f3f4',
     'gray-6': '#666666',    // 中等控件色
     'gray-12': '#1a1a1a'    // 最深的控件色
-  },
-  neutrals: {
-    'neutral-1': '#ffffff', // 页面背景（最浅）
-    'neutral-2': '#fafbfc', // 卡片背景
-    'neutral-3': '#f5f6f8', // hover 背景
-    'neutral-4': '#f0f1f4', // 分割线
-    'neutral-5': '#ebedf0', // 边框
-    'neutral-6': '#e6e8ec'  // 禁用态背景
   },
   semantic: {
     'success-1': '#f6ffed', // 最浅的成功色
@@ -1086,118 +961,3 @@ function checkContrast(backgroundColor, textColor) {
 - **5-8%**：轻微的品牌化，保持原色特性
 - **10-15%**：中等程度的品牌化，平衡效果
 - **15-20%**：强烈的品牌化，明显的主题色影响
-
-### Q: 三种混合模式有什么区别？
-
-**A:** 
-- **lab (默认)**：在 CIE Lab 色彩空间中进行线性混合，这是最平衡的选择，能保持感知上的平滑过渡
-- **hct**：HCT 线性混合，分别对色相、彩度、明度进行线性插值，适合需要精确控制各属性的场景
-- **hue-only**：仅混合色相，保持原始色彩的彩度和明度，适合保持语义色辨识度的场景
-
-### Q: 如何选择混合模式？
-
-**A:** 
-- 大多数情况下使用默认的 `lab` 模式即可
-- 如果希望语义色保持更高的辨识度，使用 `hue-only` 模式
-- 如果需要更细致地控制色彩变化，使用 `hct` 模式
-
-### Q: 生成的颜色看起来灰蒙蒙的怎么办？
-
-**A:** 这通常是因为在 HSL 空间生成渐变时，极端亮度下色彩饱和度丢失。解决方案：
-
-1. **使用 preserveChroma 参数**（默认已开启）：
-```javascript
-const colors = generateSemanticColors('#3491FA', {
-  preserveChroma: true  // 在 Lab 空间保持色度
-});
-```
-
-2. **调整亮度范围**，避免过于极端的亮度值：
-```javascript
-const colors = generateSemanticColors('#3491FA', {
-  minLightness: 20,  // 避免过暗
-  maxLightness: 90   // 避免过亮
-});
-```
-
-3. **检查基础颜色的饱和度**，如果基础色本身饱和度低，生成的渐变也会偏灰。
-
-## 更新日志
-
-### v0.4.1 (最新)
-
-- **新增** `generateNeutralColors` - 生成浅灰度色阶（neutral-1 到 neutral-6），用于背景、卡片、边框等
-- **新增** `generateInterfaceColorSystem` 返回值新增 `neutrals` 字段
-- **改进** `generateSemanticColors` 默认使用固定端点亮度范围（8-97），确保色阶从接近白色到接近黑色
-  - `-1` 色阶亮度约 97%（接近白色）
-  - `-10` 色阶亮度约 8%（接近黑色）
-- **改进** 颜色梯度更符合设计直觉，类似 Ant Design 色板
-
-### v0.4.0
-
-- **新增** `preserveChroma` 参数 - 在 Lab 空间保持感知色度，避免生成灰蒙蒙的颜色
-  - `generateMonochromeLinear` 支持 `preserveChroma` 选项
-  - `generateSemanticColors` 默认开启 `preserveChroma`
-  - `generateThemeColors` 默认开启 `preserveChroma`
-  - `generateInterfaceColorSystem` 支持 `semanticPreserveChroma` 和 `themePreserveChroma`
-- **改进** 极端亮度时的色度处理，确保颜色在 sRGB 色域内
-
-### v0.3.0
-
-- **新增** CIE Lab 色彩空间支持，提供更精准的感知均匀混合
-- **新增** 三种混合模式：`lab`、`hct`、`hue-only`
-- **新增** 颜色工具函数：
-  - `colorDifference()` - 计算两个颜色之间的 Delta E 感知差异
-  - `adjustTone()` - 调整颜色明度
-  - `adjustChroma()` - 调整颜色彩度
-  - `adjustHue()` / `rotateHue()` - 调整/旋转色相
-- **新增** 色彩和谐函数：
-  - `getComplementary()` - 获取互补色
-  - `getTriadic()` - 获取三角配色
-  - `getSplitComplementary()` - 获取分裂互补色
-  - `getAnalogous()` - 获取类似色
-- **改进** HCT 转换精度，Delta E 误差趋近于 0
-- **改进** 主题色生成的感知均匀性
-
-## preserveChroma 说明
-
-### 为什么需要 preserveChroma？
-
-在 HSL 色彩空间中，当亮度接近 0（黑色）或 100（白色）时，即使保持相同的饱和度值，颜色看起来也会变得灰蒙蒙。这是因为 HSL 的饱和度在不同亮度下表现不一致。
-
-`preserveChroma` 选项使用 CIE Lab 色彩空间来保持感知上的色度一致性：
-- 在 Lab 空间中计算色度 (chroma) 和色相角
-- 根据亮度动态调整可用色度（极端亮度时适当减少以保持在色域内）
-- 使用色域映射确保颜色始终在 sRGB 范围内
-
-### 使用示例
-
-```javascript
-import { generateSemanticColors, generateMonochromeLinear } from '@aviala-design/color';
-
-// 默认保持色度（推荐）
-const vibrantColors = generateSemanticColors('#3491FA', {
-  preserveChroma: true  // 默认就是 true
-});
-
-// 传统 HSL 渐变（可能在浅色/深色端显得灰蒙蒙）
-const traditionalColors = generateSemanticColors('#3491FA', {
-  preserveChroma: false
-});
-
-// 单色调渐变也支持 preserveChroma
-const monoVibrant = generateMonochromeLinear('#FF0000', {
-  preserveChroma: true,
-  minLightness: 20,
-  maxLightness: 95
-});
-```
-
-### 效果对比
-
-| 特性 | preserveChroma: true | preserveChroma: false |
-|------|---------------------|----------------------|
-| 浅色端 | 保持鲜艳感 | 可能显得灰白 |
-| 深色端 | 保持饱和度 | 可能显得灰暗 |
-| 色彩空间 | CIE Lab | HSL |
-| 推荐场景 | 语义色、主题色 | 灰度色、特殊需求 |

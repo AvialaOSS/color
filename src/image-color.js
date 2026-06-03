@@ -1,27 +1,10 @@
 import Color from 'color';
+import { getColorString } from './utils.js';
 
 /**
  * 从图片中提取主色调
  * @param {HTMLImageElement} image - 图片元素
  * @returns {Promise<string>} - 提取的主色调（十六进制格式）
- * 
- * @example
- * import { extractColorFromImage } from '@aviala-design/color';
- * 
- * // 从已加载的图片元素提取主色调
- * const img = document.getElementById('myImage');
- * const dominantColor = await extractColorFromImage(img);
- * console.log(dominantColor); // '#3491FA'
- * 
- * @example
- * // 动态创建图片并提取颜色
- * const img = new Image();
- * img.crossOrigin = 'anonymous';
- * img.onload = async () => {
- *   const color = await extractColorFromImage(img);
- *   document.body.style.backgroundColor = color;
- * };
- * img.src = 'https://example.com/image.jpg';
  */
 export async function extractColorFromImage(image) {
   try {
@@ -47,20 +30,9 @@ export async function extractColorFromImage(image) {
 async function getImageData(image) {
   return new Promise((resolve, reject) => {
     try {
-      // 检查是否在浏览器环境中
-      if (typeof document === 'undefined') {
-        reject(new Error('图像颜色提取功能仅在浏览器环境中可用'));
-        return;
-      }
-      
       // 创建canvas元素
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      
-      if (!context) {
-        reject(new Error('无法获取canvas 2d context'));
-        return;
-      }
       
       // 设置canvas尺寸
       const width = Math.min(image.width, 100); // 限制处理尺寸，提高性能
@@ -117,7 +89,6 @@ function getPixelsFromImageData(imageData) {
   }
   
   // 转换为数组格式
-  /** @type {Array<{r: number, g: number, b: number, count: number}>} */
   const pixels = [];
   pixelMap.forEach((count, colorKey) => {
     const [r, g, b] = colorKey.split(',').map(Number);
@@ -165,41 +136,9 @@ function quantizePixels(pixels) {
  * 从文件中读取图片并提取颜色
  * @param {File} file - 图片文件
  * @returns {Promise<string>} - 提取的主色调（十六进制格式）
- * 
- * @example
- * import { extractColorFromFile } from '@aviala-design/color';
- * 
- * // 配合文件上传控件使用
- * const fileInput = document.getElementById('fileInput');
- * fileInput.addEventListener('change', async (event) => {
- *   const file = event.target.files[0];
- *   if (file) {
- *     const color = await extractColorFromFile(file);
- *     console.log('提取的主色调:', color);
- *   }
- * });
- * 
- * @example
- * // 处理拖拽上传
- * dropZone.addEventListener('drop', async (event) => {
- *   event.preventDefault();
- *   const file = event.dataTransfer.files[0];
- *   try {
- *     const dominantColor = await extractColorFromFile(file);
- *     updateTheme(dominantColor);
- *   } catch (error) {
- *     console.error('提取颜色失败:', error);
- *   }
- * });
  */
 export function extractColorFromFile(file) {
   return new Promise((resolve, reject) => {
-    // 检查是否在浏览器环境中
-    if (typeof FileReader === 'undefined' || typeof Image === 'undefined') {
-      reject(new Error('文件读取功能仅在浏览器环境中可用'));
-      return;
-    }
-    
     // 检查文件类型
     if (!file.type.startsWith('image/')) {
       reject(new Error('请选择图片文件'));
@@ -220,13 +159,7 @@ export function extractColorFromFile(file) {
           }
         };
         image.onerror = () => reject(new Error('图片加载失败'));
-        
-        const result = event.target?.result;
-        if (typeof result === 'string') {
-          image.src = result;
-        } else {
-          reject(new Error('无法读取图片数据'));
-        }
+        image.src = event.target.result;
       } catch (error) {
         reject(error);
       }

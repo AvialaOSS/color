@@ -8,31 +8,11 @@ import { getColorString } from './utils.js';
  * 
  * @param {string} startColor - 起始颜色
  * @param {string} endColor - 结束颜色
- * @param {{steps?: number, format?: string, includeEnds?: boolean}} options - 配置选项
+ * @param {Object} options - 配置选项
+ * @param {number} options.steps - 生成的颜色数量 (默认: 10)
+ * @param {string} options.format - 颜色格式 'hex' | 'rgb' | 'hsl' (默认: 'hex')
+ * @param {boolean} options.includeEnds - 是否包含起始和结束颜色 (默认: true)
  * @returns {string[]} 颜色数组
- * 
- * @example
- * import { generateLinear } from '@aviala-design/color';
- * 
- * // 生成从白色到黑色的10个颜色
- * const grayScale = generateLinear('#ffffff', '#000000', { steps: 10 });
- * // ['#ffffff', '#e3e3e3', '#c7c7c7', ..., '#000000']
- * 
- * @example
- * // 生成RGB格式的渐变
- * const gradient = generateLinear('#ff0000', '#0000ff', { 
- *   steps: 5, 
- *   format: 'rgb' 
- * });
- * // ['rgb(255, 0, 0)', 'rgb(191, 0, 63)', ..., 'rgb(0, 0, 255)']
- * 
- * @example
- * // 不包含端点的渐变
- * const middle = generateLinear('#ff0000', '#0000ff', { 
- *   steps: 3, 
- *   includeEnds: false 
- * });
- * // 只返回中间的颜色，不包含起始和结束颜色
  */
 export function generateLinear(startColor, endColor, options = {}) {
   const { steps = 10, format = 'hex', includeEnds = true } = options;
@@ -75,27 +55,12 @@ export function generateLinear(startColor, endColor, options = {}) {
  * 生成灰色系线性渐变
  * 从白色到黑色或指定的灰色范围
  * 
- * @param {{startGray?: string, endGray?: string, steps?: number, format?: string}} options - 配置选项
+ * @param {Object} options - 配置选项
+ * @param {string} options.startGray - 起始灰色 (默认: '#ffffff')
+ * @param {string} options.endGray - 结束灰色 (默认: '#000000')
+ * @param {number} options.steps - 生成的颜色数量 (默认: 10)
+ * @param {string} options.format - 颜色格式 (默认: 'hex')
  * @returns {string[]} 灰色系颜色数组
- * 
- * @example
- * import { generateGrayLinear } from '@aviala-design/color';
- * 
- * // 生成默认灰色渐变（白到黑，10个颜色）
- * const grays = generateGrayLinear();
- * // ['#ffffff', '#e3e3e3', ..., '#000000']
- * 
- * @example
- * // 自定义灰色范围
- * const customGrays = generateGrayLinear({
- *   startGray: '#f0f0f0',
- *   endGray: '#333333',
- *   steps: 5
- * });
- * 
- * @example
- * // 生成RGB格式的灰色
- * const rgbGrays = generateGrayLinear({ format: 'rgb', steps: 8 });
  */
 export function generateGrayLinear(options = {}) {
   const { 
@@ -113,159 +78,37 @@ export function generateGrayLinear(options = {}) {
  * 基于一个基础颜色，生成从浅到深的渐变
  * 
  * @param {string} baseColor - 基础颜色
- * @param {{steps?: number, format?: string, lightnessRange?: number, minLightness?: number, maxLightness?: number, preserveChroma?: boolean}} options - 配置选项
+ * @param {Object} options - 配置选项
+ * @param {number} options.steps - 生成的颜色数量 (默认: 10)
+ * @param {string} options.format - 颜色格式 (默认: 'hex')
+ * @param {number} options.lightnessRange - 亮度范围 0-100 (默认: 80)
  * @returns {string[]} 单色调颜色数组
- * 
- * @example
- * import { generateMonochromeLinear } from '@aviala-design/color';
- * 
- * // 生成蓝色的单色调渐变
- * const blueShades = generateMonochromeLinear('#3491FA', { steps: 10 });
- * // 生成从浅蓝到深蓝的10个颜色，保持色相和饱和度
- * 
- * @example
- * // 自定义亮度范围（基于中心扩展模式）
- * const customShades = generateMonochromeLinear('#ff6b6b', {
- *   steps: 7,
- *   lightnessRange: 60  // 亮度变化范围
- * });
- * 
- * @example
- * // 直接指定最大和最小亮度（固定端点模式）
- * const fixedRange = generateMonochromeLinear('#3491FA', {
- *   steps: 12,
- *   minLightness: 10,   // 最深色接近黑色
- *   maxLightness: 98    // 最浅色接近白色
- * });
- * // 推荐用于需要接近纯白/纯黑的场景
- * 
- * @example
- * // 保持感知色度（推荐用于鲜艳的颜色）
- * const vibrantShades = generateMonochromeLinear('#FF0000', {
- *   steps: 10,
- *   preserveChroma: true  // 在 Lab 空间保持色度，避免灰蒙蒙
- * });
- * 
- * @example
- * // 生成HSL格式
- * const hslShades = generateMonochromeLinear('#00b894', {
- *   format: 'hsl',
- *   steps: 5
- * });
  */
 export function generateMonochromeLinear(baseColor, options = {}) {
-  const { 
-    steps = 10, 
-    format = 'hex', 
-    lightnessRange = 80,
-    minLightness = null,
-    maxLightness = null,
-    preserveChroma = false
-  } = options;
+  const { steps = 10, format = 'hex', lightnessRange = 80 } = options;
   
   const base = Color(baseColor);
+  const hsl = base.hsl();
   
-  let finalMaxLightness, finalMinLightness;
-  
-  // 优先使用直接指定的端点值（固定端点模式）
-  if (minLightness !== null && maxLightness !== null) {
-    if (minLightness > maxLightness) {
-      throw new Error('minLightness 不能大于 maxLightness');
-    }
-    finalMaxLightness = Math.max(0, Math.min(100, maxLightness));
-    finalMinLightness = Math.max(0, Math.min(100, minLightness));
-  } else {
-    // 否则使用基于中心扩展的模式（向后兼容）
-    const baseLightness = base.lightness();
-    finalMaxLightness = Math.min(95, baseLightness + lightnessRange / 2);
-    finalMinLightness = Math.max(5, baseLightness - lightnessRange / 2);
-  }
-  
-  // 如果需要保持感知色度，使用 Lab 空间
-  if (preserveChroma) {
-    return generateMonochromeInLab(base, finalMaxLightness, finalMinLightness, steps, format);
-  }
+  // 计算起始和结束亮度
+  const baseLightness = hsl.lightness();
+  const maxLightness = Math.min(95, baseLightness + lightnessRange / 2);
+  const minLightness = Math.max(5, baseLightness - lightnessRange / 2);
   
   // 创建起始和结束颜色（保持色相和饱和度，只改变亮度）
   const startColor = Color({
-    h: base.hue(),
-    s: base.saturationl(),
-    l: finalMaxLightness
+    h: hsl.hue(),
+    s: hsl.saturationl(),
+    l: maxLightness
   });
   
   const endColor = Color({
-    h: base.hue(),
-    s: base.saturationl(),
-    l: finalMinLightness
+    h: hsl.hue(),
+    s: hsl.saturationl(),
+    l: minLightness
   });
   
   return generateLinear(startColor.hex(), endColor.hex(), { steps, format, includeEnds: true });
-}
-
-/**
- * 在 Lab 空间生成单色调渐变，保持感知色度
- * 
- * @param {import('color')} baseColor - Color 对象
- * @param {number} maxLightness - 最大亮度
- * @param {number} minLightness - 最小亮度
- * @param {number} steps - 步数
- * @param {string} format - 输出格式
- * @returns {string[]} 颜色数组
- */
-function generateMonochromeInLab(baseColor, maxLightness, minLightness, steps, format) {
-  // 获取基础色的 Lab 值
-  const baseA = baseColor.a();
-  const baseB = baseColor.b();
-  
-  // 计算色度 (chroma) 和色相角
-  const baseChroma = Math.sqrt(baseA * baseA + baseB * baseB);
-  const hueAngle = Math.atan2(baseB, baseA);
-  
-  const colors = [];
-  const stepSize = (maxLightness - minLightness) / (steps - 1);
-  
-  for (let i = 0; i < steps; i++) {
-    // 从最亮到最暗
-    const targetL = maxLightness - stepSize * i;
-    
-    // 根据亮度计算可用的最大色度
-    // 在极端亮度时需要减少色度以保持在色域内
-    let targetChroma = baseChroma;
-    
-    // 亮度接近 0 或 100 时，逐渐减少色度
-    if (targetL > 85) {
-      // 高亮度时，色度需要降低以保持在色域内
-      const factor = Math.max(0, (100 - targetL) / 15);
-      targetChroma = baseChroma * factor;
-    } else if (targetL < 15) {
-      // 低亮度时，色度也需要降低
-      const factor = Math.max(0, targetL / 15);
-      targetChroma = baseChroma * factor;
-    }
-    
-    // 计算新的 a, b 值
-    const newA = targetChroma * Math.cos(hueAngle);
-    const newB = targetChroma * Math.sin(hueAngle);
-    
-    // 创建颜色并进行色域映射
-    let color = Color.lab(targetL, newA, newB);
-    
-    // 确保颜色在 sRGB 色域内
-    let rgb = color.rgb().array();
-    let currentChroma = targetChroma;
-    
-    while ((rgb[0] < 0 || rgb[0] > 255 || rgb[1] < 0 || rgb[1] > 255 || rgb[2] < 0 || rgb[2] > 255) && currentChroma > 0) {
-      currentChroma -= 1;
-      const adjA = currentChroma * Math.cos(hueAngle);
-      const adjB = currentChroma * Math.sin(hueAngle);
-      color = Color.lab(targetL, adjA, adjB);
-      rgb = color.rgb().array();
-    }
-    
-    colors.push(getColorString(color, format));
-  }
-  
-  return colors;
 }
 
 /**
@@ -274,30 +117,11 @@ function generateMonochromeInLab(baseColor, maxLightness, minLightness, steps, f
  * 
  * @param {string} startColor - 起始颜色
  * @param {string} endColor - 结束颜色
- * @param {{steps?: number, format?: string, includeEnds?: boolean}} options - 配置选项
+ * @param {Object} options - 配置选项
+ * @param {number} options.steps - 生成的颜色数量 (默认: 10)
+ * @param {string} options.format - 颜色格式 (默认: 'hex')
+ * @param {boolean} options.includeEnds - 是否包含起始和结束颜色 (默认: true)
  * @returns {string[]} 颜色数组
- * 
- * @example
- * import { generateLinearHSL } from '@aviala-design/color';
- * 
- * // 在 HSL 空间生成从黄色到紫色的渐变
- * const gradient = generateLinearHSL('#FFD700', '#9B59B6', { steps: 8 });
- * // 通过色相环插值，产生更自然的彩虹效果
- * 
- * @example
- * // 包含端点值
- * const withEnds = generateLinearHSL('#FF6B6B', '#4ECDC4', {
- *   steps: 5,
- *   includeEnds: true
- * });
- * // 结果的第一个是 #FF6B6B，最后一个是 #4ECDC4
- * 
- * @example
- * // 输出为 RGB 格式
- * const rgbGradient = generateLinearHSL('hsl(0, 100%, 50%)', 'hsl(240, 100%, 50%)', {
- *   steps: 6,
- *   format: 'rgb'
- * });
  */
 export function generateLinearHSL(startColor, endColor, options = {}) {
   const { steps = 10, format = 'hex', includeEnds = true } = options;
@@ -306,8 +130,8 @@ export function generateLinearHSL(startColor, endColor, options = {}) {
     throw new Error('步数必须至少为2');
   }
   
-  const start = Color(startColor);
-  const end = Color(endColor);
+  const start = Color(startColor).hsl();
+  const end = Color(endColor).hsl();
   
   const colors = [];
   
@@ -329,18 +153,13 @@ export function generateLinearHSL(startColor, endColor, options = {}) {
     }
   }
   
-  const startSat = start.saturationl();
-  const endSat = end.saturationl();
-  const startLight = start.lightness();
-  const endLight = end.lightness();
-  
   for (let i = 0; i < actualSteps; i++) {
     const ratio = i * stepSize;
     
     // 在HSL空间进行线性插值
     let h = startHue + (endHue - startHue) * ratio;
-    const s = startSat + (endSat - startSat) * ratio;
-    const l = startLight + (endLight - startLight) * ratio;
+    const s = start.saturationl() + (end.saturationl() - start.saturationl()) * ratio;
+    const l = start.lightness() + (end.lightness() - start.lightness()) * ratio;
     
     // 确保色相在0-360范围内
     h = h % 360;

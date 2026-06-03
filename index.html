@@ -1,173 +1,766 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>颜色色卡系统</title>
-  <link rel="stylesheet" href="./style.css?v=1.2">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
-</head>
-<body>
-  <div class="main-layout">
-    <aside class="sidebar">
-      <h1>色卡生成工具</h1>
-      <div class="color-input-group">
-        <div class="color-input">
-          <input type="text" id="colorInput" placeholder="输入颜色值 (例: #FF0000)" />
-          <button id="generateBtn"><i class="ri-palette-line"></i> 生成</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>颜色</title>
+    <link rel="stylesheet" href="playground.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title">颜色</div>
         </div>
-        <div class="color-input">
-          <div class="file-input-wrapper">
-            <input type="file" id="imageInput" accept="image/*" />
-            <label for="imageInput">选择图片</label>
+        <div class="topbar-right">
+          <button class="icon-btn" id="exportBtn" type="button" aria-label="导出">
+            <i class="ri-upload-2-line"></i>
+          </button>
+          <button class="icon-btn" id="uiThemeToggle" type="button" aria-label="切换主题">
+            <i class="ri-moon-line" id="uiThemeIcon"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-controls">
+            <div class="segmented" role="tablist" aria-label="模式切换">
+              <button class="segmented-btn is-active" id="modeLight" type="button">亮色模式</button>
+              <button class="segmented-btn" id="modeDark" type="button">暗色模式</button>
+            </div>
+            <button class="btn btn-secondary" id="addColorBtn" type="button">
+              <i class="ri-add-line"></i>
+              添加颜色
+            </button>
+            <div class="select-wrap">
+              <span class="select-prefix mono">格式</span>
+              <select class="select" id="formatSelect">
+                <option value="hex" selected>HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="hsl">HSL</option>
+              </select>
+            </div>
+            <div class="range-wrap">
+              <div class="range-label">输出数量</div>
+              <div class="range-row">
+                <input class="range" id="stepsRange" type="range" min="1" max="24" step="1" value="10" />
+                <div class="range-value mono" id="stepsValue">10</div>
+              </div>
+            </div>
+            <div class="range-wrap">
+              <div class="range-label">曲线</div>
+              <div class="range-row">
+                <input class="range" id="curveRange" type="range" min="0.5" max="2.5" step="0.05" value="1" />
+                <div class="range-value mono" id="curveValue">1.00</div>
+              </div>
+            </div>
           </div>
-          <button id="extractBtn"><i class="ri-image-line"></i> 提取主色</button>
+
+          <div class="palette-list" id="paletteList"></div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <dialog class="dialog" id="addDialog">
+      <div class="dialog-head">
+        <div class="dialog-title">添加颜色到色卡</div>
+        <button class="icon-btn" id="addDialogClose" type="button" aria-label="关闭">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <div class="form">
+          <div class="field">
+            <label>模式</label>
+            <div class="segmented" role="tablist" aria-label="添加模式">
+              <button class="segmented-btn is-active" id="addModePalette" type="button">颜色</button>
+              <button class="segmented-btn" id="addModeNeutral" type="button">中性色</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>颜色</label>
+            <div class="field-row" id="addPaletteFields">
+              <input class="color" type="color" id="addColorPicker" value="#f2502c" />
+              <input class="input mono" type="text" id="addColorText" value="#F2502C" />
+            </div>
+            <div class="is-hidden" id="addMixWrap">
+              <div class="field-row">
+                <input class="color" type="color" id="addMixPicker" value="#165dff" />
+                <input class="input mono" type="text" id="addMixText" value="#165DFF" />
+              </div>
+              <div class="range-row">
+                <input class="range" id="addMixRange" type="range" min="0" max="1" step="0.01" value="0.15" />
+                <div class="range-value mono" id="addMixValue">0.15</div>
+              </div>
+            </div>
+            <div class="is-hidden" id="addNeutralFields">
+              <div class="neutral-row">
+                <input class="color" type="color" id="addNeutralStartPicker" value="#ffffff" />
+                <input class="input mono" type="text" id="addNeutralStartText" value="#FFFFFF" />
+              </div>
+              <div class="neutral-row">
+                <input class="color" type="color" id="addNeutralEndPicker" value="#000000" />
+                <input class="input mono" type="text" id="addNeutralEndText" value="#000000" />
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label>色卡名称</label>
+            <input class="input" type="text" id="addName" placeholder="例如 theme-color" />
+          </div>
+          <div class="field" id="addMixField">
+            <label>混入颜色</label>
+            <div class="range-label range-label-row">
+              <span class="mono"></span>
+              <label class="check">
+                <input type="checkbox" id="addMixEnabled" />
+                <span>启用</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-section">
+          <div class="dialog-section-title">预览效果</div>
+          <div id="addPreview"></div>
         </div>
       </div>
-    </aside>
-    <main class="content">
-      <div id="notification" class="notification"></div>
-      <div id="customColorCard" class="color-card" style="display: none;">
-        <h3>自定义颜色</h3>
-        <div class="variants" id="customColorVariants"></div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="addCancelBtn" type="button">取消</button>
+        <button class="btn" id="addConfirmBtn" type="button">添加</button>
       </div>
-      <div id="colorPalette"></div>
-    </main>
-  </div>
+    </dialog>
 
-  <script type="module">
-    import { getPresetColors } from './src/index.js';
-    import generate from './src/generate.js';
-    import { extractColorFromFile } from './src/image-color.js';
+    <dialog class="dialog" id="exportDialog">
+      <div class="dialog-head">
+        <div class="dialog-title" id="exportDialogTitle"></div>
+        <button class="icon-btn" id="exportDialogClose" type="button" aria-label="关闭">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <pre class="code mono" id="exportDialogContent"></pre>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="exportDialogCopy" type="button">
+          <i class="ri-file-copy-line"></i>
+          复制
+        </button>
+        <button class="btn" id="exportDialogOk" type="button">关闭</button>
+      </div>
+    </dialog>
 
-    function showNotification(message, type = 'info') {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.className = `notification ${type}`;
-      notification.style.display = 'block';
-      setTimeout(() => {
-        notification.style.display = 'none';
-      }, 3000);
-    }
+    <script type="module">
+      import { palette, neutral } from './src/index.js';
 
-    const colorInput = document.getElementById('colorInput');
-    const generateBtn = document.getElementById('generateBtn');
-    const customColorCard = document.getElementById('customColorCard');
-    const customColorVariants = document.getElementById('customColorVariants');
+      const toastEl = document.getElementById('toast');
+      const uiThemeToggle = document.getElementById('uiThemeToggle');
+      const uiThemeIcon = document.getElementById('uiThemeIcon');
+      const formatSelect = document.getElementById('formatSelect');
+      const stepsRange = document.getElementById('stepsRange');
+      const stepsValue = document.getElementById('stepsValue');
+      const curveRange = document.getElementById('curveRange');
+      const curveValue = document.getElementById('curveValue');
+      const modeLight = document.getElementById('modeLight');
+      const modeDark = document.getElementById('modeDark');
+      const paletteListEl = document.getElementById('paletteList');
 
-    function generateColorPalette(color) {
-      if (!color) return;
-      try {
-        const lightColors = generate(color, { list: true });
-        const darkColors = generate(color, { list: true, dark: true });
+      const addDialog = document.getElementById('addDialog');
+      const addDialogClose = document.getElementById('addDialogClose');
+      const addModePalette = document.getElementById('addModePalette');
+      const addModeNeutral = document.getElementById('addModeNeutral');
+      const addPaletteFields = document.getElementById('addPaletteFields');
+      const addNeutralFields = document.getElementById('addNeutralFields');
+      const addColorPicker = document.getElementById('addColorPicker');
+      const addColorText = document.getElementById('addColorText');
+      const addMixField = document.getElementById('addMixField');
+      const addMixEnabled = document.getElementById('addMixEnabled');
+      const addMixWrap = document.getElementById('addMixWrap');
+      const addMixPicker = document.getElementById('addMixPicker');
+      const addMixText = document.getElementById('addMixText');
+      const addMixRange = document.getElementById('addMixRange');
+      const addMixValue = document.getElementById('addMixValue');
+      const addNeutralStartPicker = document.getElementById('addNeutralStartPicker');
+      const addNeutralStartText = document.getElementById('addNeutralStartText');
+      const addNeutralEndPicker = document.getElementById('addNeutralEndPicker');
+      const addNeutralEndText = document.getElementById('addNeutralEndText');
+      const addName = document.getElementById('addName');
+      const addPreview = document.getElementById('addPreview');
+      const addCancelBtn = document.getElementById('addCancelBtn');
+      const addConfirmBtn = document.getElementById('addConfirmBtn');
 
-        customColorVariants.innerHTML = `
-          <div class="variant">
-            <h4>亮色系</h4>
-            <div class="color-blocks">${lightColors.map(c => createColorBlock(c)).join('')}</div>
-          </div>
-          <div class="variant">
-            <h4>暗色系</h4>
-            <div class="color-blocks">${darkColors.map(c => createColorBlock(c)).join('')}</div>
+      const exportBtn = document.getElementById('exportBtn');
+      const exportDialog = document.getElementById('exportDialog');
+      const exportDialogTitle = document.getElementById('exportDialogTitle');
+      const exportDialogContent = document.getElementById('exportDialogContent');
+      const exportDialogClose = document.getElementById('exportDialogClose');
+      const exportDialogOk = document.getElementById('exportDialogOk');
+      const exportDialogCopy = document.getElementById('exportDialogCopy');
+
+      let toastTimer = null;
+
+      function toast(message, type = 'info') {
+        toastEl.textContent = message;
+        toastEl.dataset.type = type;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1600);
+      }
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          toast('已复制', 'success');
+        } catch {
+          toast('复制失败，请手动复制', 'error');
+        }
+      }
+
+      function normalizeColor(input) {
+        return String(input || '').trim();
+      }
+
+      function getSteps() {
+        return Math.max(1, Math.min(24, Number(stepsRange.value) || 10));
+      }
+
+      function getFormat() {
+        return formatSelect.value;
+      }
+
+      function getCurveGamma() {
+        return Math.max(0.1, Math.min(5, Number(curveRange.value) || 1));
+      }
+
+      function getMode() {
+        return modeDark.classList.contains('is-active') ? 'dark' : 'light';
+      }
+
+      function safeGenerate(color, opts) {
+        try {
+          return palette.generate(color, opts);
+        } catch (e) {
+          toast(e?.message || '生成失败', 'error');
+          return null;
+        }
+      }
+
+      function safeNeutral(startGray, endGray, opts) {
+        try {
+          return neutral.generate(startGray, endGray, opts);
+        } catch (e) {
+          toast(e?.message || '生成失败', 'error');
+          return null;
+        }
+      }
+
+      function stripHtml(title, colors) {
+        const swatches = colors
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="strip-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="strip-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="strip">
+            <div class="strip-head">
+              <div class="strip-title">${title}</div>
+              <div class="strip-meta mono">${colors.length} steps</div>
+            </div>
+            <div class="strip-scroll">
+              <div class="strip-row" style="grid-template-columns: repeat(${colors.length}, minmax(24px, 1fr));">
+                ${swatches}
+              </div>
+            </div>
           </div>
         `;
-
-        customColorCard.style.display = 'block';
-        showNotification('色卡生成成功！', 'success');
-        addCopyFunctionality(customColorCard);
-      } catch (error) {
-        showNotification(`生成失败: ${error.message}`, 'error');
       }
-    }
 
-    generateBtn.addEventListener('click', () => {
-      const color = colorInput.value.trim();
-      if (color) {
-        generateColorPalette(color);
-      } else {
-        showNotification('请输入有效的颜色值', 'error');
+      function paletteItemHtml(item, colors) {
+        const seed = item.color.toUpperCase();
+        const len = colors.light.length;
+        const swatches = colors.light
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+        const swatchesDark = colors.dark
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="palette-item" data-id="${item.id}">
+            <div class="palette-item-head">
+              <div class="palette-seed" style="background:${seed}"></div>
+              <div class="palette-meta">
+                <div class="palette-name">${item.name}</div>
+                <div class="palette-hex mono">${seed}</div>
+              </div>
+              <button class="icon-btn icon-btn-ghost palette-more" type="button" data-action="remove" aria-label="移除">
+                <i class="ri-delete-bin-6-line"></i>
+              </button>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatches}
+              </div>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatchesDark}
+              </div>
+            </div>
+          </div>
+        `;
       }
-    });
 
-    colorInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') generateBtn.click();
-    });
+      function neutralItemHtml(config, colors) {
+        const len = colors.light.length;
+        const swatches = colors.light
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
+        const swatchesDark = colors.dark
+          .map((c, idx) => {
+            const v = String(c);
+            return `
+              <button class="mini-swatch" type="button" data-color="${v}" style="background:${v}">
+                <span class="mini-index">${idx + 1}</span>
+              </button>
+            `;
+          })
+          .join('');
 
-    const imageInput = document.getElementById('imageInput');
-    const extractBtn = document.getElementById('extractBtn');
-
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files[0];
-      if (file) {
-        const label = document.querySelector('label[for="imageInput"]');
-        label.textContent = file.name.length > 15 ? `${file.name.substring(0, 12)}...` : file.name;
-        label.classList.add('file-selected');
+        return `
+          <div class="palette-item palette-item-neutral" data-id="${config.id}">
+            <div class="palette-item-head">
+              <div class="palette-seed" style="background:${config.start}"></div>
+              <div class="palette-seed" style="background:${config.end}"></div>
+              <div class="palette-meta">
+                <div class="palette-name">${config.name}</div>
+                <div class="palette-hex mono">${config.start.toUpperCase()} → ${config.end.toUpperCase()}</div>
+              </div>
+              <button class="icon-btn icon-btn-ghost palette-more" type="button" data-action="remove" aria-label="移除">
+                <i class="ri-delete-bin-6-line"></i>
+              </button>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatches}
+              </div>
+            </div>
+            <div class="mini-scroll">
+              <div class="mini-row" style="grid-template-columns: repeat(${len}, minmax(24px, 1fr));">
+                ${swatchesDark}
+              </div>
+            </div>
+          </div>
+        `;
       }
-    });
 
-    extractBtn.addEventListener('click', async () => {
-      const file = imageInput.files[0];
-      if (!file) {
-        showNotification('请选择图片文件', 'error');
-        return;
+      function exportPayload() {
+        const steps = getSteps();
+        const format = getFormat();
+        const curveGamma = getCurveGamma();
+        const payload = {};
+
+        getItems().forEach((item) => {
+          if (item.type === 'neutral') {
+            const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma });
+            const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma });
+            if (!light || !dark) return;
+            payload[item.name] = { type: 'neutral', start: item.start, end: item.end, steps, format, curveGamma, light, dark };
+            return;
+          }
+
+          const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio });
+          const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio });
+          if (!light || !dark) return;
+          payload[item.name] = { type: 'palette', seed: item.color, steps, format, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio, light, dark };
+        });
+
+        return payload;
       }
-      try {
-        extractBtn.disabled = true;
-        extractBtn.innerHTML = '<i class="ri-loader-line ri-spin"></i> 提取中';
-        const color = await extractColorFromFile(file);
-        colorInput.value = color;
-        generateColorPalette(color);
-      } catch (error) {
-        showNotification(`提取失败: ${error.message}`, 'error');
-      } finally {
-        extractBtn.disabled = false;
-        extractBtn.innerHTML = '<i class="ri-image-line"></i> 提取主色';
+
+      function exportCss(payload) {
+        const lines = [];
+        lines.push(':root {');
+        Object.entries(payload).forEach(([name, v]) => {
+          v.light.forEach((c, idx) => lines.push(`  --${name}-light-${idx + 1}: ${c};`));
+          if (v.dark) v.dark.forEach((c, idx) => lines.push(`  --${name}-dark-${idx + 1}: ${c};`));
+        });
+        lines.push('}');
+        return lines.join('\n');
       }
-    });
 
-    function createColorBlock(color) {
-      return `
-        <div class="color-block" style="background:${color}" data-color="${color}">
-          <span>${color}</span>
-          <div class="color-tooltip">复制</div>
-        </div>`;
-    }
+      function wireCopy(container) {
+        container.querySelectorAll('[data-color]').forEach((el) => {
+          el.addEventListener('click', () => copyText(el.dataset.color));
+        });
+      }
 
-    function addCopyFunctionality(container) {
-      container.querySelectorAll('.color-block').forEach(block => {
-        block.addEventListener('click', () => {
-          const color = block.dataset.color;
-          navigator.clipboard.writeText(color).then(() => {
-            showNotification(`已复制: ${color}`, 'success');
-          }, () => {
-            showNotification('复制失败', 'error');
+      const storageKey = 'aviala-color-playground-items';
+
+      function getDefaultItems() {
+        return [
+          { id: 'theme-color', name: 'theme-color', type: 'palette', color: '#F2502C' },
+          { id: 'green-leaf-green', name: 'green-leaf-green', type: 'palette', color: '#0D9E64' },
+        ];
+      }
+
+      function getItems() {
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (!raw) return getDefaultItems();
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed) || parsed.length === 0) return getDefaultItems();
+          const normalized = parsed
+            .map((x) => {
+              const id = typeof x?.id === 'string' ? x.id : null;
+              const name = typeof x?.name === 'string' ? x.name : null;
+              if (!id || !name) return null;
+
+              if (x?.type === 'neutral' || (typeof x?.start === 'string' && typeof x?.end === 'string')) {
+                const start = typeof x?.start === 'string' ? x.start : '#ffffff';
+                const end = typeof x?.end === 'string' ? x.end : '#000000';
+                return { id, name, type: 'neutral', start, end };
+              }
+
+              if (typeof x?.color === 'string') {
+                const mixColor = typeof x?.mixColor === 'string' ? x.mixColor : '';
+                const mixRatio = typeof x?.mixRatio === 'number' ? x.mixRatio : Number(x?.mixRatio) || 0;
+                return { id, name, type: 'palette', color: x.color, mixColor, mixRatio };
+              }
+
+              return null;
+            })
+            .filter(Boolean);
+          if (normalized.length === 0) return getDefaultItems();
+          return normalized;
+        } catch {
+          return getDefaultItems();
+        }
+      }
+
+      function setItems(items) {
+        localStorage.setItem(storageKey, JSON.stringify(items));
+      }
+
+      function renderList() {
+        const steps = getSteps();
+        const format = getFormat();
+        const curveGamma = getCurveGamma();
+        const html = getItems()
+          .map((item) => {
+            if (item.type === 'neutral') {
+              const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma });
+              const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma });
+              if (!light || !dark) return '';
+              return neutralItemHtml(item, { light, dark });
+            }
+
+            const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio });
+            const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio });
+            if (!light || !dark) return '';
+            return paletteItemHtml(item, { light, dark });
+          })
+          .filter(Boolean)
+          .join('');
+
+        paletteListEl.innerHTML = html;
+        wireCopy(paletteListEl);
+
+        paletteListEl.querySelectorAll('[data-action="remove"]').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            const itemEl = e.currentTarget.closest('.palette-item');
+            const id = itemEl?.dataset?.id;
+            if (!id) return;
+            setItems(getItems().filter((x) => x.id !== id));
+            renderAll();
           });
         });
+
+        paletteListEl.querySelectorAll('.palette-item').forEach((el) => {
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('[data-action="remove"]')) return;
+            paletteListEl.querySelectorAll('.palette-item').forEach((n) => n.classList.remove('is-active'));
+            el.classList.add('is-active');
+          });
+        });
+      }
+
+      function openExportDialog(title, content) {
+        exportDialogTitle.textContent = title;
+        exportDialogContent.textContent = content;
+        exportDialog.showModal();
+      }
+
+      function closeExportDialog() {
+        exportDialog.close();
+      }
+
+      function applyUiTheme(theme) {
+        const t = theme === 'dark' ? 'dark' : 'light';
+        document.documentElement.classList.toggle('dark', t === 'dark');
+        localStorage.setItem('ui-theme', t);
+        uiThemeIcon.className = t === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+      }
+
+      function syncStepsUi() {
+        stepsValue.textContent = String(getSteps());
+      }
+
+      function syncCurveUi() {
+        curveValue.textContent = getCurveGamma().toFixed(2);
+      }
+
+      function renderAll() {
+        syncStepsUi();
+        syncCurveUi();
+        renderList();
+        const first = paletteListEl.querySelector('.palette-item');
+        if (first) first.classList.add('is-active');
+      }
+
+      function openAddDialog() {
+        addName.value = '';
+        addMixEnabled.checked = false;
+        syncMixUi();
+        setAddMode('palette');
+        addDialog.showModal();
+        renderAddPreview();
+      }
+
+      function closeAddDialog() {
+        addDialog.close();
+      }
+
+      function renderAddPreview() {
+        const steps = getSteps();
+        const format = getFormat();
+        const curveGamma = getCurveGamma();
+        const mode = getAddMode();
+        if (mode === 'neutral') {
+          const start = normalizeColor(addNeutralStartText.value || addNeutralStartPicker.value);
+          const end = normalizeColor(addNeutralEndText.value || addNeutralEndPicker.value);
+          const light = safeNeutral(start, end, { steps, format, includeEnds: true, curveGamma });
+          const dark = safeNeutral(end, start, { steps, format, includeEnds: true, curveGamma });
+          if (!light || !dark) {
+            addPreview.innerHTML = '';
+            return;
+          }
+          addPreview.innerHTML = [stripHtml('Light', light), stripHtml('Dark', dark)].join('');
+          wireCopy(addPreview);
+          return;
+        }
+
+        const mix = getAddMix();
+        const color = normalizeColor(addColorText.value || addColorPicker.value);
+        const light = safeGenerate(color, { list: true, steps, format, curveGamma, dark: false, ...mix });
+        const dark = safeGenerate(color, { list: true, steps, format, curveGamma, dark: true, ...mix });
+        if (!light || !dark) {
+          addPreview.innerHTML = '';
+          return;
+        }
+        addPreview.innerHTML = [stripHtml('Light', light), stripHtml('Dark', dark)].join('');
+        wireCopy(addPreview);
+      }
+
+      document.getElementById('addColorBtn').addEventListener('click', openAddDialog);
+      addDialogClose.addEventListener('click', closeAddDialog);
+      addCancelBtn.addEventListener('click', closeAddDialog);
+      addDialog.addEventListener('click', (e) => {
+        if (e.target === addDialog) closeAddDialog();
       });
-    }
 
-    const palette = document.getElementById('colorPalette');
-    const colors = getPresetColors();
+      addColorPicker.addEventListener('input', (e) => {
+        addColorText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addColorText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addColorPicker.value = v;
+        renderAddPreview();
+      });
 
-    palette.innerHTML = Object.entries(colors).map(([name, variants]) => `
-      <div class="color-card">
-        <h3>${name}</h3>
-        <div class="variants">
-          ${Object.entries(variants).filter(([type]) => type !== 'primary').map(([type, colorset]) => `
-            <div class="variant">
-              <h4>${type}</h4>
-              <div class="color-blocks">${colorset.map(c => createColorBlock(c)).join('')}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `).join('');
+      function getAddMode() {
+        return addModeNeutral.classList.contains('is-active') ? 'neutral' : 'palette';
+      }
 
-    addCopyFunctionality(palette);
+      function setAddMode(next) {
+        const mode = next === 'neutral' ? 'neutral' : 'palette';
+        addModePalette.classList.toggle('is-active', mode === 'palette');
+        addModeNeutral.classList.toggle('is-active', mode === 'neutral');
+        addPaletteFields.classList.toggle('is-hidden', mode !== 'palette');
+        addNeutralFields.classList.toggle('is-hidden', mode !== 'neutral');
+        addMixField.classList.toggle('is-hidden', mode !== 'palette');
+        addMixWrap.classList.toggle('is-hidden', mode !== 'palette' || !addMixEnabled.checked);
+        renderAddPreview();
+      }
 
-    window.addEventListener('load', () => {
-      showNotification('欢迎使用色卡生成工具', 'info');
-    });
-  </script>
-</body>
+      function isGrayscaleHex(hex) {
+        if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return false;
+        const r = hex.slice(1, 3).toLowerCase();
+        const g = hex.slice(3, 5).toLowerCase();
+        const b = hex.slice(5, 7).toLowerCase();
+        return r === g && g === b;
+      }
+
+      addModePalette.addEventListener('click', () => setAddMode('palette'));
+      addModeNeutral.addEventListener('click', () => setAddMode('neutral'));
+
+      function syncMixUi() {
+        addMixValue.textContent = Number(addMixRange.value || 0).toFixed(2);
+        addMixWrap.classList.toggle('is-hidden', !addMixEnabled.checked);
+      }
+
+      function getAddMix() {
+        if (!addMixEnabled.checked) return {};
+        const mixColor = normalizeColor(addMixText.value || addMixPicker.value);
+        if (!/^#[0-9a-fA-F]{6}$/.test(mixColor)) return {};
+        const mixRatio = Math.max(0, Math.min(1, Number(addMixRange.value) || 0));
+        if (!mixRatio) return {};
+        return { mixColor, mixRatio };
+      }
+
+      addMixEnabled.addEventListener('change', () => {
+        syncMixUi();
+        renderAddPreview();
+      });
+      addMixPicker.addEventListener('input', (e) => {
+        addMixText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addMixText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addMixPicker.value = v;
+        renderAddPreview();
+      });
+      addMixRange.addEventListener('input', () => {
+        syncMixUi();
+        renderAddPreview();
+      });
+
+      addNeutralStartPicker.addEventListener('input', (e) => {
+        addNeutralStartText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addNeutralEndPicker.addEventListener('input', (e) => {
+        addNeutralEndText.value = e.target.value.toUpperCase();
+        renderAddPreview();
+      });
+      addNeutralStartText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addNeutralStartPicker.value = v;
+        renderAddPreview();
+      });
+      addNeutralEndText.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) addNeutralEndPicker.value = v;
+        renderAddPreview();
+      });
+
+      addConfirmBtn.addEventListener('click', () => {
+        const name = String(addName.value || '').trim();
+        if (!name) {
+          toast('请输入色卡名称', 'error');
+          return;
+        }
+        const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-_]/g, '').slice(0, 48) || `color-${Date.now()}`;
+        const next = getItems().filter((x) => x.id !== id);
+        const mode = getAddMode();
+        if (mode === 'neutral') {
+          const start = normalizeColor(addNeutralStartText.value || addNeutralStartPicker.value);
+          const end = normalizeColor(addNeutralEndText.value || addNeutralEndPicker.value);
+          if (!/^#[0-9a-fA-F]{6}$/.test(start) || !/^#[0-9a-fA-F]{6}$/.test(end)) {
+            toast('请输入有效 HEX 颜色', 'error');
+            return;
+          }
+          if (!isGrayscaleHex(start) || !isGrayscaleHex(end)) {
+            toast('中性色仅支持灰阶（R=G=B）', 'error');
+            return;
+          }
+          next.unshift({ id, name, type: 'neutral', start: start.toUpperCase(), end: end.toUpperCase() });
+        } else {
+          const color = normalizeColor(addColorText.value || addColorPicker.value);
+          if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
+            toast('请输入有效 HEX 颜色', 'error');
+            return;
+          }
+          const mix = getAddMix();
+          next.unshift({ id, name, type: 'palette', color: color.toUpperCase(), mixColor: mix.mixColor, mixRatio: mix.mixRatio });
+        }
+        setItems(next);
+        closeAddDialog();
+        renderAll();
+        toast('已添加', 'success');
+      });
+
+      exportDialogClose.addEventListener('click', closeExportDialog);
+      exportDialogOk.addEventListener('click', closeExportDialog);
+      exportDialog.addEventListener('click', (e) => {
+        if (e.target === exportDialog) closeExportDialog();
+      });
+      exportDialogCopy.addEventListener('click', () => copyText(exportDialogContent.textContent || ''));
+
+      exportBtn.addEventListener('click', () => {
+        const payload = exportPayload();
+        openExportDialog('导出（JSON）', JSON.stringify(payload, null, 2));
+      });
+
+      formatSelect.addEventListener('change', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+      stepsRange.addEventListener('input', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+      curveRange.addEventListener('input', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+
+      modeLight.addEventListener('click', () => {
+        modeLight.classList.add('is-active');
+        modeDark.classList.remove('is-active');
+        renderAll();
+      });
+      modeDark.addEventListener('click', () => {
+        modeDark.classList.add('is-active');
+        modeLight.classList.remove('is-active');
+        renderAll();
+      });
+
+      uiThemeToggle.addEventListener('click', () => applyUiTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark'));
+
+      applyUiTheme(localStorage.getItem('ui-theme') || 'light');
+      renderAll();
+    </script>
+  </body>
 </html>
