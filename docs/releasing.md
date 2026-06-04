@@ -6,6 +6,7 @@
 
 1. 在 npm 上为该包配置 Trusted Publishers（GitHub Actions）
 2. GitHub Actions 工作流需要具备 OIDC 权限（本仓库工作流已申请 `id-token: write`）
+3. 需要 npm CLI 11.5.1+ 且 Node 22.14.0+（本仓库工作流会在 CI 中安装满足要求的 npm 版本）
 
 ## 发布流程
 
