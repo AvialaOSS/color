@@ -74,3 +74,9 @@ Release 发布后会触发工作流，工作流会执行：
 1. 确认 `package.json.name` 对应的包确实存在于 npm（例如 `@aviala-design/color`）
 2. 确认该包已配置 Trusted Publishers，且指向当前仓库与 workflow
 3. 如果这是“第一次发布该包”，很多情况下需要先用传统方式手动发布一次以创建包，然后再启用 Trusted Publishers
+
+### 5) 发布失败：E422 Error verifying sigstore provenance bundle
+
+这通常意味着 `package.json.repository.url` 与 GitHub Actions 生成的 provenance 里的仓库信息不一致（例如仓库迁移/改名，或大小写不同）。
+
+处理方式：把 `package.json.repository.url` 改成与 GitHub 仓库一致的地址（建议使用不带 `git+` 与 `.git` 的 https URL），然后重新发布。
