@@ -41,7 +41,7 @@ git push origin --tags
 
 Release 发布后会触发工作流，工作流会执行：
 
-- `npm ci`
+- `npm install --include=optional`
 - `npm test`
 - 校验 tag 是否与 `package.json` 的 `version` 一致（`vX.Y.Z` ↔ `X.Y.Z`）
 - `npm publish --access public --provenance`
@@ -59,11 +59,11 @@ Release 发布后会触发工作流，工作流会执行：
 
 `@scope/name` 形式的包在 npm 上默认会走 restricted，工作流已使用 `--access public`。如需发布私有包，需要将命令与 npm 权限策略改为 `restricted`。
 
-### 3) CI 报错：Cannot find module @rollup/rollup-linux-x64-gnu
+### 3) CI 报错：npm ci lockfile 不同步 / Missing @rollup/* / Missing @esbuild/*
 
-这是 npm 在 optionalDependencies 场景下的已知问题，表现为 Linux 环境缺失 Rollup 的平台二进制包。
+这通常是因为 `package-lock.json` 在某个平台上生成（例如 Windows），但 CI 在另一个平台（Linux）执行 `npm ci` 时会严格校验当前平台的 optionalDependencies 条目是否在 lockfile 里可还原。
 
-本仓库工作流已内置修复逻辑：如果检测到缺失，会按当前 `rollup` 版本临时安装对应的 `@rollup/rollup-linux-x64-gnu`。
+本仓库工作流选择在 CI 中使用 `npm install --include=optional` 来避免跨平台 lockfile 导致的 `npm ci` 失败。
 
 ### 4) 发布失败：E404 Not Found - PUT https://registry.npmjs.org/@scope%2fname
 

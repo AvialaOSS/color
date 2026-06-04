@@ -14,11 +14,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22.14.0
           registry-url: https://registry.npmjs.org
       - run: npm i -g npm@^11.5.1
       - run: node -v && npm -v
-      - run: npm ci --include=optional
+      - run: npm install --include=optional --no-audit --no-fund
       - name: Ensure Rollup native binary (Linux)
         run: |
           node -e "require('@rollup/rollup-linux-x64-gnu')"
@@ -26,10 +26,7 @@ jobs:
       - name: Repair Rollup native binary (if missing)
         run: |
           node -e "require('@rollup/rollup-linux-x64-gnu')" && exit 0
-          ROLLUP_VERSION=$(node -p "require('./package-lock.json')?.packages?.['node_modules/rollup']?.version || require('./package-lock.json')?.dependencies?.rollup?.version || ''")
-          if [ -z \"$ROLLUP_VERSION\" ]; then
-            ROLLUP_VERSION=$(node -e "const fs=require('fs');const p='node_modules/rollup/package.json';console.log(fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')).version:'')")
-          fi
+          ROLLUP_VERSION=$(node -e "const fs=require('fs');const p='node_modules/rollup/package.json';process.stdout.write(JSON.parse(fs.readFileSync(p,'utf8')).version)")
           npm i --no-save "@rollup/rollup-linux-x64-gnu@${ROLLUP_VERSION}"
           node -e "require('@rollup/rollup-linux-x64-gnu')"
       - run: npm test
