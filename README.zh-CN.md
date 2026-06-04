@@ -3,7 +3,7 @@
 Aviala Design Color 是一个“色板生成器”，用于构建设计系统的颜色体系：
 
 - `palette.generate`：基于输入色生成色板（同时支持 Light / Dark）
-- `neutral.generate`：生成灰阶色阶（Dark 可通过反向生成）
+- `neutral.generate`：生成中性色阶（默认灰阶；可选 tinted，Dark 可通过反向生成）
 
 ## 安装
 
@@ -21,6 +21,7 @@ const paletteDark = palette.generate('#165DFF', { list: true, dark: true });
 
 const graysLight = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2 });
 const graysDark = neutral.generate('#000000', '#ffffff', { steps: 12, curveGamma: 1.2 });
+const tintedNeutral = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2, mixColor: '#165DFF', mixRatio: 0.2 });
 
 const mixed = palette.generate('#F53F3F', { index: 6, mixColor: '#165DFF', mixRatio: 0.2 });
 ```
@@ -56,6 +57,8 @@ neutral.generate(
     includeEnds?: boolean; // 默认 true
     format?: 'hex' | 'rgb' | 'hsl'; // 默认 'hex'
     curveGamma?: number; // 0.1..5，默认 1
+    mixColor?: string; // hex
+    mixRatio?: number; // 0..1，默认 0
   }
 ): string[]
 ```
@@ -78,7 +81,7 @@ neutral.generate(
 | `colorList` | 已移除。建议在你的业务/设计系统里维护自有色值常量。 |
 | `getPresetColors()` | 已移除。对你的色值列表逐个调用 `palette.generate(color, { list: true })` 生成即可。 |
 | `getRgbStr(color)` | 已移除。可直接使用 `color`（本库依赖）：`import Color from 'color'; Color(color).rgb().array().join(',')`。 |
-| `generateGrayLinear` | `neutral.generate('#ffffff', '#000000', options)`（仅灰阶） |
+| `generateGrayLinear` | `neutral.generate('#ffffff', '#000000', options)` |
 | `generateLinear*` / `generateMonochromeLinear` | 已移除。建议使用专门的渐变库（如 `d3-interpolate`、`chroma-js`）或在项目中自行实现插值。 |
 | `extractColorFromImage` / `extractColorFromFile` | 已移除。建议使用图片取色库（如 `color-thief`）或自行基于 canvas 实现。 |
 | `theme-blend` 相关导出（HCT/主题色板/界面色彩系统） | 已移除。建议使用专门方案（如 Material color utilities）或拆分到独立包维护。 |

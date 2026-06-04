@@ -2,7 +2,7 @@
 
 线性/渐变生成（Gradient）能力已从本库移除。
 
-灰阶色阶场景可使用 `neutral.generate`（仅灰阶），见 [API 参考](./api-reference.md) 或 [neutral.generate](./neutral-generate.md)。
+中性色阶场景可使用 `neutral.generate`，见 [API 参考](./api-reference.md) 或 [neutral.generate](./neutral-generate.md)。
 
 迁移建议与替代方案请参考 [迁移指南](./migration.md)。
 

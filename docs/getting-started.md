@@ -65,13 +65,15 @@ console.log(darkBluePalette);
 
 ### 3. 灰阶色阶（Neutral）
 
-本版本提供灰阶色阶能力（仅灰阶），用于背景/文本/边框等中性色体系：
+本版本提供中性色阶能力（默认灰阶，也支持 tinted neutrals），用于背景/文本/边框等中性色体系：
 
 ```js
 import { neutral } from '@aviala-design/color';
 
 const neutralLight = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2 });
 const neutralDark = neutral.generate('#000000', '#ffffff', { steps: 12, curveGamma: 1.2 });
+
+const tintedNeutral = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2, mixColor: '#165DFF', mixRatio: 0.2 });
 ```
 
 通用渐变/插值（Gradient）已移除。可参考 [迁移指南](./migration.md) 选择替代方案。

@@ -335,6 +335,7 @@
 
       function neutralItemHtml(config, colors) {
         const len = colors.light.length;
+        const mixMeta = config.mixColor && Number(config.mixRatio) > 0 ? ` · mix ${String(config.mixColor).toUpperCase()} ${Number(config.mixRatio).toFixed(2)}` : '';
         const swatches = colors.light
           .map((c, idx) => {
             const v = String(c);
@@ -363,7 +364,7 @@
               <div class="palette-seed" style="background:${config.end}"></div>
               <div class="palette-meta">
                 <div class="palette-name">${config.name}</div>
-                <div class="palette-hex mono">${config.start.toUpperCase()} → ${config.end.toUpperCase()}</div>
+                <div class="palette-hex mono">${config.start.toUpperCase()} → ${config.end.toUpperCase()}${mixMeta}</div>
               </div>
               <button class="icon-btn icon-btn-ghost palette-more" type="button" data-action="remove" aria-label="移除">
                 <i class="ri-delete-bin-6-line"></i>
@@ -391,10 +392,10 @@
 
         getItems().forEach((item) => {
           if (item.type === 'neutral') {
-            const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma });
-            const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma });
+            const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio });
+            const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio });
             if (!light || !dark) return;
-            payload[item.name] = { type: 'neutral', start: item.start, end: item.end, steps, format, curveGamma, light, dark };
+            payload[item.name] = { type: 'neutral', start: item.start, end: item.end, steps, format, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio, light, dark };
             return;
           }
 
@@ -448,7 +449,9 @@
               if (x?.type === 'neutral' || (typeof x?.start === 'string' && typeof x?.end === 'string')) {
                 const start = typeof x?.start === 'string' ? x.start : '#ffffff';
                 const end = typeof x?.end === 'string' ? x.end : '#000000';
-                return { id, name, type: 'neutral', start, end };
+                const mixColor = typeof x?.mixColor === 'string' ? x.mixColor : '';
+                const mixRatio = typeof x?.mixRatio === 'number' ? x.mixRatio : Number(x?.mixRatio) || 0;
+                return { id, name, type: 'neutral', start, end, mixColor, mixRatio };
               }
 
               if (typeof x?.color === 'string') {
@@ -478,8 +481,8 @@
         const html = getItems()
           .map((item) => {
             if (item.type === 'neutral') {
-              const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma });
-              const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma });
+              const light = safeNeutral(item.start, item.end, { steps, format, includeEnds: true, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio });
+              const dark = safeNeutral(item.end, item.start, { steps, format, includeEnds: true, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio });
               if (!light || !dark) return '';
               return neutralItemHtml(item, { light, dark });
             }
@@ -566,10 +569,11 @@
         const curveGamma = getCurveGamma();
         const mode = getAddMode();
         if (mode === 'neutral') {
+          const mix = getAddMix();
           const start = normalizeColor(addNeutralStartText.value || addNeutralStartPicker.value);
           const end = normalizeColor(addNeutralEndText.value || addNeutralEndPicker.value);
-          const light = safeNeutral(start, end, { steps, format, includeEnds: true, curveGamma });
-          const dark = safeNeutral(end, start, { steps, format, includeEnds: true, curveGamma });
+          const light = safeNeutral(start, end, { steps, format, includeEnds: true, curveGamma, ...mix });
+          const dark = safeNeutral(end, start, { steps, format, includeEnds: true, curveGamma, ...mix });
           if (!light || !dark) {
             addPreview.innerHTML = '';
             return;
@@ -618,17 +622,9 @@
         addModeNeutral.classList.toggle('is-active', mode === 'neutral');
         addPaletteFields.classList.toggle('is-hidden', mode !== 'palette');
         addNeutralFields.classList.toggle('is-hidden', mode !== 'neutral');
-        addMixField.classList.toggle('is-hidden', mode !== 'palette');
-        addMixWrap.classList.toggle('is-hidden', mode !== 'palette' || !addMixEnabled.checked);
+        addMixField.classList.toggle('is-hidden', false);
+        addMixWrap.classList.toggle('is-hidden', !addMixEnabled.checked);
         renderAddPreview();
-      }
-
-      function isGrayscaleHex(hex) {
-        if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return false;
-        const r = hex.slice(1, 3).toLowerCase();
-        const g = hex.slice(3, 5).toLowerCase();
-        const b = hex.slice(5, 7).toLowerCase();
-        return r === g && g === b;
       }
 
       addModePalette.addEventListener('click', () => setAddMode('palette'));
@@ -701,11 +697,8 @@
             toast('请输入有效 HEX 颜色', 'error');
             return;
           }
-          if (!isGrayscaleHex(start) || !isGrayscaleHex(end)) {
-            toast('中性色仅支持灰阶（R=G=B）', 'error');
-            return;
-          }
-          next.unshift({ id, name, type: 'neutral', start: start.toUpperCase(), end: end.toUpperCase() });
+          const mix = getAddMix();
+          next.unshift({ id, name, type: 'neutral', start: start.toUpperCase(), end: end.toUpperCase(), mixColor: mix.mixColor, mixRatio: mix.mixRatio });
         } else {
           const color = normalizeColor(addColorText.value || addColorPicker.value);
           if (!/^#[0-9a-fA-F]{6}$/.test(color)) {

@@ -126,3 +126,16 @@ it('neutral.generate curveGamma', () => {
   const curved = generate('#ffffff', '#000000', { steps: 12, format: 'hex', curveGamma: 2 });
   expect(lightness(curved[1])).toBeGreaterThan(lightness(linear[1]));
 });
+
+it('neutral.generate mix', () => {
+  const { generate } = lib.neutral;
+  const mixed = generate('#ffffff', '#000000', { steps: 12, format: 'hex', mixColor: '#165dff', mixRatio: 0.3 });
+  expect(mixed).toHaveLength(12);
+  expect(mixed[0]).not.toBe('#ffffff');
+  expect(mixed[11]).not.toBe('#000000');
+
+  const reverse = generate('#000000', '#ffffff', { steps: 12, format: 'hex', mixColor: '#165dff', mixRatio: 0.3 });
+  expect(reverse).toHaveLength(12);
+  expect(mixed[0]).toBe(reverse[11]);
+  expect(mixed[11]).toBe(reverse[0]);
+});

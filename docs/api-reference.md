@@ -43,7 +43,7 @@ const mixed = palette.generate('#F53F3F', { index: 6, mixColor: '#165DFF', mixRa
 
 ## neutral.generate
 
-生成灰阶色阶（仅灰阶）。
+生成中性色阶（默认灰阶；支持通过 mixColor/mixRatio 生成 tinted neutrals）。
 
 ```ts
 import { neutral } from '@aviala-design/color';
@@ -56,6 +56,8 @@ neutral.generate(
     includeEnds?: boolean; // 默认 true
     format?: 'hex' | 'rgb' | 'hsl'; // 默认 'hex'
     curveGamma?: number; // 0.1..5，默认 1
+    mixColor?: string; // hex
+    mixRatio?: number; // 0..1，默认 0
   }
 ): string[]
 ```
@@ -67,5 +69,7 @@ import { neutral } from '@aviala-design/color';
 
 const light = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2 });
 const dark = neutral.generate('#000000', '#ffffff', { steps: 12, curveGamma: 1.2 });
+
+const tinted = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2, mixColor: '#165DFF', mixRatio: 0.2 });
 ```
 
