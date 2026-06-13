@@ -9,6 +9,20 @@ function lightness(input) {
   return Color(input).hsl().color[2];
 }
 
+function saturation(input) {
+  return Color(input).hsl().color[1];
+}
+
+function expectMonotonic(values, direction) {
+  for (let i = 1; i < values.length; i++) {
+    if (direction === 'asc') {
+      expect(values[i]).toBeGreaterThanOrEqual(values[i - 1]);
+    } else {
+      expect(values[i]).toBeLessThanOrEqual(values[i - 1]);
+    }
+  }
+}
+
 it('export shape', () => {
   expect(lib).toHaveProperty('palette');
   expect(lib.palette).toHaveProperty('generate');
@@ -48,48 +62,36 @@ it('removed exports should not exist', () => {
 it('palette.generate single color', () => {
   const { generate } = lib.palette;
   const base = '#f53f3f';
-  const baseHex = normalizeHex(base);
-
-  expect(generate(base, { index: 6 })).toBe(baseHex);
-  expect(generate(base, { index: 6, dark: true })).toBe(baseHex);
-
-  expect(generate(base, { index: 1 })).not.toBe(baseHex);
-  expect(generate(base, { index: 10 })).not.toBe(baseHex);
-  expect(generate(base, { index: 1, dark: true })).not.toBe(baseHex);
-  expect(generate(base, { index: 10, dark: true })).not.toBe(baseHex);
+  expect(normalizeHex(generate(base, { index: 1 }))).not.toBe(normalizeHex(generate(base, { index: 10 })));
+  expect(normalizeHex(generate(base, { index: 1, dark: true }))).not.toBe(normalizeHex(generate(base, { index: 10, dark: true })));
 });
 
 it('palette.generate list (light/dark)', () => {
   const { generate } = lib.palette;
   const base = '#f53f3f';
-  const baseHex = normalizeHex(base);
-  const baseL = lightness(baseHex);
-
   const lightList = generate(base, { list: true });
   expect(lightList).toHaveLength(10);
-  expect(lightList[5]).toBe(baseHex);
   expect(generate(base, { index: 1 })).toBe(lightList[0]);
   expect(generate(base, { index: 10 })).toBe(lightList[9]);
-
-  for (let idx = 0; idx < 5; idx++) {
-    expect(lightness(lightList[idx])).toBeGreaterThanOrEqual(baseL);
-  }
-  for (let idx = 6; idx < 10; idx++) {
-    expect(lightness(lightList[idx])).toBeLessThanOrEqual(baseL);
-  }
+  expectMonotonic(lightList.map(lightness), 'desc');
 
   const darkList = generate(base, { list: true, dark: true });
   expect(darkList).toHaveLength(10);
-  expect(darkList[5]).toBe(baseHex);
   expect(generate(base, { index: 1, dark: true })).toBe(darkList[0]);
   expect(generate(base, { index: 10, dark: true })).toBe(darkList[9]);
+  expectMonotonic(darkList.map(lightness), 'asc');
+});
 
-  for (let idx = 0; idx < 5; idx++) {
-    expect(lightness(darkList[idx])).toBeLessThanOrEqual(baseL);
-  }
-  for (let idx = 6; idx < 10; idx++) {
-    expect(lightness(darkList[idx])).toBeGreaterThanOrEqual(baseL);
-  }
+it('palette.generate softens saturation on palette ends', () => {
+  const { generate } = lib.palette;
+  const lightList = generate('#f53f3f', { list: true });
+  const darkList = generate('#f53f3f', { list: true, dark: true });
+  const centerLight = saturation(lightList[Math.floor(lightList.length / 2)]);
+  const centerDark = saturation(darkList[Math.floor(darkList.length / 2)]);
+
+  expect(saturation(lightList[0])).toBeLessThan(centerLight);
+  expect(saturation(lightList[lightList.length - 1])).toBeLessThan(centerLight);
+  expect(saturation(darkList[0])).toBeLessThan(centerDark);
 });
 
 it('palette.generate format', () => {
@@ -101,12 +103,36 @@ it('palette.generate format', () => {
 it('palette.generate mix', () => {
   const { generate } = lib.palette;
   const base = '#f53f3f';
-  const baseHex = normalizeHex(base);
   const mixed = generate(base, { index: 6, mixColor: '#165dff', mixRatio: 0.5 });
-  expect(mixed).not.toBe(baseHex);
-  expect(generate(base, { index: 6, dark: true, mixColor: '#165dff', mixRatio: 0.5 })).toBe(mixed);
-  const list = generate(base, { list: true, mixColor: '#165dff', mixRatio: 0.5 });
-  expect(list[5]).toBe(mixed);
+  expect(normalizeHex(mixed)).not.toBe(normalizeHex(base));
+  expect(generate(base, { index: 6, dark: true, mixColor: '#165dff', mixRatio: 0.5 })).not.toBe(normalizeHex(base));
+  const meta = generate(base, { list: true, mixColor: '#165dff', mixRatio: 0.5, meta: true });
+  expect(meta.colors).toHaveLength(10);
+  expect(normalizeHex(meta.base.sourceHex)).toBe(normalizeHex(base));
+  expect(normalizeHex(meta.base.seedHex)).not.toBe(normalizeHex(base));
+  expect(meta.base.closestIndex).toBeGreaterThanOrEqual(1);
+  expect(meta.base.closestIndex).toBeLessThanOrEqual(10);
+});
+
+it('palette.generate meta exposes base color information', () => {
+  const { generate } = lib.palette;
+  const result = generate('#808080', { list: true, dark: true, meta: true });
+  expect(result).toHaveProperty('colors');
+  expect(result).toHaveProperty('base');
+  expect(result).toHaveProperty('steps');
+  expect(result.base.isNeutral).toBe(true);
+  expect(result.base.closestColor).toBe(result.colors[result.base.closestIndex - 1]);
+  expect(result.steps[0]).toHaveProperty('tone');
+  expect(result.steps[0]).toHaveProperty('chroma');
+});
+
+it('palette.generate dark neutral palette runs from black to white', () => {
+  const { generate } = lib.palette;
+  const list = generate('#808080', { list: true, dark: true });
+  const lightnessList = list.map(lightness);
+  expectMonotonic(lightnessList, 'asc');
+  expect(saturation(list[0])).toBeLessThan(5);
+  expect(saturation(list[list.length - 1])).toBeLessThan(5);
 });
 
 it('neutral.generate gray linear', () => {

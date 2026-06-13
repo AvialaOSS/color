@@ -172,6 +172,22 @@ export function harmonizeColor(themeColor, targetColor, harmonizeRatio = 0.15) {
 }
 
 /**
+ * 对语义基础色做预调和，让参数语义与主流程保持一致
+ * @param {string} themeColor - 主题色
+ * @param {Object} semanticColors - 原始语义色
+ * @param {number} harmonizeRatio - 调和强度
+ * @returns {Object} 调和后的语义色
+ */
+function harmonizeSemanticColors(themeColor, semanticColors, harmonizeRatio = 0.15) {
+  return Object.fromEntries(
+    Object.entries(semanticColors).map(([name, color]) => [
+      name,
+      harmonizeColor(themeColor, color, harmonizeRatio)
+    ])
+  );
+}
+
+/**
  * 生成主题色变体 - 基于主题色生成不同明度的颜色变体
  * @param {string} themeColor - 主题色 (RGB)
  * @param {Object|Array} options - 配置选项，可以是对象 {tones: [...]} 或直接传入数组
@@ -349,7 +365,7 @@ export function generateInterfaceColorSystem(themeColor, options = {}) {
 /**
  * 生成完整的主题色板
  * @param {string} themeColor - 主题色
- * @param {Object} options - 配置选项
+ * @param {Object} options - 配置选项；harmonizeRatio 控制语义基础色调和，blendRatio 控制最终混合强度
  * @returns {Object} 完整的主题色板
  */
 export function generateThemePalette(themeColor, options = {}) {
@@ -372,12 +388,18 @@ export function generateThemePalette(themeColor, options = {}) {
     generateVariants = true
   } = options;
   
-  // 生成语义色变体
-  const semanticVariants = generateSemanticColors(themeColor, { semanticColors, blendRatio: harmonizeRatio, isDark });
+  const harmonizedSemanticColors = harmonizeSemanticColors(themeColor, semanticColors, harmonizeRatio);
+  
+  // 先调和语义基础色，再按统一的 blendRatio 生成色阶
+  const semanticVariants = generateSemanticColors(themeColor, {
+    semanticColors: harmonizedSemanticColors,
+    blendRatio,
+    isDark
+  });
   
   // 将扁平的语义色变体重新组织为嵌套结构
   const semantic = {};
-  Object.entries(semanticColors).forEach(([name]) => {
+  Object.entries(harmonizedSemanticColors).forEach(([name]) => {
     semantic[name] = {};
     for (let i = 1; i <= 10; i++) {
       const key = `${name}-${i}`;

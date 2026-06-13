@@ -2,7 +2,7 @@
 
 Aviala Design Color is a palette generator for design systems:
 
-- `palette.generate`: Generate a palette from a seed color (light + dark)
+- `palette.generate`: Generate a UI-friendly tonal palette from a seed color (light + dark)
 - `neutral.generate`: Generate grayscale ramps (light + dark via reversing)
 
 ## Install
@@ -18,6 +18,7 @@ import { palette, neutral } from '@aviala-design/color';
 
 const paletteLight = palette.generate('#165DFF', { list: true });
 const paletteDark = palette.generate('#165DFF', { list: true, dark: true });
+const paletteMeta = palette.generate('#165DFF', { list: true, meta: true });
 
 const graysLight = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2 });
 const graysDark = neutral.generate('#000000', '#ffffff', { steps: 12, curveGamma: 1.2 });
@@ -34,16 +35,24 @@ palette.generate(
   color: string,
   options?: {
     steps?: number; // 1..24, default 10
-    index?: number; // 1..steps, default centerIndex (e.g. 6 when steps=10)
+    index?: number; // 1..steps, default mid tone
     dark?: boolean;
     list?: boolean;
+    meta?: boolean; // return colors/base metadata instead of plain string/list
     format?: 'hex' | 'rgb' | 'hsl'; // default 'hex'
     curveGamma?: number; // 0.1..5, default 1
     mixColor?: string; // hex color
     mixRatio?: number; // 0..1, default 0
   }
-): string | string[]
+): string | string[] | { color/base/step or colors/base/steps }
 ```
+
+`palette.generate` now follows a tonal palette model that is closer to Material Design 3:
+
+- Light palettes run from light to dark while reducing chroma at the extremes
+- Dark palettes run from near-black to near-white instead of simply mirroring the light ramp
+- Neutral seeds become usable black-to-white ramps with very low chroma
+- `meta: true` exposes the normalized source/seed color and the closest generated step
 
 ### neutral.generate(startGray, endGray, options?)
 

@@ -19,15 +19,16 @@ palette.generate(
   color: string,
   options?: {
     steps?: number; // 1..24，默认 10
-    index?: number; // 1..steps，默认中心档（例如 steps=10 时是 6）
+    index?: number; // 1..steps，默认中间档位
     dark?: boolean;
     list?: boolean;
+    meta?: boolean; // 返回 colors/base/steps 元信息
     format?: 'hex' | 'rgb' | 'hsl'; // 默认 'hex'
     curveGamma?: number; // 0.1..5，默认 1
     mixColor?: string; // hex
     mixRatio?: number; // 0..1，默认 0
   }
-): string | string[]
+): string | string[] | { color/base/step 或 colors/base/steps }
 ```
 
 ### 示例
@@ -37,6 +38,7 @@ import { palette } from '@aviala-design/color';
 
 const light = palette.generate('#165DFF', { list: true, steps: 12, curveGamma: 1.1 });
 const dark = palette.generate('#165DFF', { list: true, dark: true, steps: 12, curveGamma: 1.1 });
+const meta = palette.generate('#165DFF', { list: true, meta: true });
 
 const mixed = palette.generate('#F53F3F', { index: 6, mixColor: '#165DFF', mixRatio: 0.2 });
 ```

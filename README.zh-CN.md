@@ -2,7 +2,7 @@
 
 Aviala Design Color 是一个“色板生成器”，用于构建设计系统的颜色体系：
 
-- `palette.generate`：基于输入色生成色板（同时支持 Light / Dark）
+- `palette.generate`：基于输入色生成更适合 UI 的 tonal palette（同时支持 Light / Dark）
 - `neutral.generate`：生成中性色阶（默认灰阶；可选 tinted，Dark 可通过反向生成）
 
 ## 安装
@@ -18,6 +18,7 @@ import { palette, neutral } from '@aviala-design/color';
 
 const paletteLight = palette.generate('#165DFF', { list: true });
 const paletteDark = palette.generate('#165DFF', { list: true, dark: true });
+const paletteMeta = palette.generate('#165DFF', { list: true, meta: true });
 
 const graysLight = neutral.generate('#ffffff', '#000000', { steps: 12, curveGamma: 1.2 });
 const graysDark = neutral.generate('#000000', '#ffffff', { steps: 12, curveGamma: 1.2 });
@@ -35,16 +36,24 @@ palette.generate(
   color: string,
   options?: {
     steps?: number; // 1..24，默认 10
-    index?: number; // 1..steps，默认中心档（例如 steps=10 时是 6）
+    index?: number; // 1..steps，默认中间档位
     dark?: boolean;
     list?: boolean;
+    meta?: boolean; // 返回色板和基准色元信息，而不是纯字符串/数组
     format?: 'hex' | 'rgb' | 'hsl'; // 默认 'hex'
     curveGamma?: number; // 0.1..5，默认 1
     mixColor?: string; // hex
     mixRatio?: number; // 0..1，默认 0
   }
-): string | string[]
+): string | string[] | { color/base/step 或 colors/base/steps }
 ```
+
+`palette.generate` 现在采用更接近 Material Design 3 的 tonal palette 语义：
+
+- 亮色色盘从亮到暗分布，两端会主动回收色度，避免极端饱和
+- 暗色色盘从近黑到近白分布，不再只是亮色色盘的镜像翻转
+- 中性色输入会生成更接近黑白序列的低色度色盘
+- `meta: true` 可以拿到标准化后的 `source/seed` 颜色和最接近的生成档位
 
 ### neutral.generate(startGray, endGray, options?)
 

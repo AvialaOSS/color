@@ -239,6 +239,7 @@
             background: hsl(var(--muted));
             outline: none;
             cursor: pointer;
+            appearance: none;
             -webkit-appearance: none;
             position: relative;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -713,6 +714,7 @@
             .custom-semantic-colors {
                 grid-template-columns: 1fr;
             }
+        }
         
         @media (max-width: 768px) {
             body {
@@ -837,7 +839,7 @@
                     <div class="input-group">
                         <div class="range-input-group">
                             <div class="range-label">
-                                <label>协调比例</label>
+                                <label>语义色调和比例</label>
                                 <span class="range-value" id="paletteHarmonizeRatioValue">0.15</span>
                             </div>
                             <input type="range" id="paletteHarmonizeRatio" min="0" max="0.5" step="0.01" value="0.15">

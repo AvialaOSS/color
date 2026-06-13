@@ -391,8 +391,8 @@ const customPalette = generateThemePalette('#165DFF', {
     primary: '#165DFF',
     secondary: '#00B42A'
   },
-  harmonizeRatio: 0.2,
-  blendRatio: 0.1,
+  harmonizeRatio: 0.2, // 先让语义基础色向主题色色相靠拢
+  blendRatio: 0.1,     // 再控制语义色、UI 色和控件色的混合强度
   generateVariants: true
 });
 ```
@@ -445,8 +445,8 @@ interface InterfaceColorSystemOptions {
 interface ThemePaletteOptions {
   semanticColors?: Record<string, string>; // 自定义语义色
   uiColors?: Record<string, string>;       // 自定义界面色
-  harmonizeRatio?: number;                 // 调和比例 (0-1)
-  blendRatio?: number;                     // 混合比例 (0-1)
+  harmonizeRatio?: number;                 // 语义基础色调和比例 (0-1)
+  blendRatio?: number;                     // 最终混合比例 (0-1)
   generateVariants?: boolean;              // 是否生成变体
   tones?: number[];                        // 自定义明度值
 }

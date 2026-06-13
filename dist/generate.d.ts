@@ -5,13 +5,15 @@ export default generate;
  * @param {number} options.index 1 - 10 (default: 6)
  * @param {boolean} options.dark
  * @param {boolean} options.list
+ * @param {boolean} options.meta
  * @param {string} options.format 'hex' | 'rgb' | 'hsl'
  *
- * @return string | string[]
+ * @return {string|string[]|Object}
  */
 declare function generate(color: string, options?: {
     index: number;
     dark: boolean;
     list: boolean;
+    meta: boolean;
     format: string;
-}): any;
+}): string | string[] | Object;
