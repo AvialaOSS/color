@@ -14,8 +14,8 @@ import { generatePalette } from './palette-core.js';
 function generate(color, options = {}) {
   const { dark, list, format = 'hex', meta = false } = options;
   const steps = Math.max(1, Math.min(24, Number(options.steps) || 10));
-  const centerIndex = Math.floor(steps / 2) + 1;
-  const index = Math.max(1, Math.min(steps, Number(options.index) || centerIndex));
+  const hasExplicitIndex = options.index !== undefined && options.index !== null && options.index !== '';
+  const index = hasExplicitIndex ? Math.max(1, Math.min(steps, Number(options.index))) : undefined;
   const curveGamma = Math.max(0.1, Math.min(5, Number(options.curveGamma) || 1));
   const mixColor = typeof options.mixColor === 'string' ? options.mixColor : '';
   const mixRatio = Math.max(0, Math.min(1, Number(options.mixRatio) || 0));

@@ -84,14 +84,68 @@ it('palette.generate list (light/dark)', () => {
 
 it('palette.generate softens saturation on palette ends', () => {
   const { generate } = lib.palette;
-  const lightList = generate('#f53f3f', { list: true });
-  const darkList = generate('#f53f3f', { list: true, dark: true });
-  const centerLight = saturation(lightList[Math.floor(lightList.length / 2)]);
-  const centerDark = saturation(darkList[Math.floor(darkList.length / 2)]);
+  const lightList = generate('#f53f3f', { list: true, meta: true });
+  const centerLight = lightList.steps[Math.floor(lightList.steps.length / 2)].chroma;
 
-  expect(saturation(lightList[0])).toBeLessThan(centerLight);
-  expect(saturation(lightList[lightList.length - 1])).toBeLessThan(centerLight);
-  expect(saturation(darkList[0])).toBeLessThan(centerDark);
+  expect(lightList.steps[0].chroma).toBeLessThan(centerLight);
+  expect(lightList.steps[lightList.steps.length - 1].chroma).toBeLessThan(centerLight);
+});
+
+it('palette.generate keeps a subtle brand tint on the first light step', () => {
+  const { generate } = lib.palette;
+  const blueFirst = normalizeHex(generate('#1677ff', { index: 1 }));
+  const redFirst = normalizeHex(generate('#f53f3f', { index: 1 }));
+
+  expect(blueFirst).not.toBe('#f9f9f9');
+  expect(redFirst).not.toBe('#f9f9f9');
+  expect(blueFirst).not.toBe(redFirst);
+});
+
+it('palette.generate keeps a subtle brand tint on the first dark step', () => {
+  const { generate } = lib.palette;
+  const blueFirst = normalizeHex(generate('#1677ff', { index: 1, dark: true }));
+  const redFirst = normalizeHex(generate('#f53f3f', { index: 1, dark: true }));
+
+  expect(blueFirst).not.toBe('#0e0e0e');
+  expect(redFirst).not.toBe('#0e0e0e');
+  expect(blueFirst).not.toBe(redFirst);
+});
+
+it('palette.generate dark palette has usable early-step separation', () => {
+  const { generate } = lib.palette;
+  const darkList = generate('#1677ff', { list: true, dark: true });
+
+  expect(normalizeHex(darkList[0])).not.toBe(normalizeHex(darkList[1]));
+  expect(normalizeHex(darkList[1])).not.toBe(normalizeHex(darkList[2]));
+});
+
+it('palette.generate dark palette brightens while reducing chroma toward lighter steps', () => {
+  const { generate } = lib.palette;
+  const result = generate('#1677ff', { list: true, dark: true, meta: true, steps: 10 });
+
+  expect(result.steps[0].tone).toBeLessThan(result.steps[5].tone);
+  expect(result.steps[5].tone).toBeLessThan(result.steps[9].tone);
+  expect(result.steps[0].chroma).toBeGreaterThan(result.steps[5].chroma);
+  expect(result.steps[5].chroma).toBeGreaterThan(result.steps[9].chroma);
+});
+
+it('palette.generate defaults to a brighter recommended dark index', () => {
+  const { generate } = lib.palette;
+  expect(normalizeHex(generate('#1677ff', { dark: true }))).toBe(
+    normalizeHex(generate('#1677ff', { dark: true, steps: 10, index: 8 }))
+  );
+  expect(normalizeHex(generate('#1677ff', { dark: true, steps: 13 }))).toBe(
+    normalizeHex(generate('#1677ff', { dark: true, steps: 13, index: 10 }))
+  );
+});
+
+it('palette.generate dark meta uplifts baseIndex toward brighter theme steps', () => {
+  const { generate } = lib.palette;
+  const result = generate('#722ed1', { list: true, dark: true, steps: 13, meta: true });
+
+  expect(result.base.closestIndex).toBeLessThanOrEqual(result.base.baseIndex);
+  expect(result.base.baseIndex).toBeGreaterThanOrEqual(10);
+  expect(result.base.baseColor).toBe(result.colors[result.base.baseIndex - 1]);
 });
 
 it('palette.generate format', () => {

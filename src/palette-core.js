@@ -3,10 +3,10 @@ import { Blend, Hct, argbFromHex, hexFromArgb } from '@material/material-color-u
 import { getColorString } from './utils.js';
 
 const LIGHT_TONE_ANCHORS = [98, 96, 92, 86, 76, 64, 52, 40, 28, 18];
-const DARK_TONE_ANCHORS = [4, 8, 12, 18, 26, 38, 52, 68, 84, 96];
+const DARK_TONE_ANCHORS = [14, 20, 28, 38, 50, 62, 74, 86, 93, 97];
 
-const LIGHT_COLOR_CHROMA_ANCHORS = [0, 0.06, 0.16, 0.3, 0.5, 0.74, 1, 0.92, 0.78, 0.6];
-const DARK_COLOR_CHROMA_ANCHORS = [0, 0.04, 0.1, 0.18, 0.32, 0.5, 0.72, 0.94, 1, 0.76];
+const LIGHT_COLOR_CHROMA_ANCHORS = [0.08, 0.14, 0.24, 0.36, 0.5, 0.74, 1, 0.92, 0.78, 0.6];
+const DARK_COLOR_CHROMA_ANCHORS = [1, 0.98, 0.94, 0.88, 0.8, 0.72, 0.62, 0.52, 0.42, 0.32];
 
 const LIGHT_NEUTRAL_CHROMA_ANCHORS = [0, 0.02, 0.04, 0.08, 0.12, 0.16, 0.12, 0.08, 0.04, 0];
 const DARK_NEUTRAL_CHROMA_ANCHORS = [0, 0.02, 0.04, 0.08, 0.12, 0.16, 0.12, 0.08, 0.04, 0];
@@ -21,18 +21,26 @@ function round(value) {
   return Math.round(value * 100) / 100;
 }
 
+function getPreferredDarkBaseIndex(steps) {
+  return clamp(Math.round(steps * 0.77), 1, steps);
+}
+
 function normalizeOptions(options = {}) {
   const steps = clamp(Number(options.steps) || 10, 1, 24);
   const centerIndex = Math.floor(steps / 2) + 1;
+  const dark = Boolean(options.dark);
+  const hasExplicitIndex = options.index !== undefined && options.index !== null && options.index !== '';
+  const defaultIndex = dark ? getPreferredDarkBaseIndex(steps) : centerIndex;
 
   return {
-    dark: Boolean(options.dark),
+    dark,
     list: Boolean(options.list),
     meta: Boolean(options.meta),
     format: options.format || 'hex',
     steps,
     centerIndex,
-    index: clamp(Number(options.index) || centerIndex, 1, steps),
+    hasExplicitIndex,
+    index: clamp(hasExplicitIndex ? Number(options.index) : defaultIndex, 1, steps),
     curveGamma: clamp(Number(options.curveGamma) || 1, 0.1, 5),
     mixColor: typeof options.mixColor === 'string' ? options.mixColor : '',
     mixRatio: clamp(Number(options.mixRatio) || 0, 0, 1),
@@ -126,6 +134,10 @@ function buildPalette(originColor, options = {}) {
     const bestDistance = Math.abs(best.tone - baseHct.tone) + Math.abs(best.chroma - baseHct.chroma) * 0.35;
     return currentDistance < bestDistance ? current : best;
   }, descriptors[0]);
+  const preferredBaseIndex = normalized.dark
+    ? Math.max(closest.index, getPreferredDarkBaseIndex(normalized.steps))
+    : closest.index;
+  const base = descriptors[preferredBaseIndex - 1];
 
   return {
     options: normalized,
@@ -140,6 +152,8 @@ function buildPalette(originColor, options = {}) {
       seedChroma: round(baseHct.chroma),
       closestIndex: closest.index,
       closestColor: closest.color,
+      baseIndex: base.index,
+      baseColor: base.color,
       dark: normalized.dark,
       steps: normalized.steps,
       isNeutral: closest.isNeutral,
@@ -150,7 +164,8 @@ function buildPalette(originColor, options = {}) {
 function finalizePaletteResult(palette) {
   const { options, descriptors, meta } = palette;
   const colors = descriptors.map((item) => item.color);
-  const current = descriptors[options.index - 1];
+  const selectedIndex = options.hasExplicitIndex || options.list ? options.index : meta.baseIndex;
+  const current = descriptors[selectedIndex - 1];
 
   if (!options.meta) {
     return options.list ? colors : current.color;
@@ -158,7 +173,6 @@ function finalizePaletteResult(palette) {
 
   const payload = {
     ...meta,
-    baseIndex: meta.closestIndex,
   };
 
   if (options.list) {
