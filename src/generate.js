@@ -7,6 +7,7 @@ import { generatePalette } from './palette-core.js';
  * @param {boolean} options.dark
  * @param {boolean} options.list
  * @param {boolean} options.meta
+ * @param {boolean} options.protectYellow
  * @param {string} options.format 'hex' | 'rgb' | 'hsl'
  * 
  * @return {string|string[]|Object}
@@ -19,6 +20,7 @@ function generate(color, options = {}) {
   const curveGamma = Math.max(0.1, Math.min(5, Number(options.curveGamma) || 1));
   const mixColor = typeof options.mixColor === 'string' ? options.mixColor : '';
   const mixRatio = Math.max(0, Math.min(1, Number(options.mixRatio) || 0));
+  const protectYellow = Boolean(options.protectYellow);
 
   return generatePalette(color, {
     dark,
@@ -30,6 +32,7 @@ function generate(color, options = {}) {
     curveGamma,
     mixColor,
     mixRatio,
+    protectYellow,
   });
 }
 

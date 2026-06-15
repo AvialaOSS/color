@@ -148,6 +148,27 @@ it('palette.generate dark meta uplifts baseIndex toward brighter theme steps', (
   expect(result.base.baseColor).toBe(result.colors[result.base.baseIndex - 1]);
 });
 
+it('palette.generate protectYellow keeps non-yellow hues unchanged', () => {
+  const { generate } = lib.palette;
+  expect(normalizeHex(generate('#1677ff', { index: 6, protectYellow: true }))).toBe(
+    normalizeHex(generate('#1677ff', { index: 6 }))
+  );
+  expect(normalizeHex(generate('#f53f3f', { index: 6, dark: true, protectYellow: true }))).toBe(
+    normalizeHex(generate('#f53f3f', { index: 6, dark: true }))
+  );
+});
+
+it('palette.generate protectYellow brightens yellow steps without reducing chroma', () => {
+  const { generate } = lib.palette;
+  const normal = generate('#ffb630', { list: true, steps: 12, meta: true });
+  const protectedPalette = generate('#ffb630', { list: true, steps: 12, meta: true, protectYellow: true });
+
+  expect(normal.base.yellowProtectionApplied).toBe(false);
+  expect(protectedPalette.base.yellowProtectionApplied).toBe(true);
+  expect(protectedPalette.steps[5].tone).toBeGreaterThan(normal.steps[5].tone);
+  expect(protectedPalette.steps[5].chroma).toBeGreaterThanOrEqual(normal.steps[5].chroma);
+});
+
 it('palette.generate format', () => {
   const { generate } = lib.palette;
   expect(generate('#f53f3f', { index: 6, format: 'rgb' })).toMatch(/^rgb\(\d+,\s?\d+,\s?\d+\)$/);
@@ -174,19 +195,19 @@ it('palette.generate meta exposes base color information', () => {
   expect(result).toHaveProperty('colors');
   expect(result).toHaveProperty('base');
   expect(result).toHaveProperty('steps');
-  expect(result.base.isNeutral).toBe(true);
+  expect(result.base.isNeutral).toBe(false);
   expect(result.base.closestColor).toBe(result.colors[result.base.closestIndex - 1]);
   expect(result.steps[0]).toHaveProperty('tone');
   expect(result.steps[0]).toHaveProperty('chroma');
 });
 
-it('palette.generate dark neutral palette runs from black to white', () => {
+it('palette.generate dark gray seed is no longer forced into a neutral ramp', () => {
   const { generate } = lib.palette;
   const list = generate('#808080', { list: true, dark: true });
   const lightnessList = list.map(lightness);
   expectMonotonic(lightnessList, 'asc');
   expect(saturation(list[0])).toBeLessThan(5);
-  expect(saturation(list[list.length - 1])).toBeLessThan(5);
+  expect(saturation(list[list.length - 1])).toBeGreaterThan(5);
 });
 
 it('neutral.generate gray linear', () => {

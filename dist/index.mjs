@@ -1,4 +1,4 @@
-import Y from "color";
+import U from "color";
 /**
  * @license
  * Copyright 2021 Google LLC
@@ -18,22 +18,22 @@ import Y from "color";
 function H(r) {
   return r < 0 ? -1 : r === 0 ? 0 : 1;
 }
-function ne(r, e, t) {
+function ae(r, e, t) {
   return (1 - t) * r + t * e;
 }
-function _e(r, e, t) {
+function He(r, e, t) {
   return t < r ? r : t > e ? e : t;
 }
-function U(r, e, t) {
+function Y(r, e, t) {
   return t < r ? r : t > e ? e : t;
 }
 function he(r) {
   return r = r % 360, r < 0 && (r = r + 360), r;
 }
-function Ve(r, e) {
+function Ue(r, e) {
   return he(e - r) <= 180 ? 1 : -1;
 }
-function Ue(r, e) {
+function ze(r, e) {
   return 180 - Math.abs(Math.abs(r - e) - 180);
 }
 function Pe(r, e) {
@@ -56,11 +56,11 @@ function Pe(r, e) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const He = [
+const Ke = [
   [0.41233895, 0.35762064, 0.18051042],
   [0.2126, 0.7152, 0.0722],
   [0.01932141, 0.11916382, 0.95034478]
-], Ye = [
+], Ge = [
   [
     3.2413774792388685,
     -1.5376652402851851,
@@ -76,62 +76,62 @@ const He = [
     -0.20395524564742123,
     1.0571799111220335
   ]
-], ze = [95.047, 100, 108.883];
+], je = [95.047, 100, 108.883];
 function be(r, e, t) {
   return (255 << 24 | (r & 255) << 16 | (e & 255) << 8 | t & 255) >>> 0;
 }
-function De(r) {
+function we(r) {
   const e = Q(r[0]), t = Q(r[1]), n = Q(r[2]);
   return be(e, t, n);
 }
-function Me(r) {
+function Ae(r) {
   return r >> 16 & 255;
 }
-function Be(r) {
+function Ie(r) {
   return r >> 8 & 255;
 }
 function ve(r) {
   return r & 255;
 }
-function Ke(r, e, t) {
-  const n = Ye, a = n[0][0] * r + n[0][1] * e + n[0][2] * t, i = n[1][0] * r + n[1][1] * e + n[1][2] * t, s = n[2][0] * r + n[2][1] * e + n[2][2] * t, u = Q(a), l = Q(i), f = Q(s);
+function Xe(r, e, t) {
+  const n = Ge, a = n[0][0] * r + n[0][1] * e + n[0][2] * t, i = n[1][0] * r + n[1][1] * e + n[1][2] * t, s = n[2][0] * r + n[2][1] * e + n[2][2] * t, u = Q(a), l = Q(i), f = Q(s);
   return be(u, l, f);
 }
-function Ge(r) {
-  const e = re(Me(r)), t = re(Be(r)), n = re(ve(r));
-  return Pe([e, t, n], He);
+function qe(r) {
+  const e = ne(Ae(r)), t = ne(Ie(r)), n = ne(ve(r));
+  return Pe([e, t, n], Ke);
 }
-function je(r) {
-  const e = J(r), t = Q(e);
+function $e(r) {
+  const e = W(r), t = Q(e);
   return be(t, t, t);
 }
 function ge(r) {
-  const e = Ge(r)[1];
-  return 116 * Ie(e / 100) - 16;
+  const e = qe(r)[1];
+  return 116 * Le(e / 100) - 16;
 }
-function J(r) {
-  return 100 * qe((r + 16) / 116);
+function W(r) {
+  return 100 * Je((r + 16) / 116);
 }
 function ke(r) {
-  return Ie(r / 100) * 116 - 16;
+  return Le(r / 100) * 116 - 16;
 }
-function re(r) {
+function ne(r) {
   const e = r / 255;
   return e <= 0.040449936 ? e / 12.92 * 100 : Math.pow((e + 0.055) / 1.055, 2.4) * 100;
 }
 function Q(r) {
   const e = r / 100;
   let t = 0;
-  return e <= 31308e-7 ? t = e * 12.92 : t = 1.055 * Math.pow(e, 1 / 2.4) - 0.055, _e(0, 255, Math.round(t * 255));
+  return e <= 31308e-7 ? t = e * 12.92 : t = 1.055 * Math.pow(e, 1 / 2.4) - 0.055, He(0, 255, Math.round(t * 255));
 }
-function Xe() {
-  return ze;
+function We() {
+  return je;
 }
-function Ie(r) {
+function Le(r) {
   const e = 0.008856451679035631, t = 24389 / 27;
   return r > e ? Math.pow(r, 1 / 3) : (t * r + 16) / 116;
 }
-function qe(r) {
+function Je(r) {
   const e = 0.008856451679035631, t = 24389 / 27, n = r * r * r;
   return n > e ? n : (116 * r - 16) / t;
 }
@@ -174,24 +174,24 @@ class K {
    *     default = false, the eye does not perform this process on
    *       self-luminous objects like displays.
    */
-  static make(e = Xe(), t = 200 / Math.PI * J(50) / 100, n = 50, a = 2, i = !1) {
-    const s = e, u = s[0] * 0.401288 + s[1] * 0.650173 + s[2] * -0.051461, l = s[0] * -0.250268 + s[1] * 1.204414 + s[2] * 0.045854, f = s[0] * -2079e-6 + s[1] * 0.048952 + s[2] * 0.953127, h = 0.8 + a / 10, p = h >= 0.9 ? ne(0.59, 0.69, (h - 0.9) * 10) : ne(0.525, 0.59, (h - 0.8) * 10);
-    let m = i ? 1 : h * (1 - 1 / 3.6 * Math.exp((-t - 42) / 92));
-    m = m > 1 ? 1 : m < 0 ? 0 : m;
-    const x = h, P = [
-      m * (100 / u) + 1 - m,
-      m * (100 / l) + 1 - m,
-      m * (100 / f) + 1 - m
-    ], g = 1 / (5 * t + 1), y = g * g * g * g, w = 1 - y, F = y * t + 0.1 * w * w * Math.cbrt(5 * t), R = J(n) / e[1], O = 1.48 + Math.sqrt(R), E = 0.725 / Math.pow(R, 0.2), A = E, B = [
-      Math.pow(F * P[0] * u / 100, 0.42),
-      Math.pow(F * P[1] * l / 100, 0.42),
-      Math.pow(F * P[2] * f / 100, 0.42)
+  static make(e = We(), t = 200 / Math.PI * W(50) / 100, n = 50, a = 2, i = !1) {
+    const s = e, u = s[0] * 0.401288 + s[1] * 0.650173 + s[2] * -0.051461, l = s[0] * -0.250268 + s[1] * 1.204414 + s[2] * 0.045854, f = s[0] * -2079e-6 + s[1] * 0.048952 + s[2] * 0.953127, h = 0.8 + a / 10, p = h >= 0.9 ? ae(0.59, 0.69, (h - 0.9) * 10) : ae(0.525, 0.59, (h - 0.8) * 10);
+    let d = i ? 1 : h * (1 - 1 / 3.6 * Math.exp((-t - 42) / 92));
+    d = d > 1 ? 1 : d < 0 ? 0 : d;
+    const C = h, P = [
+      d * (100 / u) + 1 - d,
+      d * (100 / l) + 1 - d,
+      d * (100 / f) + 1 - d
+    ], g = 1 / (5 * t + 1), y = g * g * g * g, F = 1 - y, w = y * t + 0.1 * F * F * Math.cbrt(5 * t), O = W(n) / e[1], R = 1.48 + Math.sqrt(O), E = 0.725 / Math.pow(O, 0.2), v = E, B = [
+      Math.pow(w * P[0] * u / 100, 0.42),
+      Math.pow(w * P[1] * l / 100, 0.42),
+      Math.pow(w * P[2] * f / 100, 0.42)
     ], N = [
       400 * B[0] / (B[0] + 27.13),
       400 * B[1] / (B[1] + 27.13),
       400 * B[2] / (B[2] + 27.13)
     ], V = (2 * N[0] + N[1] + 0.05 * N[2]) * E;
-    return new K(R, V, E, A, p, x, P, F, Math.pow(F, 0.25), O);
+    return new K(O, V, E, v, p, C, P, w, Math.pow(w, 0.25), R);
   }
   /**
    * Parameters are intermediate values of the CAM16 conversion process. Their
@@ -269,8 +269,8 @@ class _ {
    * @return CAM16 color.
    */
   static fromIntInViewingConditions(e, t) {
-    const n = (e & 16711680) >> 16, a = (e & 65280) >> 8, i = e & 255, s = re(n), u = re(a), l = re(i), f = 0.41233895 * s + 0.35762064 * u + 0.18051042 * l, h = 0.2126 * s + 0.7152 * u + 0.0722 * l, p = 0.01932141 * s + 0.11916382 * u + 0.95034478 * l, m = 0.401288 * f + 0.650173 * h - 0.051461 * p, x = -0.250268 * f + 1.204414 * h + 0.045854 * p, P = -2079e-6 * f + 0.048952 * h + 0.953127 * p, g = t.rgbD[0] * m, y = t.rgbD[1] * x, w = t.rgbD[2] * P, F = Math.pow(t.fl * Math.abs(g) / 100, 0.42), R = Math.pow(t.fl * Math.abs(y) / 100, 0.42), O = Math.pow(t.fl * Math.abs(w) / 100, 0.42), E = H(g) * 400 * F / (F + 27.13), A = H(y) * 400 * R / (R + 27.13), B = H(w) * 400 * O / (O + 27.13), N = (11 * E + -12 * A + B) / 11, V = (E + A - 2 * B) / 9, L = (20 * E + 20 * A + 21 * B) / 20, G = (40 * E + 20 * A + B) / 20, ee = Math.atan2(V, N) * 180 / Math.PI, z = he(ee), ie = z * Math.PI / 180, se = G * t.nbb, q = 100 * Math.pow(se / t.aw, t.c * t.z), ce = 4 / t.c * Math.sqrt(q / 100) * (t.aw + 4) * t.fLRoot, de = z < 20.14 ? z + 360 : z, me = 0.25 * (Math.cos(de * Math.PI / 180 + 2) + 3.8), ye = 5e4 / 13 * me * t.nc * t.ncb * Math.sqrt(N * N + V * V) / (L + 0.305), ue = Math.pow(ye, 0.9) * Math.pow(1.64 - Math.pow(0.29, t.n), 0.73), Ce = ue * Math.sqrt(q / 100), xe = Ce * t.fLRoot, Re = 50 * Math.sqrt(ue * t.c / (t.aw + 4)), Oe = (1 + 100 * 7e-3) * q / (1 + 7e-3 * q), Te = 1 / 0.0228 * Math.log(1 + 0.0228 * xe), Ee = Te * Math.cos(ie), Ne = Te * Math.sin(ie);
-    return new _(z, Ce, q, ce, xe, Re, Oe, Ee, Ne);
+    const n = (e & 16711680) >> 16, a = (e & 65280) >> 8, i = e & 255, s = ne(n), u = ne(a), l = ne(i), f = 0.41233895 * s + 0.35762064 * u + 0.18051042 * l, h = 0.2126 * s + 0.7152 * u + 0.0722 * l, p = 0.01932141 * s + 0.11916382 * u + 0.95034478 * l, d = 0.401288 * f + 0.650173 * h - 0.051461 * p, C = -0.250268 * f + 1.204414 * h + 0.045854 * p, P = -2079e-6 * f + 0.048952 * h + 0.953127 * p, g = t.rgbD[0] * d, y = t.rgbD[1] * C, F = t.rgbD[2] * P, w = Math.pow(t.fl * Math.abs(g) / 100, 0.42), O = Math.pow(t.fl * Math.abs(y) / 100, 0.42), R = Math.pow(t.fl * Math.abs(F) / 100, 0.42), E = H(g) * 400 * w / (w + 27.13), v = H(y) * 400 * O / (O + 27.13), B = H(F) * 400 * R / (R + 27.13), N = (11 * E + -12 * v + B) / 11, V = (E + v - 2 * B) / 9, L = (20 * E + 20 * v + 21 * B) / 20, G = (40 * E + 20 * v + B) / 20, ee = Math.atan2(V, N) * 180 / Math.PI, z = he(ee), ie = z * Math.PI / 180, se = G * t.nbb, q = 100 * Math.pow(se / t.aw, t.c * t.z), ce = 4 / t.c * Math.sqrt(q / 100) * (t.aw + 4) * t.fLRoot, de = z < 20.14 ? z + 360 : z, me = 0.25 * (Math.cos(de * Math.PI / 180 + 2) + 3.8), ye = 5e4 / 13 * me * t.nc * t.ncb * Math.sqrt(N * N + V * V) / (L + 0.305), ue = Math.pow(ye, 0.9) * Math.pow(1.64 - Math.pow(0.29, t.n), 0.73), xe = ue * Math.sqrt(q / 100), Te = xe * t.fLRoot, Ne = 50 * Math.sqrt(ue * t.c / (t.aw + 4)), _e = (1 + 100 * 7e-3) * q / (1 + 7e-3 * q), De = 1 / 0.0228 * Math.log(1 + 0.0228 * Te), Ve = De * Math.cos(ie), Ye = De * Math.sin(ie);
+    return new _(z, xe, q, ce, Te, Ne, _e, Ve, Ye);
   }
   /**
    * @param j CAM16 lightness
@@ -288,8 +288,8 @@ class _ {
    *     was observed.
    */
   static fromJchInViewingConditions(e, t, n, a) {
-    const i = 4 / a.c * Math.sqrt(e / 100) * (a.aw + 4) * a.fLRoot, s = t * a.fLRoot, u = t / Math.sqrt(e / 100), l = 50 * Math.sqrt(u * a.c / (a.aw + 4)), f = n * Math.PI / 180, h = (1 + 100 * 7e-3) * e / (1 + 7e-3 * e), p = 1 / 0.0228 * Math.log(1 + 0.0228 * s), m = p * Math.cos(f), x = p * Math.sin(f);
-    return new _(n, t, e, i, s, l, h, m, x);
+    const i = 4 / a.c * Math.sqrt(e / 100) * (a.aw + 4) * a.fLRoot, s = t * a.fLRoot, u = t / Math.sqrt(e / 100), l = 50 * Math.sqrt(u * a.c / (a.aw + 4)), f = n * Math.PI / 180, h = (1 + 100 * 7e-3) * e / (1 + 7e-3 * e), p = 1 / 0.0228 * Math.log(1 + 0.0228 * s), d = p * Math.cos(f), C = p * Math.sin(f);
+    return new _(n, t, e, i, s, l, h, d, C);
   }
   /**
    * @param jstar CAM16-UCS lightness.
@@ -331,18 +331,18 @@ class _ {
    * @return ARGB representation of color
    */
   viewed(e) {
-    const t = this.chroma === 0 || this.j === 0 ? 0 : this.chroma / Math.sqrt(this.j / 100), n = Math.pow(t / Math.pow(1.64 - Math.pow(0.29, e.n), 0.73), 1 / 0.9), a = this.hue * Math.PI / 180, i = 0.25 * (Math.cos(a + 2) + 3.8), s = e.aw * Math.pow(this.j / 100, 1 / e.c / e.z), u = i * (5e4 / 13) * e.nc * e.ncb, l = s / e.nbb, f = Math.sin(a), h = Math.cos(a), p = 23 * (l + 0.305) * n / (23 * u + 11 * n * h + 108 * n * f), m = p * h, x = p * f, P = (460 * l + 451 * m + 288 * x) / 1403, g = (460 * l - 891 * m - 261 * x) / 1403, y = (460 * l - 220 * m - 6300 * x) / 1403, w = Math.max(0, 27.13 * Math.abs(P) / (400 - Math.abs(P))), F = H(P) * (100 / e.fl) * Math.pow(w, 1 / 0.42), R = Math.max(0, 27.13 * Math.abs(g) / (400 - Math.abs(g))), O = H(g) * (100 / e.fl) * Math.pow(R, 1 / 0.42), E = Math.max(0, 27.13 * Math.abs(y) / (400 - Math.abs(y))), A = H(y) * (100 / e.fl) * Math.pow(E, 1 / 0.42), B = F / e.rgbD[0], N = O / e.rgbD[1], V = A / e.rgbD[2], L = 1.86206786 * B - 1.01125463 * N + 0.14918677 * V, G = 0.38752654 * B + 0.62144744 * N - 897398e-8 * V, X = -0.0158415 * B - 0.03412294 * N + 1.04996444 * V;
-    return Ke(L, G, X);
+    const t = this.chroma === 0 || this.j === 0 ? 0 : this.chroma / Math.sqrt(this.j / 100), n = Math.pow(t / Math.pow(1.64 - Math.pow(0.29, e.n), 0.73), 1 / 0.9), a = this.hue * Math.PI / 180, i = 0.25 * (Math.cos(a + 2) + 3.8), s = e.aw * Math.pow(this.j / 100, 1 / e.c / e.z), u = i * (5e4 / 13) * e.nc * e.ncb, l = s / e.nbb, f = Math.sin(a), h = Math.cos(a), p = 23 * (l + 0.305) * n / (23 * u + 11 * n * h + 108 * n * f), d = p * h, C = p * f, P = (460 * l + 451 * d + 288 * C) / 1403, g = (460 * l - 891 * d - 261 * C) / 1403, y = (460 * l - 220 * d - 6300 * C) / 1403, F = Math.max(0, 27.13 * Math.abs(P) / (400 - Math.abs(P))), w = H(P) * (100 / e.fl) * Math.pow(F, 1 / 0.42), O = Math.max(0, 27.13 * Math.abs(g) / (400 - Math.abs(g))), R = H(g) * (100 / e.fl) * Math.pow(O, 1 / 0.42), E = Math.max(0, 27.13 * Math.abs(y) / (400 - Math.abs(y))), v = H(y) * (100 / e.fl) * Math.pow(E, 1 / 0.42), B = w / e.rgbD[0], N = R / e.rgbD[1], V = v / e.rgbD[2], L = 1.86206786 * B - 1.01125463 * N + 0.14918677 * V, G = 0.38752654 * B + 0.62144744 * N - 897398e-8 * V, X = -0.0158415 * B - 0.03412294 * N + 1.04996444 * V;
+    return Xe(L, G, X);
   }
   /// Given color expressed in XYZ and viewed in [viewingConditions], convert to
   /// CAM16.
   static fromXyzInViewingConditions(e, t, n, a) {
-    const i = 0.401288 * e + 0.650173 * t - 0.051461 * n, s = -0.250268 * e + 1.204414 * t + 0.045854 * n, u = -2079e-6 * e + 0.048952 * t + 0.953127 * n, l = a.rgbD[0] * i, f = a.rgbD[1] * s, h = a.rgbD[2] * u, p = Math.pow(a.fl * Math.abs(l) / 100, 0.42), m = Math.pow(a.fl * Math.abs(f) / 100, 0.42), x = Math.pow(a.fl * Math.abs(h) / 100, 0.42), P = H(l) * 400 * p / (p + 27.13), g = H(f) * 400 * m / (m + 27.13), y = H(h) * 400 * x / (x + 27.13), w = (11 * P + -12 * g + y) / 11, F = (P + g - 2 * y) / 9, R = (20 * P + 20 * g + 21 * y) / 20, O = (40 * P + 20 * g + y) / 20, A = Math.atan2(F, w) * 180 / Math.PI, B = A < 0 ? A + 360 : A >= 360 ? A - 360 : A, N = B * Math.PI / 180, V = O * a.nbb, L = 100 * Math.pow(V / a.aw, a.c * a.z), G = 4 / a.c * Math.sqrt(L / 100) * (a.aw + 4) * a.fLRoot, X = B < 20.14 ? B + 360 : B, ee = 1 / 4 * (Math.cos(X * Math.PI / 180 + 2) + 3.8), ie = 5e4 / 13 * ee * a.nc * a.ncb * Math.sqrt(w * w + F * F) / (R + 0.305), se = Math.pow(ie, 0.9) * Math.pow(1.64 - Math.pow(0.29, a.n), 0.73), q = se * Math.sqrt(L / 100), ce = q * a.fLRoot, de = 50 * Math.sqrt(se * a.c / (a.aw + 4)), me = (1 + 100 * 7e-3) * L / (1 + 7e-3 * L), pe = Math.log(1 + 0.0228 * ce) / 0.0228, ye = pe * Math.cos(N), ue = pe * Math.sin(N);
+    const i = 0.401288 * e + 0.650173 * t - 0.051461 * n, s = -0.250268 * e + 1.204414 * t + 0.045854 * n, u = -2079e-6 * e + 0.048952 * t + 0.953127 * n, l = a.rgbD[0] * i, f = a.rgbD[1] * s, h = a.rgbD[2] * u, p = Math.pow(a.fl * Math.abs(l) / 100, 0.42), d = Math.pow(a.fl * Math.abs(f) / 100, 0.42), C = Math.pow(a.fl * Math.abs(h) / 100, 0.42), P = H(l) * 400 * p / (p + 27.13), g = H(f) * 400 * d / (d + 27.13), y = H(h) * 400 * C / (C + 27.13), F = (11 * P + -12 * g + y) / 11, w = (P + g - 2 * y) / 9, O = (20 * P + 20 * g + 21 * y) / 20, R = (40 * P + 20 * g + y) / 20, v = Math.atan2(w, F) * 180 / Math.PI, B = v < 0 ? v + 360 : v >= 360 ? v - 360 : v, N = B * Math.PI / 180, V = R * a.nbb, L = 100 * Math.pow(V / a.aw, a.c * a.z), G = 4 / a.c * Math.sqrt(L / 100) * (a.aw + 4) * a.fLRoot, X = B < 20.14 ? B + 360 : B, ee = 1 / 4 * (Math.cos(X * Math.PI / 180 + 2) + 3.8), ie = 5e4 / 13 * ee * a.nc * a.ncb * Math.sqrt(F * F + w * w) / (O + 0.305), se = Math.pow(ie, 0.9) * Math.pow(1.64 - Math.pow(0.29, a.n), 0.73), q = se * Math.sqrt(L / 100), ce = q * a.fLRoot, de = 50 * Math.sqrt(se * a.c / (a.aw + 4)), me = (1 + 100 * 7e-3) * L / (1 + 7e-3 * L), pe = Math.log(1 + 0.0228 * ce) / 0.0228, ye = pe * Math.cos(N), ue = pe * Math.sin(N);
     return new _(B, q, L, G, ce, de, me, ye, ue);
   }
   /// XYZ representation of CAM16 seen in [viewingConditions].
   xyzInViewingConditions(e) {
-    const t = this.chroma === 0 || this.j === 0 ? 0 : this.chroma / Math.sqrt(this.j / 100), n = Math.pow(t / Math.pow(1.64 - Math.pow(0.29, e.n), 0.73), 1 / 0.9), a = this.hue * Math.PI / 180, i = 0.25 * (Math.cos(a + 2) + 3.8), s = e.aw * Math.pow(this.j / 100, 1 / e.c / e.z), u = i * (5e4 / 13) * e.nc * e.ncb, l = s / e.nbb, f = Math.sin(a), h = Math.cos(a), p = 23 * (l + 0.305) * n / (23 * u + 11 * n * h + 108 * n * f), m = p * h, x = p * f, P = (460 * l + 451 * m + 288 * x) / 1403, g = (460 * l - 891 * m - 261 * x) / 1403, y = (460 * l - 220 * m - 6300 * x) / 1403, w = Math.max(0, 27.13 * Math.abs(P) / (400 - Math.abs(P))), F = H(P) * (100 / e.fl) * Math.pow(w, 1 / 0.42), R = Math.max(0, 27.13 * Math.abs(g) / (400 - Math.abs(g))), O = H(g) * (100 / e.fl) * Math.pow(R, 1 / 0.42), E = Math.max(0, 27.13 * Math.abs(y) / (400 - Math.abs(y))), A = H(y) * (100 / e.fl) * Math.pow(E, 1 / 0.42), B = F / e.rgbD[0], N = O / e.rgbD[1], V = A / e.rgbD[2], L = 1.86206786 * B - 1.01125463 * N + 0.14918677 * V, G = 0.38752654 * B + 0.62144744 * N - 897398e-8 * V, X = -0.0158415 * B - 0.03412294 * N + 1.04996444 * V;
+    const t = this.chroma === 0 || this.j === 0 ? 0 : this.chroma / Math.sqrt(this.j / 100), n = Math.pow(t / Math.pow(1.64 - Math.pow(0.29, e.n), 0.73), 1 / 0.9), a = this.hue * Math.PI / 180, i = 0.25 * (Math.cos(a + 2) + 3.8), s = e.aw * Math.pow(this.j / 100, 1 / e.c / e.z), u = i * (5e4 / 13) * e.nc * e.ncb, l = s / e.nbb, f = Math.sin(a), h = Math.cos(a), p = 23 * (l + 0.305) * n / (23 * u + 11 * n * h + 108 * n * f), d = p * h, C = p * f, P = (460 * l + 451 * d + 288 * C) / 1403, g = (460 * l - 891 * d - 261 * C) / 1403, y = (460 * l - 220 * d - 6300 * C) / 1403, F = Math.max(0, 27.13 * Math.abs(P) / (400 - Math.abs(P))), w = H(P) * (100 / e.fl) * Math.pow(F, 1 / 0.42), O = Math.max(0, 27.13 * Math.abs(g) / (400 - Math.abs(g))), R = H(g) * (100 / e.fl) * Math.pow(O, 1 / 0.42), E = Math.max(0, 27.13 * Math.abs(y) / (400 - Math.abs(y))), v = H(y) * (100 / e.fl) * Math.pow(E, 1 / 0.42), B = w / e.rgbD[0], N = R / e.rgbD[1], V = v / e.rgbD[2], L = 1.86206786 * B - 1.01125463 * N + 0.14918677 * V, G = 0.38752654 * B + 0.62144744 * N - 897398e-8 * V, X = -0.0158415 * B - 0.03412294 * N + 1.04996444 * V;
     return [L, G, X];
   }
 }
@@ -517,8 +517,8 @@ class S {
         let l = -1, f = 255;
         a[u] < s[u] ? (l = S.criticalPlaneBelow(S.trueDelinearized(a[u])), f = S.criticalPlaneAbove(S.trueDelinearized(s[u]))) : (l = S.criticalPlaneAbove(S.trueDelinearized(a[u])), f = S.criticalPlaneBelow(S.trueDelinearized(s[u])));
         for (let h = 0; h < 8 && !(Math.abs(f - l) <= 1); h++) {
-          const p = Math.floor((l + f) / 2), m = S.CRITICAL_PLANES[p], x = S.setCoordinate(a, m, s, u), P = S.hueOf(x);
-          S.areInCyclicOrder(i, t, P) ? (s = x, f = p) : (a = x, i = P, l = p);
+          const p = Math.floor((l + f) / 2), d = S.CRITICAL_PLANES[p], C = S.setCoordinate(a, d, s, u), P = S.hueOf(C);
+          S.areInCyclicOrder(i, t, P) ? (s = C, f = p) : (a = C, i = P, l = p);
         }
       }
     return S.midpoint(a, s);
@@ -540,14 +540,14 @@ class S {
     let a = Math.sqrt(n) * 11;
     const i = K.DEFAULT, s = 1 / Math.pow(1.64 - Math.pow(0.29, i.n), 0.73), l = 0.25 * (Math.cos(e + 2) + 3.8) * (5e4 / 13) * i.nc * i.ncb, f = Math.sin(e), h = Math.cos(e);
     for (let p = 0; p < 5; p++) {
-      const m = a / 100, x = t === 0 || a === 0 ? 0 : t / Math.sqrt(m), P = Math.pow(x * s, 1 / 0.9), y = i.aw * Math.pow(m, 1 / i.c / i.z) / i.nbb, w = 23 * (y + 0.305) * P / (23 * l + 11 * P * h + 108 * P * f), F = w * h, R = w * f, O = (460 * y + 451 * F + 288 * R) / 1403, E = (460 * y - 891 * F - 261 * R) / 1403, A = (460 * y - 220 * F - 6300 * R) / 1403, B = S.inverseChromaticAdaptation(O), N = S.inverseChromaticAdaptation(E), V = S.inverseChromaticAdaptation(A), L = Pe([B, N, V], S.LINRGB_FROM_SCALED_DISCOUNT);
+      const d = a / 100, C = t === 0 || a === 0 ? 0 : t / Math.sqrt(d), P = Math.pow(C * s, 1 / 0.9), y = i.aw * Math.pow(d, 1 / i.c / i.z) / i.nbb, F = 23 * (y + 0.305) * P / (23 * l + 11 * P * h + 108 * P * f), w = F * h, O = F * f, R = (460 * y + 451 * w + 288 * O) / 1403, E = (460 * y - 891 * w - 261 * O) / 1403, v = (460 * y - 220 * w - 6300 * O) / 1403, B = S.inverseChromaticAdaptation(R), N = S.inverseChromaticAdaptation(E), V = S.inverseChromaticAdaptation(v), L = Pe([B, N, V], S.LINRGB_FROM_SCALED_DISCOUNT);
       if (L[0] < 0 || L[1] < 0 || L[2] < 0)
         return 0;
       const G = S.Y_FROM_LINRGB[0], X = S.Y_FROM_LINRGB[1], ee = S.Y_FROM_LINRGB[2], z = G * L[0] + X * L[1] + ee * L[2];
       if (z <= 0)
         return 0;
       if (p === 4 || Math.abs(z - n) < 2e-3)
-        return L[0] > 100.01 || L[1] > 100.01 || L[2] > 100.01 ? 0 : De(L);
+        return L[0] > 100.01 || L[1] > 100.01 || L[2] > 100.01 ? 0 : we(L);
       a = a - (z - n) * a / (2 * z);
     }
     return 0;
@@ -566,13 +566,13 @@ class S {
    */
   static solveToInt(e, t, n) {
     if (t < 1e-4 || n < 1e-4 || n > 99.9999)
-      return je(n);
+      return $e(n);
     e = he(e);
-    const a = e / 180 * Math.PI, i = J(n), s = S.findResultByJ(a, t, i);
+    const a = e / 180 * Math.PI, i = W(n), s = S.findResultByJ(a, t, i);
     if (s !== 0)
       return s;
     const u = S.bisectToLimit(i, a);
-    return De(u);
+    return we(u);
   }
   /**
    * Finds an sRGB color with the given hue, chroma, and L*, if
@@ -1023,7 +1023,7 @@ class oe {
    * color's hue.
    */
   static harmonize(e, t) {
-    const n = T.fromInt(e), a = T.fromInt(t), i = Ue(n.hue, a.hue), s = Math.min(i * 0.5, 15), u = he(n.hue + s * Ve(n.hue, a.hue));
+    const n = T.fromInt(e), a = T.fromInt(t), i = ze(n.hue, a.hue), s = Math.min(i * 0.5, 15), u = he(n.hue + s * Ue(n.hue, a.hue));
     return T.from(u, n.chroma, n.tone).toInt();
   }
   /**
@@ -1050,8 +1050,8 @@ class oe {
    * change.
    */
   static cam16Ucs(e, t, n) {
-    const a = _.fromInt(e), i = _.fromInt(t), s = a.jstar, u = a.astar, l = a.bstar, f = i.jstar, h = i.astar, p = i.bstar, m = s + (f - s) * n, x = u + (h - u) * n, P = l + (p - l) * n;
-    return _.fromUcs(m, x, P).toInt();
+    const a = _.fromInt(e), i = _.fromInt(t), s = a.jstar, u = a.astar, l = a.bstar, f = i.jstar, h = i.astar, p = i.bstar, d = s + (f - s) * n, C = u + (h - u) * n, P = l + (p - l) * n;
+    return _.fromUcs(d, C, P).toInt();
   }
 }
 /**
@@ -1070,7 +1070,7 @@ class oe {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class v {
+class A {
   /**
    * Returns a contrast ratio, which ranges from 1 to 21.
    *
@@ -1078,7 +1078,7 @@ class v {
    * @param toneB Tone between 0 and 100. Values outside will be clamped.
    */
   static ratioOfTones(e, t) {
-    return e = U(0, 100, e), t = U(0, 100, t), v.ratioOfYs(J(e), J(t));
+    return e = Y(0, 100, e), t = Y(0, 100, t), A.ratioOfYs(W(e), W(t));
   }
   static ratioOfYs(e, t) {
     const n = e > t ? e : t, a = n === t ? e : t;
@@ -1097,7 +1097,7 @@ class v {
   static lighter(e, t) {
     if (e < 0 || e > 100)
       return -1;
-    const n = J(e), a = t * (n + 5) - 5, i = v.ratioOfYs(a, n), s = Math.abs(i - t);
+    const n = W(e), a = t * (n + 5) - 5, i = A.ratioOfYs(a, n), s = Math.abs(i - t);
     if (i < t && s > 0.04)
       return -1;
     const u = ke(a) + 0.4;
@@ -1116,7 +1116,7 @@ class v {
   static darker(e, t) {
     if (e < 0 || e > 100)
       return -1;
-    const n = J(e), a = (n + 5) / t - 5, i = v.ratioOfYs(n, a), s = Math.abs(i - t);
+    const n = W(e), a = (n + 5) / t - 5, i = A.ratioOfYs(n, a), s = Math.abs(i - t);
     if (i < t && s > 0.04)
       return -1;
     const u = ke(a) - 0.4;
@@ -1137,7 +1137,7 @@ class v {
    * Range is 1 to 21, invalid values have undefined behavior.
    */
   static lighterUnsafe(e, t) {
-    const n = v.lighter(e, t);
+    const n = A.lighter(e, t);
     return n < 0 ? 100 : n;
   }
   /**
@@ -1155,7 +1155,7 @@ class v {
    * Range is 1 to 21, invalid values have undefined behavior.
    */
   static darkerUnsafe(e, t) {
-    const n = v.darker(e, t);
+    const n = A.darker(e, t);
     return n < 0 ? 0 : n;
   }
 }
@@ -1215,14 +1215,14 @@ class Se {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function $e(r, e, t) {
+function Ze(r, e, t) {
   if (r.name !== t.name)
     throw new Error(`Attempting to extend color ${r.name} with color ${t.name} of different name for spec version ${e}.`);
   if (r.isBackground !== t.isBackground)
     throw new Error(`Attempting to extend color ${r.name} as a ${r.isBackground ? "background" : "foreground"} with color ${t.name} as a ${t.isBackground ? "background" : "foreground"} for spec version ${e}.`);
 }
-function C(r, e, t) {
-  return $e(r, e, t), c.fromPalette({
+function x(r, e, t) {
+  return Ze(r, e, t), c.fromPalette({
     name: r.name,
     palette: (n) => n.specVersion === e ? t.palette(n) : r.palette(n),
     tone: (n) => n.specVersion === e ? t.tone(n) : r.tone(n),
@@ -1372,7 +1372,7 @@ class c {
    *     value.
    */
   static foregroundTone(e, t) {
-    const n = v.lighterUnsafe(e, t), a = v.darkerUnsafe(e, t), i = v.ratioOfTones(n, e), s = v.ratioOfTones(a, e);
+    const n = A.lighterUnsafe(e, t), a = A.darkerUnsafe(e, t), i = A.ratioOfTones(n, e), s = A.ratioOfTones(a, e);
     if (c.tonePrefersLightForeground(e)) {
       const l = Math.abs(i - s) < 0.1 && i < t && s < t;
       return i >= t || i >= s || l ? n : a;
@@ -1408,7 +1408,7 @@ class c {
     return c.tonePrefersLightForeground(e) && !c.toneAllowsLightForeground(e) ? 49 : e;
   }
 }
-class Je {
+class Qe {
   getHct(e, t) {
     const n = t.getTone(e);
     return t.palette(e).getHct(n);
@@ -1416,32 +1416,32 @@ class Je {
   getTone(e, t) {
     const n = e.contrastLevel < 0, a = t.toneDeltaPair ? t.toneDeltaPair(e) : void 0;
     if (a) {
-      const i = a.roleA, s = a.roleB, u = a.delta, l = a.polarity, f = a.stayTogether, h = l === "nearer" || l === "lighter" && !e.isDark || l === "darker" && e.isDark, p = h ? i : s, m = h ? s : i, x = t.name === p.name, P = e.isDark ? 1 : -1;
-      let g = p.tone(e), y = m.tone(e);
-      if (t.background && p.contrastCurve && m.contrastCurve) {
-        const w = t.background(e), F = p.contrastCurve(e), R = m.contrastCurve(e);
-        if (w && F && R) {
-          const O = w.getTone(e), E = F.get(e.contrastLevel), A = R.get(e.contrastLevel);
-          v.ratioOfTones(O, g) < E && (g = c.foregroundTone(O, E)), v.ratioOfTones(O, y) < A && (y = c.foregroundTone(O, A)), n && (g = c.foregroundTone(O, E), y = c.foregroundTone(O, A));
+      const i = a.roleA, s = a.roleB, u = a.delta, l = a.polarity, f = a.stayTogether, h = l === "nearer" || l === "lighter" && !e.isDark || l === "darker" && e.isDark, p = h ? i : s, d = h ? s : i, C = t.name === p.name, P = e.isDark ? 1 : -1;
+      let g = p.tone(e), y = d.tone(e);
+      if (t.background && p.contrastCurve && d.contrastCurve) {
+        const F = t.background(e), w = p.contrastCurve(e), O = d.contrastCurve(e);
+        if (F && w && O) {
+          const R = F.getTone(e), E = w.get(e.contrastLevel), v = O.get(e.contrastLevel);
+          A.ratioOfTones(R, g) < E && (g = c.foregroundTone(R, E)), A.ratioOfTones(R, y) < v && (y = c.foregroundTone(R, v)), n && (g = c.foregroundTone(R, E), y = c.foregroundTone(R, v));
         }
       }
-      return (y - g) * P < u && (y = U(0, 100, g + u * P), (y - g) * P >= u || (g = U(0, 100, y - u * P))), 50 <= g && g < 60 ? P > 0 ? (g = 60, y = Math.max(y, g + u * P)) : (g = 49, y = Math.min(y, g + u * P)) : 50 <= y && y < 60 && (f ? P > 0 ? (g = 60, y = Math.max(y, g + u * P)) : (g = 49, y = Math.min(y, g + u * P)) : P > 0 ? y = 60 : y = 49), x ? g : y;
+      return (y - g) * P < u && (y = Y(0, 100, g + u * P), (y - g) * P >= u || (g = Y(0, 100, y - u * P))), 50 <= g && g < 60 ? P > 0 ? (g = 60, y = Math.max(y, g + u * P)) : (g = 49, y = Math.min(y, g + u * P)) : 50 <= y && y < 60 && (f ? P > 0 ? (g = 60, y = Math.max(y, g + u * P)) : (g = 49, y = Math.min(y, g + u * P)) : P > 0 ? y = 60 : y = 49), C ? g : y;
     } else {
       let i = t.tone(e);
       if (t.background == null || t.background(e) === void 0 || t.contrastCurve == null || t.contrastCurve(e) === void 0)
         return i;
       const s = t.background(e).getTone(e), u = t.contrastCurve(e).get(e.contrastLevel);
-      if (v.ratioOfTones(s, i) >= u || (i = c.foregroundTone(s, u)), n && (i = c.foregroundTone(s, u)), t.isBackground && 50 <= i && i < 60 && (v.ratioOfTones(49, s) >= u ? i = 49 : i = 60), t.secondBackground == null || t.secondBackground(e) === void 0)
+      if (A.ratioOfTones(s, i) >= u || (i = c.foregroundTone(s, u)), n && (i = c.foregroundTone(s, u)), t.isBackground && 50 <= i && i < 60 && (A.ratioOfTones(49, s) >= u ? i = 49 : i = 60), t.secondBackground == null || t.secondBackground(e) === void 0)
         return i;
-      const [l, f] = [t.background, t.secondBackground], [h, p] = [l(e).getTone(e), f(e).getTone(e)], [m, x] = [Math.max(h, p), Math.min(h, p)];
-      if (v.ratioOfTones(m, i) >= u && v.ratioOfTones(x, i) >= u)
+      const [l, f] = [t.background, t.secondBackground], [h, p] = [l(e).getTone(e), f(e).getTone(e)], [d, C] = [Math.max(h, p), Math.min(h, p)];
+      if (A.ratioOfTones(d, i) >= u && A.ratioOfTones(C, i) >= u)
         return i;
-      const P = v.lighter(m, u), g = v.darker(x, u), y = [];
+      const P = A.lighter(d, u), g = A.darker(C, u), y = [];
       return P !== -1 && y.push(P), g !== -1 && y.push(g), c.tonePrefersLightForeground(h) || c.tonePrefersLightForeground(p) ? P < 0 ? 100 : P : y.length === 1 ? y[0] : g < 0 ? 0 : g;
     }
   }
 }
-class We {
+class et {
   getHct(e, t) {
     const n = t.palette(e), a = t.getTone(e), i = n.hue, s = n.chroma * (t.chromaMultiplier ? t.chromaMultiplier(e) : 1);
     return T.from(i, s, a);
@@ -1450,34 +1450,34 @@ class We {
     const n = t.toneDeltaPair ? t.toneDeltaPair(e) : void 0;
     if (n) {
       const a = n.roleA, i = n.roleB, s = n.polarity, u = n.constraint, l = s === "darker" || s === "relative_lighter" && e.isDark || s === "relative_darker" && !e.isDark ? -n.delta : n.delta, f = t.name === a.name, h = f ? a : i, p = f ? i : a;
-      let m = h.tone(e), x = p.getTone(e);
+      let d = h.tone(e), C = p.getTone(e);
       const P = l * (f ? 1 : -1);
-      if (u === "exact" ? m = U(0, 100, x + P) : u === "nearer" ? P > 0 ? m = U(0, 100, U(x, x + P, m)) : m = U(0, 100, U(x + P, x, m)) : u === "farther" && (P > 0 ? m = U(x + P, 100, m) : m = U(0, x + P, m)), t.background && t.contrastCurve) {
+      if (u === "exact" ? d = Y(0, 100, C + P) : u === "nearer" ? P > 0 ? d = Y(0, 100, Y(C, C + P, d)) : d = Y(0, 100, Y(C + P, C, d)) : u === "farther" && (P > 0 ? d = Y(C + P, 100, d) : d = Y(0, C + P, d)), t.background && t.contrastCurve) {
         const g = t.background(e), y = t.contrastCurve(e);
         if (g && y) {
-          const w = g.getTone(e), F = y.get(e.contrastLevel);
-          m = v.ratioOfTones(w, m) >= F && e.contrastLevel >= 0 ? m : c.foregroundTone(w, F);
+          const F = g.getTone(e), w = y.get(e.contrastLevel);
+          d = A.ratioOfTones(F, d) >= w && e.contrastLevel >= 0 ? d : c.foregroundTone(F, w);
         }
       }
-      return t.isBackground && !t.name.endsWith("_fixed_dim") && (m >= 57 ? m = U(65, 100, m) : m = U(0, 49, m)), m;
+      return t.isBackground && !t.name.endsWith("_fixed_dim") && (d >= 57 ? d = Y(65, 100, d) : d = Y(0, 49, d)), d;
     } else {
       let a = t.tone(e);
       if (t.background == null || t.background(e) === void 0 || t.contrastCurve == null || t.contrastCurve(e) === void 0)
         return a;
       const i = t.background(e).getTone(e), s = t.contrastCurve(e).get(e.contrastLevel);
-      if (a = v.ratioOfTones(i, a) >= s && e.contrastLevel >= 0 ? a : c.foregroundTone(i, s), t.isBackground && !t.name.endsWith("_fixed_dim") && (a >= 57 ? a = U(65, 100, a) : a = U(0, 49, a)), t.secondBackground == null || t.secondBackground(e) === void 0)
+      if (a = A.ratioOfTones(i, a) >= s && e.contrastLevel >= 0 ? a : c.foregroundTone(i, s), t.isBackground && !t.name.endsWith("_fixed_dim") && (a >= 57 ? a = Y(65, 100, a) : a = Y(0, 49, a)), t.secondBackground == null || t.secondBackground(e) === void 0)
         return a;
-      const [u, l] = [t.background, t.secondBackground], [f, h] = [u(e).getTone(e), l(e).getTone(e)], [p, m] = [Math.max(f, h), Math.min(f, h)];
-      if (v.ratioOfTones(p, a) >= s && v.ratioOfTones(m, a) >= s)
+      const [u, l] = [t.background, t.secondBackground], [f, h] = [u(e).getTone(e), l(e).getTone(e)], [p, d] = [Math.max(f, h), Math.min(f, h)];
+      if (A.ratioOfTones(p, a) >= s && A.ratioOfTones(d, a) >= s)
         return a;
-      const x = v.lighter(p, s), P = v.darker(m, s), g = [];
-      return x !== -1 && g.push(x), P !== -1 && g.push(P), c.tonePrefersLightForeground(f) || c.tonePrefersLightForeground(h) ? x < 0 ? 100 : x : g.length === 1 ? g[0] : P < 0 ? 0 : P;
+      const C = A.lighter(p, s), P = A.darker(d, s), g = [];
+      return C !== -1 && g.push(C), P !== -1 && g.push(P), c.tonePrefersLightForeground(f) || c.tonePrefersLightForeground(h) ? C < 0 ? 100 : C : g.length === 1 ? g[0] : P < 0 ? 0 : P;
     }
   }
 }
-const Ze = new Je(), Qe = new We();
+const tt = new Qe(), rt = new et();
 function Fe(r) {
-  return r === "2025" ? Qe : Ze;
+  return r === "2025" ? rt : tt;
 }
 /**
  * @license
@@ -1515,7 +1515,7 @@ class k {
    * @return The value. For contrast ratios, a number between 1.0 and 21.0.
    */
   get(e) {
-    return e <= -1 ? this.low : e < 0 ? ne(this.low, this.normal, (e - -1) / 1) : e < 0.5 ? ne(this.normal, this.medium, (e - 0) / 0.5) : e < 1 ? ne(this.medium, this.high, (e - 0.5) / 0.5) : this.high;
+    return e <= -1 ? this.low : e < 0 ? ae(this.low, this.normal, (e - -1) / 1) : e < 0.5 ? ae(this.normal, this.medium, (e - 0) / 0.5) : e < 1 ? ae(this.medium, this.high, (e - 0.5) / 0.5) : this.high;
   }
 }
 /**
@@ -1580,10 +1580,10 @@ class M {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var d;
+var m;
 (function(r) {
   r[r.MONOCHROME = 0] = "MONOCHROME", r[r.NEUTRAL = 1] = "NEUTRAL", r[r.TONAL_SPOT = 2] = "TONAL_SPOT", r[r.VIBRANT = 3] = "VIBRANT", r[r.EXPRESSIVE = 4] = "EXPRESSIVE", r[r.FIDELITY = 5] = "FIDELITY", r[r.CONTENT = 6] = "CONTENT", r[r.RAINBOW = 7] = "RAINBOW", r[r.FRUIT_SALAD = 8] = "FRUIT_SALAD";
-})(d || (d = {}));
+})(m || (m = {}));
 /**
  * @license
  * Copyright 2025 Google LLC
@@ -1601,12 +1601,12 @@ var d;
  * limitations under the License.
  */
 function te(r) {
-  return r.variant === d.FIDELITY || r.variant === d.CONTENT;
+  return r.variant === m.FIDELITY || r.variant === m.CONTENT;
 }
 function I(r) {
-  return r.variant === d.MONOCHROME;
+  return r.variant === m.MONOCHROME;
 }
-function et(r, e, t, n) {
+function nt(r, e, t, n) {
   let a = t, i = T.from(r, e, t);
   if (i.chroma < e) {
     let s = i.chroma;
@@ -1621,7 +1621,7 @@ function et(r, e, t, n) {
   }
   return a;
 }
-class tt {
+class at {
   ////////////////////////////////////////////////////////////////
   // Main Palettes                                              //
   ////////////////////////////////////////////////////////////////
@@ -1919,7 +1919,7 @@ class tt {
       palette: (e) => e.secondaryPalette,
       tone: (e) => {
         const t = e.isDark ? 30 : 90;
-        return I(e) ? e.isDark ? 30 : 85 : te(e) ? et(e.secondaryPalette.hue, e.secondaryPalette.chroma, t, !e.isDark) : t;
+        return I(e) ? e.isDark ? 30 : 85 : te(e) ? nt(e.secondaryPalette.hue, e.secondaryPalette.chroma, t, !e.isDark) : t;
       },
       isBackground: !0,
       background: (e) => this.highestSurface(e),
@@ -2192,14 +2192,14 @@ class tt {
  * limitations under the License.
  */
 function D(r, e = 0, t = 100, n = 1) {
-  let a = Ae(r.hue, r.chroma * n, 100, !0);
-  return U(e, t, a);
+  let a = Oe(r.hue, r.chroma * n, 100, !0);
+  return Y(e, t, a);
 }
 function $(r, e = 0, t = 100) {
-  let n = Ae(r.hue, r.chroma, 0, !1);
-  return U(e, t, n);
+  let n = Oe(r.hue, r.chroma, 0, !1);
+  return Y(e, t, n);
 }
-function Ae(r, e, t, n) {
+function Oe(r, e, t, n) {
   let a = t, i = T.from(r, e, a);
   for (; i.chroma < e && !(t < 0 || t > 100); ) {
     t += n ? -1 : 1;
@@ -2211,7 +2211,7 @@ function Ae(r, e, t, n) {
 function b(r) {
   return r === 1.5 ? new k(1.5, 1.5, 3, 5.5) : r === 3 ? new k(3, 3, 4.5, 7) : r === 4.5 ? new k(4.5, 4.5, 7, 11) : r === 6 ? new k(6, 6, 7, 11) : r === 7 ? new k(7, 7, 11, 21) : r === 9 ? new k(9, 9, 11, 21) : r === 11 ? new k(11, 11, 21, 21) : r === 21 ? new k(21, 21, 21, 21) : new k(r, r, 7, 21);
 }
-class rt extends tt {
+class ot extends at {
   ////////////////////////////////////////////////////////////////
   // Surfaces [S]                                               //
   ////////////////////////////////////////////////////////////////
@@ -2219,54 +2219,54 @@ class rt extends tt {
     const e = c.fromPalette({
       name: "surface",
       palette: (t) => t.neutralPalette,
-      tone: (t) => (super.surface().tone(t), t.platform === "phone" ? t.isDark ? 4 : T.isYellow(t.neutralPalette.hue) ? 99 : t.variant === d.VIBRANT ? 97 : 98 : 0),
+      tone: (t) => (super.surface().tone(t), t.platform === "phone" ? t.isDark ? 4 : T.isYellow(t.neutralPalette.hue) ? 99 : t.variant === m.VIBRANT ? 97 : 98 : 0),
       isBackground: !0
     });
-    return C(super.surface(), "2025", e);
+    return x(super.surface(), "2025", e);
   }
   surfaceDim() {
     const e = c.fromPalette({
       name: "surface_dim",
       palette: (t) => t.neutralPalette,
-      tone: (t) => t.isDark ? 4 : T.isYellow(t.neutralPalette.hue) ? 90 : t.variant === d.VIBRANT ? 85 : 87,
+      tone: (t) => t.isDark ? 4 : T.isYellow(t.neutralPalette.hue) ? 90 : t.variant === m.VIBRANT ? 85 : 87,
       isBackground: !0,
       chromaMultiplier: (t) => {
         if (!t.isDark) {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 2.5;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.7;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? 2.7 : 1.75;
-          if (t.variant === d.VIBRANT)
+          if (t.variant === m.VIBRANT)
             return 1.36;
         }
         return 1;
       }
     });
-    return C(super.surfaceDim(), "2025", e);
+    return x(super.surfaceDim(), "2025", e);
   }
   surfaceBright() {
     const e = c.fromPalette({
       name: "surface_bright",
       palette: (t) => t.neutralPalette,
-      tone: (t) => t.isDark ? 18 : T.isYellow(t.neutralPalette.hue) ? 99 : t.variant === d.VIBRANT ? 97 : 98,
+      tone: (t) => t.isDark ? 18 : T.isYellow(t.neutralPalette.hue) ? 99 : t.variant === m.VIBRANT ? 97 : 98,
       isBackground: !0,
       chromaMultiplier: (t) => {
         if (t.isDark) {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 2.5;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.7;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? 2.7 : 1.75;
-          if (t.variant === d.VIBRANT)
+          if (t.variant === m.VIBRANT)
             return 1.36;
         }
         return 1;
       }
     });
-    return C(super.surfaceBright(), "2025", e);
+    return x(super.surfaceBright(), "2025", e);
   }
   surfaceContainerLowest() {
     const e = c.fromPalette({
@@ -2275,96 +2275,96 @@ class rt extends tt {
       tone: (t) => t.isDark ? 0 : 100,
       isBackground: !0
     });
-    return C(super.surfaceContainerLowest(), "2025", e);
+    return x(super.surfaceContainerLowest(), "2025", e);
   }
   surfaceContainerLow() {
     const e = c.fromPalette({
       name: "surface_container_low",
       palette: (t) => t.neutralPalette,
-      tone: (t) => t.platform === "phone" ? t.isDark ? 6 : T.isYellow(t.neutralPalette.hue) ? 98 : t.variant === d.VIBRANT ? 95 : 96 : 15,
+      tone: (t) => t.platform === "phone" ? t.isDark ? 6 : T.isYellow(t.neutralPalette.hue) ? 98 : t.variant === m.VIBRANT ? 95 : 96 : 15,
       isBackground: !0,
       chromaMultiplier: (t) => {
         if (t.platform === "phone") {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 1.3;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.25;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? 1.3 : 1.15;
-          if (t.variant === d.VIBRANT)
+          if (t.variant === m.VIBRANT)
             return 1.08;
         }
         return 1;
       }
     });
-    return C(super.surfaceContainerLow(), "2025", e);
+    return x(super.surfaceContainerLow(), "2025", e);
   }
   surfaceContainer() {
     const e = c.fromPalette({
       name: "surface_container",
       palette: (t) => t.neutralPalette,
-      tone: (t) => t.platform === "phone" ? t.isDark ? 9 : T.isYellow(t.neutralPalette.hue) ? 96 : t.variant === d.VIBRANT ? 92 : 94 : 20,
+      tone: (t) => t.platform === "phone" ? t.isDark ? 9 : T.isYellow(t.neutralPalette.hue) ? 96 : t.variant === m.VIBRANT ? 92 : 94 : 20,
       isBackground: !0,
       chromaMultiplier: (t) => {
         if (t.platform === "phone") {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 1.6;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.4;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? 1.6 : 1.3;
-          if (t.variant === d.VIBRANT)
+          if (t.variant === m.VIBRANT)
             return 1.15;
         }
         return 1;
       }
     });
-    return C(super.surfaceContainer(), "2025", e);
+    return x(super.surfaceContainer(), "2025", e);
   }
   surfaceContainerHigh() {
     const e = c.fromPalette({
       name: "surface_container_high",
       palette: (t) => t.neutralPalette,
-      tone: (t) => t.platform === "phone" ? t.isDark ? 12 : T.isYellow(t.neutralPalette.hue) ? 94 : t.variant === d.VIBRANT ? 90 : 92 : 25,
+      tone: (t) => t.platform === "phone" ? t.isDark ? 12 : T.isYellow(t.neutralPalette.hue) ? 94 : t.variant === m.VIBRANT ? 90 : 92 : 25,
       isBackground: !0,
       chromaMultiplier: (t) => {
         if (t.platform === "phone") {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 1.9;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.5;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? 1.95 : 1.45;
-          if (t.variant === d.VIBRANT)
+          if (t.variant === m.VIBRANT)
             return 1.22;
         }
         return 1;
       }
     });
-    return C(super.surfaceContainerHigh(), "2025", e);
+    return x(super.surfaceContainerHigh(), "2025", e);
   }
   surfaceContainerHighest() {
     const e = c.fromPalette({
       name: "surface_container_highest",
       palette: (t) => t.neutralPalette,
-      tone: (t) => t.isDark ? 15 : T.isYellow(t.neutralPalette.hue) ? 92 : t.variant === d.VIBRANT ? 88 : 90,
+      tone: (t) => t.isDark ? 15 : T.isYellow(t.neutralPalette.hue) ? 92 : t.variant === m.VIBRANT ? 88 : 90,
       isBackground: !0,
-      chromaMultiplier: (t) => t.variant === d.NEUTRAL ? 2.2 : t.variant === d.TONAL_SPOT ? 1.7 : t.variant === d.EXPRESSIVE ? T.isYellow(t.neutralPalette.hue) ? 2.3 : 1.6 : t.variant === d.VIBRANT ? 1.29 : 1
+      chromaMultiplier: (t) => t.variant === m.NEUTRAL ? 2.2 : t.variant === m.TONAL_SPOT ? 1.7 : t.variant === m.EXPRESSIVE ? T.isYellow(t.neutralPalette.hue) ? 2.3 : 1.6 : t.variant === m.VIBRANT ? 1.29 : 1
     });
-    return C(super.surfaceContainerHighest(), "2025", e);
+    return x(super.surfaceContainerHighest(), "2025", e);
   }
   onSurface() {
     const e = c.fromPalette({
       name: "on_surface",
       palette: (t) => t.neutralPalette,
-      tone: (t) => t.variant === d.VIBRANT ? D(t.neutralPalette, 0, 100, 1.1) : c.getInitialToneFromBackground((n) => n.platform === "phone" ? this.highestSurface(n) : this.surfaceContainerHigh())(t),
+      tone: (t) => t.variant === m.VIBRANT ? D(t.neutralPalette, 0, 100, 1.1) : c.getInitialToneFromBackground((n) => n.platform === "phone" ? this.highestSurface(n) : this.surfaceContainerHigh())(t),
       chromaMultiplier: (t) => {
         if (t.platform === "phone") {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 2.2;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.7;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? t.isDark ? 3 : 2.3 : 1.6;
         }
         return 1;
@@ -2372,7 +2372,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : this.surfaceContainerHigh(),
       contrastCurve: (t) => t.isDark && t.platform === "phone" ? b(11) : b(9)
     });
-    return C(super.onSurface(), "2025", e);
+    return x(super.onSurface(), "2025", e);
   }
   onSurfaceVariant() {
     const e = c.fromPalette({
@@ -2380,11 +2380,11 @@ class rt extends tt {
       palette: (t) => t.neutralPalette,
       chromaMultiplier: (t) => {
         if (t.platform === "phone") {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 2.2;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.7;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? t.isDark ? 3 : 2.3 : 1.6;
         }
         return 1;
@@ -2392,7 +2392,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : this.surfaceContainerHigh(),
       contrastCurve: (t) => t.platform === "phone" ? t.isDark ? b(6) : b(4.5) : b(7)
     });
-    return C(super.onSurfaceVariant(), "2025", e);
+    return x(super.onSurfaceVariant(), "2025", e);
   }
   outline() {
     const e = c.fromPalette({
@@ -2400,11 +2400,11 @@ class rt extends tt {
       palette: (t) => t.neutralPalette,
       chromaMultiplier: (t) => {
         if (t.platform === "phone") {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 2.2;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.7;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? t.isDark ? 3 : 2.3 : 1.6;
         }
         return 1;
@@ -2412,7 +2412,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : this.surfaceContainerHigh(),
       contrastCurve: (t) => t.platform === "phone" ? b(3) : b(4.5)
     });
-    return C(super.outline(), "2025", e);
+    return x(super.outline(), "2025", e);
   }
   outlineVariant() {
     const e = c.fromPalette({
@@ -2420,11 +2420,11 @@ class rt extends tt {
       palette: (t) => t.neutralPalette,
       chromaMultiplier: (t) => {
         if (t.platform === "phone") {
-          if (t.variant === d.NEUTRAL)
+          if (t.variant === m.NEUTRAL)
             return 2.2;
-          if (t.variant === d.TONAL_SPOT)
+          if (t.variant === m.TONAL_SPOT)
             return 1.7;
-          if (t.variant === d.EXPRESSIVE)
+          if (t.variant === m.EXPRESSIVE)
             return T.isYellow(t.neutralPalette.hue) ? t.isDark ? 3 : 2.3 : 1.6;
         }
         return 1;
@@ -2432,7 +2432,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : this.surfaceContainerHigh(),
       contrastCurve: (t) => t.platform === "phone" ? b(1.5) : b(3)
     });
-    return C(super.outlineVariant(), "2025", e);
+    return x(super.outlineVariant(), "2025", e);
   }
   inverseSurface() {
     const e = c.fromPalette({
@@ -2441,7 +2441,7 @@ class rt extends tt {
       tone: (t) => t.isDark ? 98 : 4,
       isBackground: !0
     });
-    return C(super.inverseSurface(), "2025", e);
+    return x(super.inverseSurface(), "2025", e);
   }
   inverseOnSurface() {
     const e = c.fromPalette({
@@ -2450,7 +2450,7 @@ class rt extends tt {
       background: (t) => this.inverseSurface(),
       contrastCurve: (t) => b(7)
     });
-    return C(super.inverseOnSurface(), "2025", e);
+    return x(super.inverseOnSurface(), "2025", e);
   }
   ////////////////////////////////////////////////////////////////
   // Primaries [P]                                              //
@@ -2459,19 +2459,19 @@ class rt extends tt {
     const e = c.fromPalette({
       name: "primary",
       palette: (t) => t.primaryPalette,
-      tone: (t) => t.variant === d.NEUTRAL ? t.platform === "phone" ? t.isDark ? 80 : 40 : 90 : t.variant === d.TONAL_SPOT ? t.platform === "phone" ? t.isDark ? 80 : D(t.primaryPalette) : D(t.primaryPalette, 0, 90) : t.variant === d.EXPRESSIVE ? t.platform === "phone" ? D(t.primaryPalette, 0, T.isYellow(t.primaryPalette.hue) ? 25 : T.isCyan(t.primaryPalette.hue) ? 88 : 98) : D(t.primaryPalette) : t.platform === "phone" ? D(t.primaryPalette, 0, T.isCyan(t.primaryPalette.hue) ? 88 : 98) : D(t.primaryPalette),
+      tone: (t) => t.variant === m.NEUTRAL ? t.platform === "phone" ? t.isDark ? 80 : 40 : 90 : t.variant === m.TONAL_SPOT ? t.platform === "phone" ? t.isDark ? 80 : D(t.primaryPalette) : D(t.primaryPalette, 0, 90) : t.variant === m.EXPRESSIVE ? t.platform === "phone" ? D(t.primaryPalette, 0, T.isYellow(t.primaryPalette.hue) ? 25 : T.isCyan(t.primaryPalette.hue) ? 88 : 98) : D(t.primaryPalette) : t.platform === "phone" ? D(t.primaryPalette, 0, T.isCyan(t.primaryPalette.hue) ? 88 : 98) : D(t.primaryPalette),
       isBackground: !0,
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : this.surfaceContainerHigh(),
       contrastCurve: (t) => t.platform === "phone" ? b(4.5) : b(7),
       toneDeltaPair: (t) => t.platform === "phone" ? new M(this.primaryContainer(), this.primary(), 5, "relative_lighter", !0, "farther") : void 0
     });
-    return C(super.primary(), "2025", e);
+    return x(super.primary(), "2025", e);
   }
   primaryDim() {
     return c.fromPalette({
       name: "primary_dim",
       palette: (e) => e.primaryPalette,
-      tone: (e) => e.variant === d.NEUTRAL ? 85 : e.variant === d.TONAL_SPOT ? D(e.primaryPalette, 0, 90) : D(e.primaryPalette),
+      tone: (e) => e.variant === m.NEUTRAL ? 85 : e.variant === m.TONAL_SPOT ? D(e.primaryPalette, 0, 90) : D(e.primaryPalette),
       isBackground: !0,
       background: (e) => this.surfaceContainerHigh(),
       contrastCurve: (e) => b(4.5),
@@ -2485,19 +2485,19 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.primary() : this.primaryDim(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.onPrimary(), "2025", e);
+    return x(super.onPrimary(), "2025", e);
   }
   primaryContainer() {
     const e = c.fromPalette({
       name: "primary_container",
       palette: (t) => t.primaryPalette,
-      tone: (t) => t.platform === "watch" ? 30 : t.variant === d.NEUTRAL ? t.isDark ? 30 : 90 : t.variant === d.TONAL_SPOT ? t.isDark ? $(t.primaryPalette, 35, 93) : D(t.primaryPalette, 0, 90) : t.variant === d.EXPRESSIVE ? t.isDark ? D(t.primaryPalette, 30, 93) : D(t.primaryPalette, 78, T.isCyan(t.primaryPalette.hue) ? 88 : 90) : t.isDark ? $(t.primaryPalette, 66, 93) : D(t.primaryPalette, 66, T.isCyan(t.primaryPalette.hue) ? 88 : 93),
+      tone: (t) => t.platform === "watch" ? 30 : t.variant === m.NEUTRAL ? t.isDark ? 30 : 90 : t.variant === m.TONAL_SPOT ? t.isDark ? $(t.primaryPalette, 35, 93) : D(t.primaryPalette, 0, 90) : t.variant === m.EXPRESSIVE ? t.isDark ? D(t.primaryPalette, 30, 93) : D(t.primaryPalette, 78, T.isCyan(t.primaryPalette.hue) ? 88 : 90) : t.isDark ? $(t.primaryPalette, 66, 93) : D(t.primaryPalette, 66, T.isCyan(t.primaryPalette.hue) ? 88 : 93),
       isBackground: !0,
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : void 0,
       toneDeltaPair: (t) => t.platform === "phone" ? void 0 : new M(this.primaryContainer(), this.primaryDim(), 10, "darker", !0, "farther"),
       contrastCurve: (t) => t.platform === "phone" && t.contrastLevel > 0 ? b(1.5) : void 0
     });
-    return C(super.primaryContainer(), "2025", e);
+    return x(super.primaryContainer(), "2025", e);
   }
   onPrimaryContainer() {
     const e = c.fromPalette({
@@ -2506,7 +2506,7 @@ class rt extends tt {
       background: (t) => this.primaryContainer(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.onPrimaryContainer(), "2025", e);
+    return x(super.onPrimaryContainer(), "2025", e);
   }
   primaryFixed() {
     const e = c.fromPalette({
@@ -2520,7 +2520,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : void 0,
       contrastCurve: (t) => t.platform === "phone" && t.contrastLevel > 0 ? b(1.5) : void 0
     });
-    return C(super.primaryFixed(), "2025", e);
+    return x(super.primaryFixed(), "2025", e);
   }
   primaryFixedDim() {
     const e = c.fromPalette({
@@ -2530,7 +2530,7 @@ class rt extends tt {
       isBackground: !0,
       toneDeltaPair: (t) => new M(this.primaryFixedDim(), this.primaryFixed(), 5, "darker", !0, "exact")
     });
-    return C(super.primaryFixedDim(), "2025", e);
+    return x(super.primaryFixedDim(), "2025", e);
   }
   onPrimaryFixed() {
     const e = c.fromPalette({
@@ -2539,7 +2539,7 @@ class rt extends tt {
       background: (t) => this.primaryFixedDim(),
       contrastCurve: (t) => b(7)
     });
-    return C(super.onPrimaryFixed(), "2025", e);
+    return x(super.onPrimaryFixed(), "2025", e);
   }
   onPrimaryFixedVariant() {
     const e = c.fromPalette({
@@ -2548,7 +2548,7 @@ class rt extends tt {
       background: (t) => this.primaryFixedDim(),
       contrastCurve: (t) => b(4.5)
     });
-    return C(super.onPrimaryFixedVariant(), "2025", e);
+    return x(super.onPrimaryFixedVariant(), "2025", e);
   }
   inversePrimary() {
     const e = c.fromPalette({
@@ -2558,7 +2558,7 @@ class rt extends tt {
       background: (t) => this.inverseSurface(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.inversePrimary(), "2025", e);
+    return x(super.inversePrimary(), "2025", e);
   }
   ////////////////////////////////////////////////////////////////
   // Secondaries [Q]                                            //
@@ -2567,19 +2567,19 @@ class rt extends tt {
     const e = c.fromPalette({
       name: "secondary",
       palette: (t) => t.secondaryPalette,
-      tone: (t) => t.platform === "watch" ? t.variant === d.NEUTRAL ? 90 : D(t.secondaryPalette, 0, 90) : t.variant === d.NEUTRAL ? t.isDark ? $(t.secondaryPalette, 0, 98) : D(t.secondaryPalette) : t.variant === d.VIBRANT ? D(t.secondaryPalette, 0, t.isDark ? 90 : 98) : t.isDark ? 80 : D(t.secondaryPalette),
+      tone: (t) => t.platform === "watch" ? t.variant === m.NEUTRAL ? 90 : D(t.secondaryPalette, 0, 90) : t.variant === m.NEUTRAL ? t.isDark ? $(t.secondaryPalette, 0, 98) : D(t.secondaryPalette) : t.variant === m.VIBRANT ? D(t.secondaryPalette, 0, t.isDark ? 90 : 98) : t.isDark ? 80 : D(t.secondaryPalette),
       isBackground: !0,
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : this.surfaceContainerHigh(),
       contrastCurve: (t) => t.platform === "phone" ? b(4.5) : b(7),
       toneDeltaPair: (t) => t.platform === "phone" ? new M(this.secondaryContainer(), this.secondary(), 5, "relative_lighter", !0, "farther") : void 0
     });
-    return C(super.secondary(), "2025", e);
+    return x(super.secondary(), "2025", e);
   }
   secondaryDim() {
     return c.fromPalette({
       name: "secondary_dim",
       palette: (e) => e.secondaryPalette,
-      tone: (e) => e.variant === d.NEUTRAL ? 85 : D(e.secondaryPalette, 0, 90),
+      tone: (e) => e.variant === m.NEUTRAL ? 85 : D(e.secondaryPalette, 0, 90),
       isBackground: !0,
       background: (e) => this.surfaceContainerHigh(),
       contrastCurve: (e) => b(4.5),
@@ -2593,19 +2593,19 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.secondary() : this.secondaryDim(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.onSecondary(), "2025", e);
+    return x(super.onSecondary(), "2025", e);
   }
   secondaryContainer() {
     const e = c.fromPalette({
       name: "secondary_container",
       palette: (t) => t.secondaryPalette,
-      tone: (t) => t.platform === "watch" ? 30 : t.variant === d.VIBRANT ? t.isDark ? $(t.secondaryPalette, 30, 40) : D(t.secondaryPalette, 84, 90) : t.variant === d.EXPRESSIVE ? t.isDark ? 15 : D(t.secondaryPalette, 90, 95) : t.isDark ? 25 : 90,
+      tone: (t) => t.platform === "watch" ? 30 : t.variant === m.VIBRANT ? t.isDark ? $(t.secondaryPalette, 30, 40) : D(t.secondaryPalette, 84, 90) : t.variant === m.EXPRESSIVE ? t.isDark ? 15 : D(t.secondaryPalette, 90, 95) : t.isDark ? 25 : 90,
       isBackground: !0,
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : void 0,
       toneDeltaPair: (t) => t.platform === "watch" ? new M(this.secondaryContainer(), this.secondaryDim(), 10, "darker", !0, "farther") : void 0,
       contrastCurve: (t) => t.platform === "phone" && t.contrastLevel > 0 ? b(1.5) : void 0
     });
-    return C(super.secondaryContainer(), "2025", e);
+    return x(super.secondaryContainer(), "2025", e);
   }
   onSecondaryContainer() {
     const e = c.fromPalette({
@@ -2614,7 +2614,7 @@ class rt extends tt {
       background: (t) => this.secondaryContainer(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.onSecondaryContainer(), "2025", e);
+    return x(super.onSecondaryContainer(), "2025", e);
   }
   secondaryFixed() {
     const e = c.fromPalette({
@@ -2628,7 +2628,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : void 0,
       contrastCurve: (t) => t.platform === "phone" && t.contrastLevel > 0 ? b(1.5) : void 0
     });
-    return C(super.secondaryFixed(), "2025", e);
+    return x(super.secondaryFixed(), "2025", e);
   }
   secondaryFixedDim() {
     const e = c.fromPalette({
@@ -2638,7 +2638,7 @@ class rt extends tt {
       isBackground: !0,
       toneDeltaPair: (t) => new M(this.secondaryFixedDim(), this.secondaryFixed(), 5, "darker", !0, "exact")
     });
-    return C(super.secondaryFixedDim(), "2025", e);
+    return x(super.secondaryFixedDim(), "2025", e);
   }
   onSecondaryFixed() {
     const e = c.fromPalette({
@@ -2647,7 +2647,7 @@ class rt extends tt {
       background: (t) => this.secondaryFixedDim(),
       contrastCurve: (t) => b(7)
     });
-    return C(super.onSecondaryFixed(), "2025", e);
+    return x(super.onSecondaryFixed(), "2025", e);
   }
   onSecondaryFixedVariant() {
     const e = c.fromPalette({
@@ -2656,7 +2656,7 @@ class rt extends tt {
       background: (t) => this.secondaryFixedDim(),
       contrastCurve: (t) => b(4.5)
     });
-    return C(super.onSecondaryFixedVariant(), "2025", e);
+    return x(super.onSecondaryFixedVariant(), "2025", e);
   }
   ////////////////////////////////////////////////////////////////
   // Tertiaries [T]                                             //
@@ -2665,19 +2665,19 @@ class rt extends tt {
     const e = c.fromPalette({
       name: "tertiary",
       palette: (t) => t.tertiaryPalette,
-      tone: (t) => t.platform === "watch" ? t.variant === d.TONAL_SPOT ? D(t.tertiaryPalette, 0, 90) : D(t.tertiaryPalette) : t.variant === d.EXPRESSIVE || t.variant === d.VIBRANT ? D(t.tertiaryPalette, 0, T.isCyan(t.tertiaryPalette.hue) ? 88 : t.isDark ? 98 : 100) : t.isDark ? D(t.tertiaryPalette, 0, 98) : D(t.tertiaryPalette),
+      tone: (t) => t.platform === "watch" ? t.variant === m.TONAL_SPOT ? D(t.tertiaryPalette, 0, 90) : D(t.tertiaryPalette) : t.variant === m.EXPRESSIVE || t.variant === m.VIBRANT ? D(t.tertiaryPalette, 0, T.isCyan(t.tertiaryPalette.hue) ? 88 : t.isDark ? 98 : 100) : t.isDark ? D(t.tertiaryPalette, 0, 98) : D(t.tertiaryPalette),
       isBackground: !0,
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : this.surfaceContainerHigh(),
       contrastCurve: (t) => t.platform === "phone" ? b(4.5) : b(7),
       toneDeltaPair: (t) => t.platform === "phone" ? new M(this.tertiaryContainer(), this.tertiary(), 5, "relative_lighter", !0, "farther") : void 0
     });
-    return C(super.tertiary(), "2025", e);
+    return x(super.tertiary(), "2025", e);
   }
   tertiaryDim() {
     return c.fromPalette({
       name: "tertiary_dim",
       palette: (e) => e.tertiaryPalette,
-      tone: (e) => e.variant === d.TONAL_SPOT ? D(e.tertiaryPalette, 0, 90) : D(e.tertiaryPalette),
+      tone: (e) => e.variant === m.TONAL_SPOT ? D(e.tertiaryPalette, 0, 90) : D(e.tertiaryPalette),
       isBackground: !0,
       background: (e) => this.surfaceContainerHigh(),
       contrastCurve: (e) => b(4.5),
@@ -2691,19 +2691,19 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.tertiary() : this.tertiaryDim(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.onTertiary(), "2025", e);
+    return x(super.onTertiary(), "2025", e);
   }
   tertiaryContainer() {
     const e = c.fromPalette({
       name: "tertiary_container",
       palette: (t) => t.tertiaryPalette,
-      tone: (t) => t.platform === "watch" ? t.variant === d.TONAL_SPOT ? D(t.tertiaryPalette, 0, 90) : D(t.tertiaryPalette) : t.variant === d.NEUTRAL ? t.isDark ? D(t.tertiaryPalette, 0, 93) : D(t.tertiaryPalette, 0, 96) : t.variant === d.TONAL_SPOT ? D(t.tertiaryPalette, 0, t.isDark ? 93 : 100) : t.variant === d.EXPRESSIVE ? D(t.tertiaryPalette, 75, T.isCyan(t.tertiaryPalette.hue) ? 88 : t.isDark ? 93 : 100) : t.isDark ? D(t.tertiaryPalette, 0, 93) : D(t.tertiaryPalette, 72, 100),
+      tone: (t) => t.platform === "watch" ? t.variant === m.TONAL_SPOT ? D(t.tertiaryPalette, 0, 90) : D(t.tertiaryPalette) : t.variant === m.NEUTRAL ? t.isDark ? D(t.tertiaryPalette, 0, 93) : D(t.tertiaryPalette, 0, 96) : t.variant === m.TONAL_SPOT ? D(t.tertiaryPalette, 0, t.isDark ? 93 : 100) : t.variant === m.EXPRESSIVE ? D(t.tertiaryPalette, 75, T.isCyan(t.tertiaryPalette.hue) ? 88 : t.isDark ? 93 : 100) : t.isDark ? D(t.tertiaryPalette, 0, 93) : D(t.tertiaryPalette, 72, 100),
       isBackground: !0,
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : void 0,
       toneDeltaPair: (t) => t.platform === "watch" ? new M(this.tertiaryContainer(), this.tertiaryDim(), 10, "darker", !0, "farther") : void 0,
       contrastCurve: (t) => t.platform === "phone" && t.contrastLevel > 0 ? b(1.5) : void 0
     });
-    return C(super.tertiaryContainer(), "2025", e);
+    return x(super.tertiaryContainer(), "2025", e);
   }
   onTertiaryContainer() {
     const e = c.fromPalette({
@@ -2712,7 +2712,7 @@ class rt extends tt {
       background: (t) => this.tertiaryContainer(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.onTertiaryContainer(), "2025", e);
+    return x(super.onTertiaryContainer(), "2025", e);
   }
   tertiaryFixed() {
     const e = c.fromPalette({
@@ -2726,7 +2726,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.highestSurface(t) : void 0,
       contrastCurve: (t) => t.platform === "phone" && t.contrastLevel > 0 ? b(1.5) : void 0
     });
-    return C(super.tertiaryFixed(), "2025", e);
+    return x(super.tertiaryFixed(), "2025", e);
   }
   tertiaryFixedDim() {
     const e = c.fromPalette({
@@ -2736,7 +2736,7 @@ class rt extends tt {
       isBackground: !0,
       toneDeltaPair: (t) => new M(this.tertiaryFixedDim(), this.tertiaryFixed(), 5, "darker", !0, "exact")
     });
-    return C(super.tertiaryFixedDim(), "2025", e);
+    return x(super.tertiaryFixedDim(), "2025", e);
   }
   onTertiaryFixed() {
     const e = c.fromPalette({
@@ -2745,7 +2745,7 @@ class rt extends tt {
       background: (t) => this.tertiaryFixedDim(),
       contrastCurve: (t) => b(7)
     });
-    return C(super.onTertiaryFixed(), "2025", e);
+    return x(super.onTertiaryFixed(), "2025", e);
   }
   onTertiaryFixedVariant() {
     const e = c.fromPalette({
@@ -2754,7 +2754,7 @@ class rt extends tt {
       background: (t) => this.tertiaryFixedDim(),
       contrastCurve: (t) => b(4.5)
     });
-    return C(super.onTertiaryFixedVariant(), "2025", e);
+    return x(super.onTertiaryFixedVariant(), "2025", e);
   }
   ////////////////////////////////////////////////////////////////
   // Errors [E]                                                 //
@@ -2769,7 +2769,7 @@ class rt extends tt {
       contrastCurve: (t) => t.platform === "phone" ? b(4.5) : b(7),
       toneDeltaPair: (t) => t.platform === "phone" ? new M(this.errorContainer(), this.error(), 5, "relative_lighter", !0, "farther") : void 0
     });
-    return C(super.error(), "2025", e);
+    return x(super.error(), "2025", e);
   }
   errorDim() {
     return c.fromPalette({
@@ -2789,7 +2789,7 @@ class rt extends tt {
       background: (t) => t.platform === "phone" ? this.error() : this.errorDim(),
       contrastCurve: (t) => t.platform === "phone" ? b(6) : b(7)
     });
-    return C(super.onError(), "2025", e);
+    return x(super.onError(), "2025", e);
   }
   errorContainer() {
     const e = c.fromPalette({
@@ -2801,7 +2801,7 @@ class rt extends tt {
       toneDeltaPair: (t) => t.platform === "watch" ? new M(this.errorContainer(), this.errorDim(), 10, "darker", !0, "farther") : void 0,
       contrastCurve: (t) => t.platform === "phone" && t.contrastLevel > 0 ? b(1.5) : void 0
     });
-    return C(super.errorContainer(), "2025", e);
+    return x(super.errorContainer(), "2025", e);
   }
   onErrorContainer() {
     const e = c.fromPalette({
@@ -2810,29 +2810,29 @@ class rt extends tt {
       background: (t) => this.errorContainer(),
       contrastCurve: (t) => t.platform === "phone" ? b(4.5) : b(7)
     });
-    return C(super.onErrorContainer(), "2025", e);
+    return x(super.onErrorContainer(), "2025", e);
   }
   /////////////////////////////////////////////////////////////////
   // Remapped Colors                                             //
   /////////////////////////////////////////////////////////////////
   surfaceVariant() {
     const e = Object.assign(this.surfaceContainerHighest().clone(), { name: "surface_variant" });
-    return C(super.surfaceVariant(), "2025", e);
+    return x(super.surfaceVariant(), "2025", e);
   }
   surfaceTint() {
     const e = Object.assign(this.primary().clone(), { name: "surface_tint" });
-    return C(super.surfaceTint(), "2025", e);
+    return x(super.surfaceTint(), "2025", e);
   }
   background() {
     const e = Object.assign(this.surface().clone(), { name: "background" });
-    return C(super.background(), "2025", e);
+    return x(super.background(), "2025", e);
   }
   onBackground() {
     const e = Object.assign(this.onSurface().clone(), {
       name: "on_background",
       tone: (t) => t.platform === "watch" ? 100 : this.onSurface().getTone(t)
     });
-    return C(super.onBackground(), "2025", e);
+    return x(super.onBackground(), "2025", e);
   }
 }
 /**
@@ -3120,7 +3120,7 @@ class o {
   }
 }
 o.contentAccentToneDelta = 15;
-o.colorSpec = new rt();
+o.colorSpec = new ot();
 o.primaryPaletteKeyColor = o.colorSpec.primaryPaletteKeyColor();
 o.secondaryPaletteKeyColor = o.colorSpec.secondaryPaletteKeyColor();
 o.tertiaryPaletteKeyColor = o.colorSpec.tertiaryPaletteKeyColor();
@@ -3192,12 +3192,12 @@ o.onTertiaryFixedVariant = o.colorSpec.onTertiaryFixedVariant();
  * limitations under the License.
  */
 function le(r) {
-  const e = Me(r), t = Be(r), n = ve(r), a = [e.toString(16), t.toString(16), n.toString(16)];
+  const e = Ae(r), t = Ie(r), n = ve(r), a = [e.toString(16), t.toString(16), n.toString(16)];
   for (const [i, s] of a.entries())
     s.length === 1 && (a[i] = "0" + s);
   return "#" + a.join("");
 }
-function W(r) {
+function J(r) {
   r = r.replace("#", "");
   const e = r.length === 3, t = r.length === 6, n = r.length === 8;
   if (!e && !t && !n)
@@ -3208,26 +3208,36 @@ function W(r) {
 function j(r) {
   return parseInt(r, 16);
 }
-const nt = ["hex", "rgb", "hsl"];
-function at(r) {
-  return !r || nt.indexOf(r) < 0 ? "hex" : r;
+const it = ["hex", "rgb", "hsl"];
+function st(r) {
+  return !r || it.indexOf(r) < 0 ? "hex" : r;
 }
 function fe(r, e) {
-  const t = at(e);
+  const t = st(e);
   return t === "hex" ? r[t]().toLowerCase() : r[t]().round().string();
 }
-const ot = [98, 96, 92, 86, 76, 64, 52, 40, 28, 18], it = [14, 20, 28, 38, 50, 62, 74, 86, 93, 97], st = [0.08, 0.14, 0.24, 0.36, 0.5, 0.74, 1, 0.92, 0.78, 0.6], ct = [1, 0.98, 0.94, 0.88, 0.8, 0.72, 0.62, 0.52, 0.42, 0.32], ut = [0, 0.02, 0.04, 0.08, 0.12, 0.16, 0.12, 0.08, 0.04, 0], lt = [0, 0.02, 0.04, 0.08, 0.12, 0.16, 0.12, 0.08, 0.04, 0], ft = 12;
+const ct = [98, 96, 92, 86, 76, 64, 52, 40, 28, 18], ut = [14, 20, 28, 38, 50, 62, 74, 86, 93, 97], lt = [99, 97, 94, 89, 80, 70, 60, 50, 40, 30], ft = [18, 24, 32, 42, 54, 66, 77, 87, 94, 98], ht = [0.08, 0.14, 0.24, 0.36, 0.5, 0.74, 1, 0.92, 0.78, 0.6], dt = [1, 0.98, 0.94, 0.88, 0.8, 0.72, 0.62, 0.52, 0.42, 0.32], mt = [0.12, 0.18, 0.3, 0.46, 0.62, 0.82, 1.02, 1, 0.92, 0.8], pt = [1.02, 1, 0.98, 0.94, 0.9, 0.84, 0.76, 0.68, 0.58, 0.48], yt = 105, Me = 32;
 function Z(r, e, t) {
   return Math.max(e, Math.min(t, r));
 }
-function ae(r) {
+function re(r) {
   return Math.round(r * 100) / 100;
 }
-function Le(r) {
+function Pt(r, e) {
+  const t = Math.abs(r - e) % 360;
+  return t > 180 ? 360 - t : t;
+}
+function gt(r, e, t) {
+  return r + (e - r) * t;
+}
+function Re(r, e, t) {
+  return t <= 0 ? r : t >= 1 ? e : r.map((n, a) => gt(n, e[a], t));
+}
+function Ee(r) {
   return Z(Math.round(r * 0.77), 1, r);
 }
-function ht(r = {}) {
-  const e = Z(Number(r.steps) || 10, 1, 24), t = Math.floor(e / 2) + 1, n = !!r.dark, a = r.index !== void 0 && r.index !== null && r.index !== "", i = n ? Le(e) : t;
+function kt(r = {}) {
+  const e = Z(Number(r.steps) || 10, 1, 24), t = Math.floor(e / 2) + 1, n = !!r.dark, a = r.index !== void 0 && r.index !== null && r.index !== "", i = n ? Ee(e) : t;
   return {
     dark: n,
     list: !!r.list,
@@ -3239,78 +3249,91 @@ function ht(r = {}) {
     index: Z(a ? Number(r.index) : i, 1, e),
     curveGamma: Z(Number(r.curveGamma) || 1, 0.1, 5),
     mixColor: typeof r.mixColor == "string" ? r.mixColor : "",
-    mixRatio: Z(Number(r.mixRatio) || 0, 0, 1)
+    mixRatio: Z(Number(r.mixRatio) || 0, 0, 1),
+    protectYellow: !!r.protectYellow
   };
 }
-function dt(r, e, t) {
-  const n = Y(r);
+function bt(r, e, t) {
+  const n = U(r);
   if (!e || t <= 0)
     return n;
-  const a = W(n.hex().toLowerCase()), i = W(Y(e).hex().toLowerCase());
-  return Y(le(oe.cam16Ucs(a, i, t)));
+  const a = J(n.hex().toLowerCase()), i = J(U(e).hex().toLowerCase());
+  return U(le(oe.cam16Ucs(a, i, t)));
 }
-function mt(r, e) {
+function St(r, e) {
   const t = Z(r, 0, 1);
   return t <= 0.5 ? 0.5 * Math.pow(t * 2, e) : 1 - 0.5 * Math.pow((1 - t) * 2, e);
 }
-function we(r, e) {
+function Be(r, e) {
   if (r.length === 1)
     return r[0];
   const t = Z(e, 0, 1) * (r.length - 1), n = Math.floor(t), a = Math.min(r.length - 1, n + 1), i = t - n;
   return r[n] + (r[a] - r[n]) * i;
 }
-function pt(r, e) {
-  return e ? r ? lt : ut : r ? ct : st;
+function Ce(r, e) {
+  if (!e)
+    return 0;
+  const t = Pt(r, yt);
+  if (t >= Me)
+    return 0;
+  const n = 1 - t / Me;
+  return n * n;
 }
-function yt(r) {
-  return r ? it : ot;
+function Ct(r, e, t) {
+  return Re(e ? dt : ht, e ? pt : mt, Ce(r.hue, t));
 }
-function Pt(r, e, t) {
-  const n = t.steps === 1 ? 0.5 : e / (t.steps - 1), a = mt(n, t.curveGamma), i = we(yt(t.dark), a), s = r.chroma <= ft, u = we(pt(t.dark, s), a), l = s ? Math.min(r.chroma, 10) : r.chroma, f = s ? Math.min(6, l * u) : Z(r.chroma * u, 0, 140);
+function xt(r, e, t) {
+  return Re(e ? ut : ct, e ? ft : lt, Ce(r.hue, t));
+}
+function Tt(r, e, t) {
+  const n = t.steps === 1 ? 0.5 : e / (t.steps - 1), a = St(n, t.curveGamma), i = Be(xt(r, t.dark, t.protectYellow), a), s = Be(Ct(r, t.dark, t.protectYellow), a), u = Z(r.chroma * s, 0, 140);
   return {
-    tone: ae(i),
-    chroma: ae(f),
-    isNeutral: s
+    tone: re(i),
+    chroma: re(u),
+    isNeutral: !1
   };
 }
-function gt(r, e, t) {
+function Dt(r, e, t) {
   const n = T.from(r.hue, e.chroma, e.tone);
-  return fe(Y(le(n.toInt())), t);
+  return fe(U(le(n.toInt())), t);
 }
-function kt(r, e = {}) {
-  const t = ht(e), n = dt(r, t.mixColor, t.mixRatio), a = T.fromInt(W(n.hex().toLowerCase())), i = Array.from({ length: t.steps }, (f, h) => {
-    const p = Pt(a, h, t);
+function wt(r, e = {}) {
+  const t = kt(e), n = bt(r, t.mixColor, t.mixRatio), a = T.fromInt(J(n.hex().toLowerCase())), i = Ce(a.hue, t.protectYellow), s = Array.from({ length: t.steps }, (h, p) => {
+    const d = Tt(a, p, t);
     return {
-      index: h + 1,
-      ...p,
-      color: gt(a, p, t.format)
+      index: p + 1,
+      ...d,
+      color: Dt(a, d, t.format)
     };
-  }), s = i.reduce((f, h) => {
-    const p = Math.abs(h.tone - a.tone) + Math.abs(h.chroma - a.chroma) * 0.35, m = Math.abs(f.tone - a.tone) + Math.abs(f.chroma - a.chroma) * 0.35;
-    return p < m ? h : f;
-  }, i[0]), u = t.dark ? Math.max(s.index, Le(t.steps)) : s.index, l = i[u - 1];
+  }), u = s.reduce((h, p) => {
+    const d = Math.abs(p.tone - a.tone) + Math.abs(p.chroma - a.chroma) * 0.35, C = Math.abs(h.tone - a.tone) + Math.abs(h.chroma - a.chroma) * 0.35;
+    return d < C ? p : h;
+  }, s[0]), l = t.dark ? Math.max(u.index, Ee(t.steps)) : u.index, f = s[l - 1];
   return {
     options: t,
-    descriptors: i,
+    descriptors: s,
     meta: {
-      sourceColor: fe(Y(r), t.format),
+      sourceColor: fe(U(r), t.format),
       seedColor: fe(n, t.format),
-      sourceHex: Y(r).hex().toLowerCase(),
+      sourceHex: U(r).hex().toLowerCase(),
       seedHex: n.hex().toLowerCase(),
-      sourceTone: ae(T.fromInt(W(Y(r).hex().toLowerCase())).tone),
-      seedTone: ae(a.tone),
-      seedChroma: ae(a.chroma),
-      closestIndex: s.index,
-      closestColor: s.color,
-      baseIndex: l.index,
-      baseColor: l.color,
+      sourceTone: re(T.fromInt(J(U(r).hex().toLowerCase())).tone),
+      seedTone: re(a.tone),
+      seedChroma: re(a.chroma),
+      closestIndex: u.index,
+      closestColor: u.color,
+      baseIndex: f.index,
+      baseColor: f.color,
       dark: t.dark,
       steps: t.steps,
-      isNeutral: s.isNeutral
+      isNeutral: u.isNeutral,
+      protectYellow: t.protectYellow,
+      yellowProtectionApplied: i > 0,
+      yellowProtectionStrength: re(i)
     }
   };
 }
-function bt(r) {
+function Ft(r) {
   const { options: e, descriptors: t, meta: n } = r, a = t.map((l) => l.color), i = e.hasExplicitIndex || e.list ? e.index : n.baseIndex, s = t[i - 1];
   if (!e.meta)
     return e.list ? a : s.color;
@@ -3336,12 +3359,12 @@ function bt(r) {
     base: u
   };
 }
-function St(r, e = {}) {
-  return bt(kt(r, e));
+function Mt(r, e = {}) {
+  return Ft(wt(r, e));
 }
-function Ct(r, e = {}) {
-  const { dark: t, list: n, format: a = "hex", meta: i = !1 } = e, s = Math.max(1, Math.min(24, Number(e.steps) || 10)), l = e.index !== void 0 && e.index !== null && e.index !== "" ? Math.max(1, Math.min(s, Number(e.index))) : void 0, f = Math.max(0.1, Math.min(5, Number(e.curveGamma) || 1)), h = typeof e.mixColor == "string" ? e.mixColor : "", p = Math.max(0, Math.min(1, Number(e.mixRatio) || 0));
-  return St(r, {
+function Bt(r, e = {}) {
+  const { dark: t, list: n, format: a = "hex", meta: i = !1 } = e, s = Math.max(1, Math.min(24, Number(e.steps) || 10)), l = e.index !== void 0 && e.index !== null && e.index !== "" ? Math.max(1, Math.min(s, Number(e.index))) : void 0, f = Math.max(0.1, Math.min(5, Number(e.curveGamma) || 1)), h = typeof e.mixColor == "string" ? e.mixColor : "", p = Math.max(0, Math.min(1, Number(e.mixRatio) || 0)), d = !!e.protectYellow;
+  return Mt(r, {
     dark: t,
     list: n,
     meta: i,
@@ -3350,27 +3373,28 @@ function Ct(r, e = {}) {
     index: l,
     curveGamma: f,
     mixColor: h,
-    mixRatio: p
+    mixRatio: p,
+    protectYellow: d
   });
 }
-function xt(r = "#ffffff", e = "#000000", t = {}) {
+function At(r = "#ffffff", e = "#000000", t = {}) {
   const { steps: n = 10, format: a = "hex", includeEnds: i = !0, curveGamma: s = 1 } = t, u = Math.max(1, Math.min(24, Number(n) || 10)), l = Math.max(0.1, Math.min(5, Number(s) || 1)), f = typeof t.mixColor == "string" ? t.mixColor : "", h = Math.max(0, Math.min(1, Number(t.mixRatio) || 0));
-  let p = Y(r), m = Y(e);
+  let p = U(r), d = U(e);
   if (f && h > 0) {
-    const y = Y(f).hex().toLowerCase(), w = p.hex().toLowerCase(), F = m.hex().toLowerCase();
-    p = Y(le(oe.cam16Ucs(W(w), W(y), h))), m = Y(le(oe.cam16Ucs(W(F), W(y), h)));
+    const y = U(f).hex().toLowerCase(), F = p.hex().toLowerCase(), w = d.hex().toLowerCase();
+    p = U(le(oe.cam16Ucs(J(F), J(y), h))), d = U(le(oe.cam16Ucs(J(w), J(y), h)));
   }
-  const x = i ? u : u + 2, P = Math.max(1, x - 1), g = [];
-  for (let y = 0; y < x; y++) {
-    const w = Math.pow(y / P, l), F = Math.round(p.red() + (m.red() - p.red()) * w), R = Math.round(p.green() + (m.green() - p.green()) * w), O = Math.round(p.blue() + (m.blue() - p.blue()) * w), E = fe(Y({ r: F, g: R, b: O }), a);
-    !i && (y === 0 || y === x - 1) || g.push(E);
+  const C = i ? u : u + 2, P = Math.max(1, C - 1), g = [];
+  for (let y = 0; y < C; y++) {
+    const F = Math.pow(y / P, l), w = Math.round(p.red() + (d.red() - p.red()) * F), O = Math.round(p.green() + (d.green() - p.green()) * F), R = Math.round(p.blue() + (d.blue() - p.blue()) * F), E = fe(U({ r: w, g: O, b: R }), a);
+    !i && (y === 0 || y === C - 1) || g.push(E);
   }
   return g;
 }
-const Tt = { generate: xt }, Ft = {
-  generate: Ct
-}, wt = Tt;
+const It = { generate: At }, Lt = {
+  generate: Bt
+}, Ot = It;
 export {
-  wt as neutral,
-  Ft as palette
+  Ot as neutral,
+  Lt as palette
 };

@@ -1,6 +1,6 @@
 import { generatePalette } from './palette-core.js';
 
-function colorPaletteDark(originColor, i, format, steps = 10, curveGamma = 1, mixColor = '', mixRatio = 0, meta = false) {
+function colorPaletteDark(originColor, i, format, steps = 10, curveGamma = 1, mixColor = '', mixRatio = 0, meta = false, protectYellow = false) {
   return generatePalette(originColor, {
     dark: true,
     index: i,
@@ -10,6 +10,7 @@ function colorPaletteDark(originColor, i, format, steps = 10, curveGamma = 1, mi
     mixColor,
     mixRatio,
     meta,
+    protectYellow,
   });
 }
 

@@ -4,14 +4,16 @@ import { getColorString } from './utils.js';
 
 const LIGHT_TONE_ANCHORS = [98, 96, 92, 86, 76, 64, 52, 40, 28, 18];
 const DARK_TONE_ANCHORS = [14, 20, 28, 38, 50, 62, 74, 86, 93, 97];
+const LIGHT_YELLOW_TONE_ANCHORS = [99, 97, 94, 89, 80, 70, 60, 50, 40, 30];
+const DARK_YELLOW_TONE_ANCHORS = [18, 24, 32, 42, 54, 66, 77, 87, 94, 98];
 
 const LIGHT_COLOR_CHROMA_ANCHORS = [0.08, 0.14, 0.24, 0.36, 0.5, 0.74, 1, 0.92, 0.78, 0.6];
 const DARK_COLOR_CHROMA_ANCHORS = [1, 0.98, 0.94, 0.88, 0.8, 0.72, 0.62, 0.52, 0.42, 0.32];
+const LIGHT_YELLOW_CHROMA_ANCHORS = [0.12, 0.18, 0.3, 0.46, 0.62, 0.82, 1.02, 1, 0.92, 0.8];
+const DARK_YELLOW_CHROMA_ANCHORS = [1.02, 1, 0.98, 0.94, 0.9, 0.84, 0.76, 0.68, 0.58, 0.48];
 
-const LIGHT_NEUTRAL_CHROMA_ANCHORS = [0, 0.02, 0.04, 0.08, 0.12, 0.16, 0.12, 0.08, 0.04, 0];
-const DARK_NEUTRAL_CHROMA_ANCHORS = [0, 0.02, 0.04, 0.08, 0.12, 0.16, 0.12, 0.08, 0.04, 0];
-
-const NEUTRAL_CHROMA_THRESHOLD = 12;
+const YELLOW_PROTECTION_CENTER = 105;
+const YELLOW_PROTECTION_WIDTH = 32;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -19,6 +21,26 @@ function clamp(value, min, max) {
 
 function round(value) {
   return Math.round(value * 100) / 100;
+}
+
+function getHueDistance(a, b) {
+  const diff = Math.abs(a - b) % 360;
+  return diff > 180 ? 360 - diff : diff;
+}
+
+function mixValue(start, end, ratio) {
+  return start + (end - start) * ratio;
+}
+
+function mixAnchors(baseAnchors, targetAnchors, ratio) {
+  if (ratio <= 0) {
+    return baseAnchors;
+  }
+  if (ratio >= 1) {
+    return targetAnchors;
+  }
+
+  return baseAnchors.map((value, index) => mixValue(value, targetAnchors[index], ratio));
 }
 
 function getPreferredDarkBaseIndex(steps) {
@@ -44,6 +66,7 @@ function normalizeOptions(options = {}) {
     curveGamma: clamp(Number(options.curveGamma) || 1, 0.1, 5),
     mixColor: typeof options.mixColor === 'string' ? options.mixColor : '',
     mixRatio: clamp(Number(options.mixRatio) || 0, 0, 1),
+    protectYellow: Boolean(options.protectYellow),
   };
 }
 
@@ -80,33 +103,44 @@ function sampleAnchors(anchors, t) {
   return anchors[leftIndex] + (anchors[rightIndex] - anchors[leftIndex]) * mix;
 }
 
-function getChromaAnchors(isDark, isNeutral) {
-  if (isNeutral) {
-    return isDark ? DARK_NEUTRAL_CHROMA_ANCHORS : LIGHT_NEUTRAL_CHROMA_ANCHORS;
+function getYellowProtectionStrength(hue, enabled) {
+  if (!enabled) {
+    return 0;
   }
-  return isDark ? DARK_COLOR_CHROMA_ANCHORS : LIGHT_COLOR_CHROMA_ANCHORS;
+
+  const distance = getHueDistance(hue, YELLOW_PROTECTION_CENTER);
+  if (distance >= YELLOW_PROTECTION_WIDTH) {
+    return 0;
+  }
+
+  const normalized = 1 - distance / YELLOW_PROTECTION_WIDTH;
+  return normalized * normalized;
 }
 
-function getToneAnchors(isDark) {
-  return isDark ? DARK_TONE_ANCHORS : LIGHT_TONE_ANCHORS;
+function getChromaAnchors(baseHct, isDark, protectYellow) {
+  const baseAnchors = isDark ? DARK_COLOR_CHROMA_ANCHORS : LIGHT_COLOR_CHROMA_ANCHORS;
+  const yellowAnchors = isDark ? DARK_YELLOW_CHROMA_ANCHORS : LIGHT_YELLOW_CHROMA_ANCHORS;
+  return mixAnchors(baseAnchors, yellowAnchors, getYellowProtectionStrength(baseHct.hue, protectYellow));
+}
+
+function getToneAnchors(baseHct, isDark, protectYellow) {
+  const baseAnchors = isDark ? DARK_TONE_ANCHORS : LIGHT_TONE_ANCHORS;
+  const yellowAnchors = isDark ? DARK_YELLOW_TONE_ANCHORS : LIGHT_YELLOW_TONE_ANCHORS;
+  return mixAnchors(baseAnchors, yellowAnchors, getYellowProtectionStrength(baseHct.hue, protectYellow));
 }
 
 function getStepDescriptor(baseHct, stepIndex, options) {
   const progress = options.steps === 1 ? 0.5 : stepIndex / (options.steps - 1);
   const warped = warpProgress(progress, options.curveGamma);
-  const tone = sampleAnchors(getToneAnchors(options.dark), warped);
+  const tone = sampleAnchors(getToneAnchors(baseHct, options.dark, options.protectYellow), warped);
 
-  const isNeutral = baseHct.chroma <= NEUTRAL_CHROMA_THRESHOLD;
-  const chromaRatio = sampleAnchors(getChromaAnchors(options.dark, isNeutral), warped);
-  const chromaBase = isNeutral ? Math.min(baseHct.chroma, 10) : baseHct.chroma;
-  const chroma = isNeutral
-    ? Math.min(6, chromaBase * chromaRatio)
-    : clamp(baseHct.chroma * chromaRatio, 0, 140);
+  const chromaRatio = sampleAnchors(getChromaAnchors(baseHct, options.dark, options.protectYellow), warped);
+  const chroma = clamp(baseHct.chroma * chromaRatio, 0, 140);
 
   return {
     tone: round(tone),
     chroma: round(chroma),
-    isNeutral,
+    isNeutral: false,
   };
 }
 
@@ -119,6 +153,7 @@ function buildPalette(originColor, options = {}) {
   const normalized = normalizeOptions(options);
   const seedColor = getSeedColor(originColor, normalized.mixColor, normalized.mixRatio);
   const baseHct = Hct.fromInt(argbFromHex(seedColor.hex().toLowerCase()));
+  const yellowProtectionStrength = getYellowProtectionStrength(baseHct.hue, normalized.protectYellow);
 
   const descriptors = Array.from({ length: normalized.steps }, (_, stepIndex) => {
     const descriptor = getStepDescriptor(baseHct, stepIndex, normalized);
@@ -157,6 +192,9 @@ function buildPalette(originColor, options = {}) {
       dark: normalized.dark,
       steps: normalized.steps,
       isNeutral: closest.isNeutral,
+      protectYellow: normalized.protectYellow,
+      yellowProtectionApplied: yellowProtectionStrength > 0,
+      yellowProtectionStrength: round(yellowProtectionStrength),
     },
   };
 }

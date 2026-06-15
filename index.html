@@ -56,6 +56,15 @@
                 <div class="range-value mono" id="curveValue">1.00</div>
               </div>
             </div>
+            <div class="range-wrap">
+              <div class="range-label range-label-row">
+                <span>黄色保护</span>
+                <label class="check">
+                  <input type="checkbox" id="yellowProtectToggle" />
+                  <span>启用</span>
+                </label>
+              </div>
+            </div>
           </div>
 
           <div class="palette-list" id="paletteList"></div>
@@ -163,6 +172,7 @@
       const stepsValue = document.getElementById('stepsValue');
       const curveRange = document.getElementById('curveRange');
       const curveValue = document.getElementById('curveValue');
+      const yellowProtectToggle = document.getElementById('yellowProtectToggle');
       const modeLight = document.getElementById('modeLight');
       const modeDark = document.getElementById('modeDark');
       const paletteListEl = document.getElementById('paletteList');
@@ -232,6 +242,10 @@
 
       function getCurveGamma() {
         return Math.max(0.1, Math.min(5, Number(curveRange.value) || 1));
+      }
+
+      function getProtectYellow() {
+        return yellowProtectToggle.checked;
       }
 
       function getMode() {
@@ -388,6 +402,7 @@
         const steps = getSteps();
         const format = getFormat();
         const curveGamma = getCurveGamma();
+        const protectYellow = getProtectYellow();
         const payload = {};
 
         getItems().forEach((item) => {
@@ -399,10 +414,10 @@
             return;
           }
 
-          const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio });
-          const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio });
+          const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
+          const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
           if (!light || !dark) return;
-          payload[item.name] = { type: 'palette', seed: item.color, steps, format, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio, light, dark };
+          payload[item.name] = { type: 'palette', seed: item.color, steps, format, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow, light, dark };
         });
 
         return payload;
@@ -478,6 +493,7 @@
         const steps = getSteps();
         const format = getFormat();
         const curveGamma = getCurveGamma();
+        const protectYellow = getProtectYellow();
         const html = getItems()
           .map((item) => {
             if (item.type === 'neutral') {
@@ -487,8 +503,8 @@
               return neutralItemHtml(item, { light, dark });
             }
 
-            const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio });
-            const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio });
+            const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
+            const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
             if (!light || !dark) return '';
             return paletteItemHtml(item, { light, dark });
           })
@@ -567,6 +583,7 @@
         const steps = getSteps();
         const format = getFormat();
         const curveGamma = getCurveGamma();
+        const protectYellow = getProtectYellow();
         const mode = getAddMode();
         if (mode === 'neutral') {
           const mix = getAddMix();
@@ -585,8 +602,8 @@
 
         const mix = getAddMix();
         const color = normalizeColor(addColorText.value || addColorPicker.value);
-        const light = safeGenerate(color, { list: true, steps, format, curveGamma, dark: false, ...mix });
-        const dark = safeGenerate(color, { list: true, steps, format, curveGamma, dark: true, ...mix });
+        const light = safeGenerate(color, { list: true, steps, format, curveGamma, dark: false, protectYellow, ...mix });
+        const dark = safeGenerate(color, { list: true, steps, format, curveGamma, dark: true, protectYellow, ...mix });
         if (!light || !dark) {
           addPreview.innerHTML = '';
           return;
@@ -735,6 +752,10 @@
         if (addDialog.open) renderAddPreview();
       });
       curveRange.addEventListener('input', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+      yellowProtectToggle.addEventListener('change', () => {
         renderAll();
         if (addDialog.open) renderAddPreview();
       });

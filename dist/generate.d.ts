@@ -6,6 +6,7 @@ export default generate;
  * @param {boolean} options.dark
  * @param {boolean} options.list
  * @param {boolean} options.meta
+ * @param {boolean} options.protectYellow
  * @param {string} options.format 'hex' | 'rgb' | 'hsl'
  *
  * @return {string|string[]|Object}
@@ -15,5 +16,6 @@ declare function generate(color: string, options?: {
     dark: boolean;
     list: boolean;
     meta: boolean;
+    protectYellow: boolean;
     format: string;
 }): string | string[] | Object;
