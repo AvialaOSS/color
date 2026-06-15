@@ -4,16 +4,26 @@ import { getColorString } from './utils.js';
 
 const LIGHT_TONE_ANCHORS = [98, 96, 92, 86, 76, 64, 52, 40, 28, 18];
 const DARK_TONE_ANCHORS = [14, 20, 28, 38, 50, 62, 74, 86, 93, 97];
-const LIGHT_YELLOW_TONE_ANCHORS = [99, 97, 94, 89, 80, 70, 60, 50, 40, 30];
-const DARK_YELLOW_TONE_ANCHORS = [18, 24, 32, 42, 54, 66, 77, 87, 94, 98];
+const LIGHT_PROTECTED_TONE_ANCHORS = [99, 97.5, 95, 91, 84, 76, 68, 58, 48, 36];
+const DARK_PROTECTED_TONE_ANCHORS = [18, 24, 32, 42, 54, 66, 77, 87, 94, 98];
 
 const LIGHT_COLOR_CHROMA_ANCHORS = [0.08, 0.14, 0.24, 0.36, 0.5, 0.74, 1, 0.92, 0.78, 0.6];
 const DARK_COLOR_CHROMA_ANCHORS = [1, 0.98, 0.94, 0.88, 0.8, 0.72, 0.62, 0.52, 0.42, 0.32];
-const LIGHT_YELLOW_CHROMA_ANCHORS = [0.12, 0.18, 0.3, 0.46, 0.62, 0.82, 1.02, 1, 0.92, 0.8];
-const DARK_YELLOW_CHROMA_ANCHORS = [1.02, 1, 0.98, 0.94, 0.9, 0.84, 0.76, 0.68, 0.58, 0.48];
+const LIGHT_PROTECTED_CHROMA_ANCHORS = [0.16, 0.24, 0.38, 0.54, 0.7, 0.88, 1.04, 1.02, 0.98, 0.9];
+const DARK_PROTECTED_CHROMA_ANCHORS = [1.05, 1.03, 1, 0.97, 0.94, 0.9, 0.84, 0.76, 0.68, 0.58];
 
-const YELLOW_PROTECTION_CENTER = 105;
-const YELLOW_PROTECTION_WIDTH = 32;
+const HUE_FAMILY_CONFIG = {
+  red: { center: 20, width: 40 },
+  orange: { center: 75, width: 42 },
+  yellow: { center: 112, width: 36 },
+  green: { center: 155, width: 36 },
+  cyan: { center: 195, width: 36 },
+  blue: { center: 258, width: 32 },
+  purple: { center: 305, width: 36 },
+  magenta: { center: 340, width: 38 },
+};
+
+const HUE_FAMILY_NAMES = Object.keys(HUE_FAMILY_CONFIG);
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -36,11 +46,31 @@ function mixAnchors(baseAnchors, targetAnchors, ratio) {
   if (ratio <= 0) {
     return baseAnchors;
   }
-  if (ratio >= 1) {
-    return targetAnchors;
-  }
 
   return baseAnchors.map((value, index) => mixValue(value, targetAnchors[index], ratio));
+}
+
+function normalizeHueFamilyInput(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    return value
+      .split(/[,\s]+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  if (value === true) {
+    return ['yellow'];
+  }
+  return [];
+}
+
+function normalizeProtectHueFamilies(value, legacyProtectYellow) {
+  const rawFamilies = normalizeHueFamilyInput(value);
+  const legacyFamilies = rawFamilies.length === 0 && legacyProtectYellow ? ['yellow'] : [];
+  const candidates = [...rawFamilies, ...legacyFamilies];
+  return [...new Set(candidates.map((item) => String(item).toLowerCase()).filter((item) => HUE_FAMILY_NAMES.includes(item)))];
 }
 
 function getPreferredDarkBaseIndex(steps) {
@@ -66,7 +96,8 @@ function normalizeOptions(options = {}) {
     curveGamma: clamp(Number(options.curveGamma) || 1, 0.1, 5),
     mixColor: typeof options.mixColor === 'string' ? options.mixColor : '',
     mixRatio: clamp(Number(options.mixRatio) || 0, 0, 1),
-    protectYellow: Boolean(options.protectYellow),
+    protectHueFamilies: normalizeProtectHueFamilies(options.protectHueFamilies, options.protectYellow),
+    protectHueStrength: clamp(Number(options.protectHueStrength) || 1, 0, 2),
   };
 }
 
@@ -103,38 +134,59 @@ function sampleAnchors(anchors, t) {
   return anchors[leftIndex] + (anchors[rightIndex] - anchors[leftIndex]) * mix;
 }
 
-function getYellowProtectionStrength(hue, enabled) {
-  if (!enabled) {
+function getHueFamilyStrength(hue, family) {
+  const familyConfig = HUE_FAMILY_CONFIG[family];
+  if (!familyConfig) {
     return 0;
   }
 
-  const distance = getHueDistance(hue, YELLOW_PROTECTION_CENTER);
-  if (distance >= YELLOW_PROTECTION_WIDTH) {
+  const distance = getHueDistance(hue, familyConfig.center);
+  if (distance >= familyConfig.width) {
     return 0;
   }
 
-  const normalized = 1 - distance / YELLOW_PROTECTION_WIDTH;
-  return normalized * normalized;
+  const normalized = 1 - distance / familyConfig.width;
+  return Math.pow(normalized, 0.7);
 }
 
-function getChromaAnchors(baseHct, isDark, protectYellow) {
+function getHueProtectionState(hue, families, strength) {
+  if (!families.length || strength <= 0) {
+    return {
+      strength: 0,
+      appliedFamilies: [],
+    };
+  }
+
+  const appliedFamilies = families.filter((family) => getHueFamilyStrength(hue, family) > 0);
+  const familyStrength = appliedFamilies.reduce(
+    (maxStrength, family) => Math.max(maxStrength, getHueFamilyStrength(hue, family)),
+    0
+  );
+
+  return {
+    strength: clamp(familyStrength * strength, 0, 1.75),
+    appliedFamilies,
+  };
+}
+
+function getChromaAnchors(isDark, protectionState) {
   const baseAnchors = isDark ? DARK_COLOR_CHROMA_ANCHORS : LIGHT_COLOR_CHROMA_ANCHORS;
-  const yellowAnchors = isDark ? DARK_YELLOW_CHROMA_ANCHORS : LIGHT_YELLOW_CHROMA_ANCHORS;
-  return mixAnchors(baseAnchors, yellowAnchors, getYellowProtectionStrength(baseHct.hue, protectYellow));
+  const protectedAnchors = isDark ? DARK_PROTECTED_CHROMA_ANCHORS : LIGHT_PROTECTED_CHROMA_ANCHORS;
+  return mixAnchors(baseAnchors, protectedAnchors, protectionState.strength);
 }
 
-function getToneAnchors(baseHct, isDark, protectYellow) {
+function getToneAnchors(isDark, protectionState) {
   const baseAnchors = isDark ? DARK_TONE_ANCHORS : LIGHT_TONE_ANCHORS;
-  const yellowAnchors = isDark ? DARK_YELLOW_TONE_ANCHORS : LIGHT_YELLOW_TONE_ANCHORS;
-  return mixAnchors(baseAnchors, yellowAnchors, getYellowProtectionStrength(baseHct.hue, protectYellow));
+  const protectedAnchors = isDark ? DARK_PROTECTED_TONE_ANCHORS : LIGHT_PROTECTED_TONE_ANCHORS;
+  return mixAnchors(baseAnchors, protectedAnchors, protectionState.strength);
 }
 
-function getStepDescriptor(baseHct, stepIndex, options) {
+function getStepDescriptor(baseHct, stepIndex, options, protectionState) {
   const progress = options.steps === 1 ? 0.5 : stepIndex / (options.steps - 1);
   const warped = warpProgress(progress, options.curveGamma);
-  const tone = sampleAnchors(getToneAnchors(baseHct, options.dark, options.protectYellow), warped);
+  const tone = sampleAnchors(getToneAnchors(options.dark, protectionState), warped);
 
-  const chromaRatio = sampleAnchors(getChromaAnchors(baseHct, options.dark, options.protectYellow), warped);
+  const chromaRatio = sampleAnchors(getChromaAnchors(options.dark, protectionState), warped);
   const chroma = clamp(baseHct.chroma * chromaRatio, 0, 140);
 
   return {
@@ -153,10 +205,10 @@ function buildPalette(originColor, options = {}) {
   const normalized = normalizeOptions(options);
   const seedColor = getSeedColor(originColor, normalized.mixColor, normalized.mixRatio);
   const baseHct = Hct.fromInt(argbFromHex(seedColor.hex().toLowerCase()));
-  const yellowProtectionStrength = getYellowProtectionStrength(baseHct.hue, normalized.protectYellow);
+  const protectionState = getHueProtectionState(baseHct.hue, normalized.protectHueFamilies, normalized.protectHueStrength);
 
   const descriptors = Array.from({ length: normalized.steps }, (_, stepIndex) => {
-    const descriptor = getStepDescriptor(baseHct, stepIndex, normalized);
+    const descriptor = getStepDescriptor(baseHct, stepIndex, normalized, protectionState);
     return {
       index: stepIndex + 1,
       ...descriptor,
@@ -192,9 +244,16 @@ function buildPalette(originColor, options = {}) {
       dark: normalized.dark,
       steps: normalized.steps,
       isNeutral: closest.isNeutral,
-      protectYellow: normalized.protectYellow,
-      yellowProtectionApplied: yellowProtectionStrength > 0,
-      yellowProtectionStrength: round(yellowProtectionStrength),
+      protectHueFamilies: normalized.protectHueFamilies,
+      protectHueStrength: normalized.protectHueStrength,
+      hueProtectionApplied: protectionState.appliedFamilies.length > 0,
+      hueProtectionStrength: round(protectionState.strength),
+      hueProtectionFamiliesApplied: protectionState.appliedFamilies,
+      protectYellow: normalized.protectHueFamilies.includes('yellow'),
+      yellowProtectionApplied: protectionState.appliedFamilies.includes('yellow'),
+      yellowProtectionStrength: round(
+        protectionState.appliedFamilies.includes('yellow') ? protectionState.strength : 0
+      ),
     },
   };
 }

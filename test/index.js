@@ -148,25 +148,46 @@ it('palette.generate dark meta uplifts baseIndex toward brighter theme steps', (
   expect(result.base.baseColor).toBe(result.colors[result.base.baseIndex - 1]);
 });
 
-it('palette.generate protectYellow keeps non-yellow hues unchanged', () => {
+it('palette.generate protectHueFamilies keeps non-target hues unchanged', () => {
   const { generate } = lib.palette;
-  expect(normalizeHex(generate('#1677ff', { index: 6, protectYellow: true }))).toBe(
+  expect(normalizeHex(generate('#1677ff', { index: 6, protectHueFamilies: ['yellow', 'orange'] }))).toBe(
     normalizeHex(generate('#1677ff', { index: 6 }))
   );
-  expect(normalizeHex(generate('#f53f3f', { index: 6, dark: true, protectYellow: true }))).toBe(
+  expect(normalizeHex(generate('#f53f3f', { index: 6, dark: true, protectHueFamilies: ['yellow', 'orange'] }))).toBe(
     normalizeHex(generate('#f53f3f', { index: 6, dark: true }))
   );
 });
 
-it('palette.generate protectYellow brightens yellow steps without reducing chroma', () => {
+it('palette.generate protectHueFamilies and strength visibly affect warm yellow-orange hues', () => {
   const { generate } = lib.palette;
   const normal = generate('#ffb630', { list: true, steps: 12, meta: true });
-  const protectedPalette = generate('#ffb630', { list: true, steps: 12, meta: true, protectYellow: true });
+  const protectedPalette = generate('#ffb630', {
+    list: true,
+    steps: 12,
+    meta: true,
+    protectHueFamilies: ['yellow', 'orange'],
+    protectHueStrength: 1.4,
+  });
+  const strongerPalette = generate('#ffb630', {
+    list: true,
+    steps: 12,
+    meta: true,
+    protectHueFamilies: 'yellow orange',
+    protectHueStrength: 2,
+  });
 
-  expect(normal.base.yellowProtectionApplied).toBe(false);
-  expect(protectedPalette.base.yellowProtectionApplied).toBe(true);
+  expect(normal.base.hueProtectionApplied).toBe(false);
+  expect(protectedPalette.base.hueProtectionApplied).toBe(true);
+  expect(protectedPalette.base.hueProtectionFamiliesApplied.length).toBeGreaterThan(0);
   expect(protectedPalette.steps[5].tone).toBeGreaterThan(normal.steps[5].tone);
   expect(protectedPalette.steps[5].chroma).toBeGreaterThanOrEqual(normal.steps[5].chroma);
+  expect(strongerPalette.steps[5].tone).toBeGreaterThan(protectedPalette.steps[5].tone);
+});
+
+it('palette.generate keeps legacy protectYellow compatible', () => {
+  const { generate } = lib.palette;
+  const result = generate('#f6c445', { list: true, meta: true, protectYellow: true });
+  expect(result.base.protectYellow).toBe(true);
 });
 
 it('palette.generate format', () => {

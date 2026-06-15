@@ -58,11 +58,16 @@
             </div>
             <div class="range-wrap">
               <div class="range-label range-label-row">
-                <span>黄色保护</span>
+                <span>色相保护</span>
                 <label class="check">
-                  <input type="checkbox" id="yellowProtectToggle" />
+                  <input type="checkbox" id="hueProtectToggle" />
                   <span>启用</span>
                 </label>
+              </div>
+              <input class="input mono" id="hueProtectFamiliesInput" type="text" value="yellow, orange" placeholder="yellow, orange" />
+              <div class="range-row">
+                <input class="range" id="hueProtectStrengthRange" type="range" min="0" max="2" step="0.05" value="1" />
+                <div class="range-value mono" id="hueProtectStrengthValue">1.00</div>
               </div>
             </div>
           </div>
@@ -172,7 +177,10 @@
       const stepsValue = document.getElementById('stepsValue');
       const curveRange = document.getElementById('curveRange');
       const curveValue = document.getElementById('curveValue');
-      const yellowProtectToggle = document.getElementById('yellowProtectToggle');
+      const hueProtectToggle = document.getElementById('hueProtectToggle');
+      const hueProtectFamiliesInput = document.getElementById('hueProtectFamiliesInput');
+      const hueProtectStrengthRange = document.getElementById('hueProtectStrengthRange');
+      const hueProtectStrengthValue = document.getElementById('hueProtectStrengthValue');
       const modeLight = document.getElementById('modeLight');
       const modeDark = document.getElementById('modeDark');
       const paletteListEl = document.getElementById('paletteList');
@@ -244,8 +252,28 @@
         return Math.max(0.1, Math.min(5, Number(curveRange.value) || 1));
       }
 
-      function getProtectYellow() {
-        return yellowProtectToggle.checked;
+      function getHueProtectionOptions() {
+        if (!hueProtectToggle.checked) {
+          return {};
+        }
+
+        const protectHueFamilies = String(hueProtectFamiliesInput.value || '')
+          .split(/[,\s]+/)
+          .map((item) => item.trim().toLowerCase())
+          .filter(Boolean);
+        if (protectHueFamilies.length === 0) {
+          return {};
+        }
+
+        const protectHueStrength = Math.max(0, Math.min(2, Number(hueProtectStrengthRange.value) || 1));
+        return {
+          protectHueFamilies,
+          protectHueStrength,
+        };
+      }
+
+      function syncHueProtectUi() {
+        hueProtectStrengthValue.textContent = (Math.max(0, Math.min(2, Number(hueProtectStrengthRange.value) || 1))).toFixed(2);
       }
 
       function getMode() {
@@ -402,7 +430,7 @@
         const steps = getSteps();
         const format = getFormat();
         const curveGamma = getCurveGamma();
-        const protectYellow = getProtectYellow();
+        const hueProtection = getHueProtectionOptions();
         const payload = {};
 
         getItems().forEach((item) => {
@@ -414,10 +442,10 @@
             return;
           }
 
-          const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
-          const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
+          const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio, ...hueProtection });
+          const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio, ...hueProtection });
           if (!light || !dark) return;
-          payload[item.name] = { type: 'palette', seed: item.color, steps, format, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow, light, dark };
+          payload[item.name] = { type: 'palette', seed: item.color, steps, format, curveGamma, mixColor: item.mixColor, mixRatio: item.mixRatio, ...hueProtection, light, dark };
         });
 
         return payload;
@@ -493,7 +521,7 @@
         const steps = getSteps();
         const format = getFormat();
         const curveGamma = getCurveGamma();
-        const protectYellow = getProtectYellow();
+        const hueProtection = getHueProtectionOptions();
         const html = getItems()
           .map((item) => {
             if (item.type === 'neutral') {
@@ -503,8 +531,8 @@
               return neutralItemHtml(item, { light, dark });
             }
 
-            const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
-            const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio, protectYellow });
+            const light = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: false, mixColor: item.mixColor, mixRatio: item.mixRatio, ...hueProtection });
+            const dark = safeGenerate(item.color, { list: true, steps, format, curveGamma, dark: true, mixColor: item.mixColor, mixRatio: item.mixRatio, ...hueProtection });
             if (!light || !dark) return '';
             return paletteItemHtml(item, { light, dark });
           })
@@ -561,6 +589,7 @@
       function renderAll() {
         syncStepsUi();
         syncCurveUi();
+        syncHueProtectUi();
         renderList();
         const first = paletteListEl.querySelector('.palette-item');
         if (first) first.classList.add('is-active');
@@ -583,7 +612,7 @@
         const steps = getSteps();
         const format = getFormat();
         const curveGamma = getCurveGamma();
-        const protectYellow = getProtectYellow();
+        const hueProtection = getHueProtectionOptions();
         const mode = getAddMode();
         if (mode === 'neutral') {
           const mix = getAddMix();
@@ -602,8 +631,8 @@
 
         const mix = getAddMix();
         const color = normalizeColor(addColorText.value || addColorPicker.value);
-        const light = safeGenerate(color, { list: true, steps, format, curveGamma, dark: false, protectYellow, ...mix });
-        const dark = safeGenerate(color, { list: true, steps, format, curveGamma, dark: true, protectYellow, ...mix });
+        const light = safeGenerate(color, { list: true, steps, format, curveGamma, dark: false, ...hueProtection, ...mix });
+        const dark = safeGenerate(color, { list: true, steps, format, curveGamma, dark: true, ...hueProtection, ...mix });
         if (!light || !dark) {
           addPreview.innerHTML = '';
           return;
@@ -755,7 +784,15 @@
         renderAll();
         if (addDialog.open) renderAddPreview();
       });
-      yellowProtectToggle.addEventListener('change', () => {
+      hueProtectToggle.addEventListener('change', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+      hueProtectFamiliesInput.addEventListener('input', () => {
+        renderAll();
+        if (addDialog.open) renderAddPreview();
+      });
+      hueProtectStrengthRange.addEventListener('input', () => {
         renderAll();
         if (addDialog.open) renderAddPreview();
       });
